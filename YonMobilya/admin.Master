@@ -1,0 +1,359 @@
+﻿<%@ Master Language="C#" AutoEventWireup="true" CodeBehind="admin.master.cs" Inherits="YonMobilya.admin" %>
+
+
+<!DOCTYPE html>
+
+<html>
+<head runat="server">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <!-- Tell the browser to be responsive to screen width -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <!-- Favicon icon -->
+    <link rel="icon" type="image/png" sizes="16x16" href="assets/images/Yon%20Logo.png" />
+    <title>Yön Avm</title>
+    <!-- Custom CSS -->
+    <link href="assets/extra-libs/c3/c3.min.css" rel="stylesheet">
+<%--    <link href="assets/libs/chartist/dist/chartist.min.css" rel="stylesheet">--%>
+    <%--<link href="assets/extra-libs/jvector/jquery-jvectormap-2.0.2.css" rel="stylesheet" />--%>
+    <!-- Custom CSS -->
+    <link href="dist/css/style.min.css" rel="stylesheet">
+    <%--<link href="assets/libs/fullcalendar/css/fullcalendar.min.css" rel="stylesheet" />--%>
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+<![endif]-->
+    <script>
+        function loadNotifications(notifications) {
+            const container = document.getElementById('notification-container');
+            container.innerHTML = ''; // Clear previous notifications
+
+            notifications.forEach(notification => {
+                const notificationItem = document.createElement('a');
+                notificationItem.href = 'javascript:void(0)';
+                notificationItem.className = 'message-item d-flex align-items-center border-bottom px-3 py-2';
+
+                const iconDiv = document.createElement('div');
+                iconDiv.className = 'btn btn-danger rounded-circle btn-circle';
+                const icon = document.createElement('i');
+                icon.setAttribute('data-feather', notification.Icon);
+                icon.className = 'text-white';
+                iconDiv.appendChild(icon);
+
+                const textDiv = document.createElement('div');
+                textDiv.className = 'w-75 d-inline-block v-middle pl-2';
+                const title = document.createElement('h6');
+                title.className = 'message-title mb-0 mt-1';
+                title.textContent = notification.Title;
+                const message = document.createElement('span');
+                message.className = 'font-12 text-nowrap d-block text-muted';
+                message.textContent = notification.Message;
+                const time = document.createElement('span');
+                time.className = 'font-12 text-nowrap d-block text-muted';
+                time.textContent = notification.Time;
+
+                textDiv.appendChild(title);
+                textDiv.appendChild(message);
+                textDiv.appendChild(time);
+
+                notificationItem.appendChild(iconDiv);
+                notificationItem.appendChild(textDiv);
+
+                container.appendChild(notificationItem);
+            });
+
+            feather.replace(); // Replace feather icons
+        }
+    </script>
+    <asp:ContentPlaceHolder ID="head" runat="server">
+    </asp:ContentPlaceHolder>
+</head>
+<body>
+    <!-- ============================================================== -->
+    <!-- Preloader - style you can find in spinners.css -->
+    <!-- ============================================================== -->
+    <div class="preloader">
+        <div class="lds-ripple">
+            <div class="lds-pos"></div>
+            <div class="lds-pos"></div>
+        </div>
+    </div>
+    <!-- ============================================================== -->
+    <!-- Main wrapper - style you can find in pages.scss -->
+    <!-- ============================================================== -->
+    <div id="main-wrapper" data-theme="light" data-layout="vertical" data-navbarbg="skin6" data-sidebartype="full"
+        data-sidebar-position="fixed" data-header-position="fixed" data-boxed-layout="full">
+        <!-- Topbar header - style you can find in pages.scss -->
+        <!-- ============================================================== -->
+        <header class="topbar" data-navbarbg="skin6">
+            <nav class="navbar top-navbar navbar-expand-md">
+                <div class="navbar-header" data-logobg="skin6">
+                    <!-- This is for the sidebar toggle which is visible on mobile only -->
+                    <a class="nav-toggler waves-effect waves-light d-block d-md-none" href="javascript:void(0)"><i
+                        class="ti-menu ti-close"></i></a>
+                    <!-- ============================================================== -->
+                    <!-- Logo -->
+                    <!-- ============================================================== -->
+                    <div class="navbar-brand">
+                        <!-- Logo icon -->
+                        <a href="frmAnaSayfa.aspx">
+                            <b class="logo-icon">
+                                <!-- Dark Logo icon -->
+                                <img src="assets/images/Yon%20Logo.png" alt="homepage" class="dark-logo" />
+                                <!-- Light Logo icon -->
+                                <img src="assets/images/Yon%20Logo.png" style="resize: initial" alt="homepage" class="light-logo" />
+                            </b>
+                            <!--End Logo icon -->
+                            <!-- Logo text -->
+                            <span class="logo-text">
+                                <!-- dark Logo text -->
+                                <img src="assets/images/Yon%20Text.png" alt="homepage" class="dark-logo" />
+                                <!-- Light Logo text -->
+                                <img src="assets/images/Yon%20Text.png" style="resize: initial" class="light-logo" alt="homepage" />
+                            </span>
+                        </a>
+                    </div>
+                    <!-- ============================================================== -->
+                    <!-- End Logo -->
+                    <!-- ============================================================== -->
+                    <!-- ============================================================== -->
+                    <!-- Toggle which is visible on mobile only -->
+                    <!-- ============================================================== -->
+                    <a class="topbartoggler d-block d-md-none waves-effect waves-light" href="javascript:void(0)"
+                        data-toggle="collapse" data-target="#navbarSupportedContent"
+                        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><i class="ti-more"></i></a>
+                </div>
+                <!-- ============================================================== -->
+                <!-- End Logo -->
+                <!-- ============================================================== -->
+                <div class="navbar-collapse collapse" id="navbarSupportedContent">
+                    <!-- ============================================================== -->
+                    <!-- toggle and nav items -->
+                    <!-- ============================================================== -->
+                    <ul class="navbar-nav float-left mr-auto ml-3 pl-1">
+                        <!-- Notification -->
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle pl-md-3 position-relative" href="javascript:void(0)"
+                                id="bell" role="button" data-toggle="dropdown" aria-haspopup="true"
+                                aria-expanded="false">
+                                <span><i data-feather="bell" class="svg-icon"></i></span>
+                                <span runat="server" id="uyariadet" class="badge badge-primary notify-no rounded-circle messenger"></span>
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-left mailbox animated bounceInDown">
+                                <ul class="list-style-none">
+                                    <li>
+                                        <div id="notification-container" class="message-center notifications position-relative">
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <a class="nav-link pt-3 text-center text-dark" href="javascript:void(0);">
+                                            <strong>Tüm bildirimleri gör</strong>
+                                            <i class="fa fa-angle-right"></i>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </li>
+                        <!-- End Notification -->
+                        <!-- ============================================================== -->
+                        <!-- create new -->
+                        <!-- ============================================================== -->
+                        <%--<li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <i data-feather="settings" class="svg-icon"></i>
+                            </a>
+                            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                <a class="dropdown-item" href="#">Action</a>
+                                <a class="dropdown-item" href="#">Another action</a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item" href="#">Something else here</a>
+                            </div>
+                        </li>--%>
+                    </ul>
+                    <!-- ============================================================== -->
+                    <!-- Right side toggle and nav items -->
+                    <!-- ============================================================== -->
+                    <ul class="navbar-nav float-right">
+                        <!-- ============================================================== -->
+                        <!-- Search -->
+                        <!-- ============================================================== -->
+                        <li class="nav-item d-none d-md-block">
+                            <a class="nav-link" href="javascript:void(0)">
+                                <%--                                <form>
+                                    <div class="customize-input">
+                                        <input class="form-control custom-shadow custom-radius border-0 bg-white"
+                                            type="search" placeholder="Search" aria-label="Search">
+                                        <i class="form-control-icon" data-feather="search"></i>
+                                    </div>
+                                </form>--%>
+                            </a>
+                        </li>
+                        <!-- ============================================================== -->
+                        <!-- User profile and search -->
+                        <!-- ============================================================== -->
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="javascript:void(0)" data-toggle="dropdown"
+                                aria-haspopup="true" aria-expanded="false">
+                                <img src="assets/images/users/profile-pic.jpg" alt="user" class="rounded-circle"
+                                    width="40">
+                                <span class="ml-2 d-none d-lg-inline-block"><span>Merhaba,</span>
+                                    <span runat="server" id="Username" class="text-dark"></span><i data-feather="chevron-down" class="svg-icon"></i></span>
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-right user-dd animated flipInY">
+                                <a class="dropdown-item" href="KullaniciProfili.aspx"><i data-feather="user"
+                                    class="svg-icon mr-2 ml-1"></i>Bilgilerim</a>
+                                <a class="dropdown-item" href="javascript:void(0)"><i data-feather="credit-card"
+                                    class="svg-icon mr-2 ml-1"></i>Işlemlerim</a>
+                                <a class="dropdown-item" href="javascript:void(0)"><i data-feather="mail"
+                                    class="svg-icon mr-2 ml-1"></i>Bildimler</a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item" href="javascript:void(0)"><i data-feather="settings"
+                                    class="svg-icon mr-2 ml-1"></i>Hesap Ayarı</a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item" href="Cikis.aspx"><i data-feather="power"
+                                    class="svg-icon mr-2 ml-1"></i>Çıkış</a>
+                                <div class="dropdown-divider"></div>
+                                <div class="pl-4 p-3"><a href="javascript:void(0)" class="btn btn-sm btn-info">Profil Görünüm</a></div>
+                            </div>
+                        </li>
+                        <!-- ============================================================== -->
+                        <!-- User profile and search -->
+                        <!-- ============================================================== -->
+                    </ul>
+                </div>
+            </nav>
+        </header>
+        <!-- ============================================================== -->
+        <!-- End Topbar header -->
+
+        <!-- ============================================================== -->
+        <!-- Left Sidebar - style you can find in sidebar.scss  -->
+        <!-- ============================================================== -->
+        <aside class="left-sidebar" data-sidebarbg="skin6">
+            <!-- Sidebar scroll-->
+            <div class="scroll-sidebar" data-sidebarbg="skin6">
+                <!-- Sidebar navigation-->
+                <nav class="sidebar-nav">
+                    <ul id="sidebarnav">
+                        <li class="sidebar-item"><a class="sidebar-link sidebar-link" href="frmAnaSayfa.aspx"
+                            aria-expanded="false"><i data-feather="home" class="feather-icon"></i><span
+                                class="hide-menu">Ana Panel</span></a></li>
+                        <li class="list-divider"></li>
+                        <%-- Mağaza Giriş Ekranı --%>
+                        <li class="nav-small-cap"><span class="hide-menu" style="font-size: large">Kurulum Bildirimi</span></li>
+                        <li runat="server" id="yon" class="sidebar-item"><a class="sidebar-link has-arrow" href="javascript:void(0)"
+                            aria-expanded="false"><i data-feather="file-text" class="feather-icon"></i><span
+                                class="hide-menu">Talep Girişi </span></a>
+                            <ul aria-expanded="false" class="collapse  first-level base-level-line">
+                                <li class="sidebar-item">
+                                    <a href="Kurulum.aspx" class="sidebar-link">
+                                        <i data-feather="refresh-cw" class="feather-icon"></i>
+                                        <span class="hide-menu">Mağaza Kurulumu</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                        <%-- Kurulmucu Atanmış Liste Ekranı --%>
+                        <li class="list-divider"></li>
+                        <li class="nav-small-cap">
+                            <span class="hide-menu" style="font-size: large">Mağaza Taleb Listesi</span>
+                        </li>
+                        <li runat="server" id="firma" class="sidebar-item">
+                            <a class="sidebar-link has-arrow" href="javascript:void(0)" aria-expanded="false">
+                                <i data-feather="file-text" class="feather-icon"></i>
+                                <span class="hide-menu">İşlem Listesi</span>
+                            </a>
+                            <ul aria-expanded="false" class="collapse  first-level base-level-line">
+                                <li class="nav-small-cap"><span class="hide-menu" style="font-size: 14px">Mağaza Taleb Listesi</span></li>
+                                <li class="sidebar-item"><a class="sidebar-link sidebar" href="Satis.aspx"
+                                    aria-expanded="false"><i class="fa fa-shopping-cart" aria-hidden="true"></i><span class="hide-menu">Müşteri <br />Randevu Atama</span></a>
+                                </li>
+                                <li class="sidebar-item"><a class="sidebar-link sidebar-link" href="MagazaKurulum.aspx"
+                                    aria-expanded="false"><i data-feather="refresh-cw" class="feather-icon"></i><span class="hide-menu">Mağaza Kurulumu <br />Randevu Atama</span></a></li>
+                                <li class="nav-small-cap"><span class="hide-menu" style="font-size: 14px">Onaylı İş Planı</span></li>
+                                <li class="sidebar-item"><a class="sidebar-link sidebar-link" href="Takvim.aspx"
+                                    aria-expanded="false"><i data-feather="calendar" class="feather-icon"></i><span class="hide-menu">Bekleyen <br />Kurulum Takvimi</span></a></li>
+                                <li class="sidebar-item"><a class="sidebar-link sidebar-link" href="Onayli.aspx"
+                                    aria-expanded="false"><i data-feather="list" class="feather-icon"></i><span class="hide-menu">İşlem Listesi</span></a></li>
+                                <li class="sidebar-item"><a class="sidebar-link sidebar-link" href="javascript:void(0)"
+                                    aria-expanded="false"><i data-feather="check-circle" class="feather-icon"></i><span class="hide-menu">Tamamlanan İşler</span> </a></li>
+                                <li class="sidebar-item"><a class="sidebar-link sidebar-link" href="javascript:void(0)"
+                                    aria-expanded="false"><i data-feather="flag" class="feather-icon"></i><span class="hide-menu">Hakediş Raporları</span> </a></li>
+                            </ul>
+                        </li>
+                        <%--<li class="sidebar-item">
+                            <a class="sidebar-link sidebar-link" href="authentication-login1.html" aria-expanded="false">
+                            <i data-feather="lock" class="feather-icon"></i>
+                            <span class="hide-menu">Login </span>
+                            </a>
+                        </li>--%>
+                        <li class="list-divider"></li>
+                        <li class="nav-small-cap"><span class="hide-menu" style="font-size: large">Sistem Ayarları</span></li>
+                        <li runat="server" id="ayarlar" class="sidebar-item"><a class="sidebar-link sidebar-link"
+                            href="Ayarlar.aspx" aria-expanded="false"><i data-feather="settings" class="feather-icon"></i><span class="hide-menu">Ayarlar </span></a>
+                        </li>
+                        <li class="list-divider"></li>
+                        <li class="nav-small-cap"><span class="hide-menu">Çıkış</span></li>
+                        <%--<li class="sidebar-item">
+                            <a class="sidebar-link sidebar-link" href="docs/docs.html" aria-expanded="false">
+                                <i data-feather="edit-3" class="feather-icon"></i>
+                            <span class="hide-menu">Documentation</span>
+                            </a>
+                        </li>--%>
+                        <li class="sidebar-item">
+                            <a class="sidebar-link sidebar-link" href="Cikis.aspx" aria-expanded="false">
+                                <i data-feather="log-out" class="feather-icon"></i>
+                                <span class="hide-menu">Logout</span></a></li>
+                    </ul>
+                </nav>
+                <!-- End Sidebar navigation -->
+            </div>
+            <!-- End Sidebar scroll-->
+        </aside>
+        <!-- ============================================================== -->
+        <!-- End Left Sidebar - style you can find in sidebar.scss  -->
+        <form id="form1" runat="server">
+            <div>
+                <asp:ContentPlaceHolder ID="ContentPlaceHolder1" runat="server">
+                </asp:ContentPlaceHolder>
+            </div>
+        </form>
+    </div>
+    <footer class="footer text-center text-muted">
+            <div class="copyright">
+                    &copy; Copyright <strong><span style="color:red" >Yön AVM</span></strong>. Tüm Hakları Saklıdır.
+                </div>
+                <div class="credits">
+                    <!-- All the links in the footer should remain intact. -->
+                    <!-- You can delete the links only if you purchased the pro version. -->
+                    <!-- Licensing information: https://bootstrapmade.com/license/ -->
+                    <!-- Purchase the pro version with working PHP/AJAX contact form: https://bootstrapmade.com/nice-admin-bootstrap-admin-html-template/ -->
+                    Tasarım <a href="#">EntegreF</a>
+                </div>
+    </footer>
+</body>
+    <script src="assets/libs/popper.js/dist/umd/popper.min.js"></script>
+    <script src="assets/libs/bootstrap/dist/js/bootstrap.min.js"></script>
+    <!-- apps -->
+    <!-- apps -->
+    <script src="dist/js/app-style-switcher.js"></script>
+    <script src="dist/js/feather.min.js"></script>
+    <script src="assets/libs/perfect-scrollbar/dist/perfect-scrollbar.jquery.min.js"></script>
+    <script src="dist/js/sidebarmenu.js"></script>
+    <!--Custom JavaScript -->
+    <script src="dist/js/custom.min.js"></script>
+    <!--This page JavaScript -->
+<%--    <script src="assets/extra-libs/c3/d3.min.js"></script>
+    <script src="assets/extra-libs/c3/c3.min.js"></script>
+    <script src="assets/libs/chartist/dist/chartist.min.js"></script>
+    <script src="assets/libs/chartist-plugin-tooltips/dist/chartist-plugin-tooltip.min.js"></script>
+    <script src="assets/extra-libs/jvector/jquery-jvectormap-2.0.2.min.js"></script>
+    <script src="assets/extra-libs/jvector/jquery-jvectormap-world-mill-en.js"></script>--%>
+<%--    <script src="dist/js/pages/dashboards/dashboard1.min.js"></script>
+    <script src="assets/extra-libs/sparkline/sparkline.js"></script>--%>
+</html>
