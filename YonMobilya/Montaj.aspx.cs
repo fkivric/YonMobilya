@@ -35,8 +35,8 @@ namespace YonMobilya
                 {
                     string script = "$(document).ready(function () { $('[id*=btnSubmit]').click(); });";
                     ClientScript.RegisterStartupScript(this.GetType(), "load", script, true);
-                    SALID = Request.QueryString["id"];
-                    CURID = DbQuery.GetValue($"select SALCURID from SALES where SALID = {SALID}");
+                    SALID = Request.QueryString["salid"];
+                    CURID = Request.QueryString["curid"]; //DbQuery.GetValue($"select SALCURID from SALES where SALID = {SALID}");
                     var ftp = (List<Ftp>)Session["FTP"];
                     if (ftp != null)
                     {
@@ -63,20 +63,36 @@ namespace YonMobilya
         }
         private void BindGridView()
         {
-            string query = String.Format(@"select distinct CDRSALID,ORDCHID,PROID, PROVAL,PRONAME,Convert(int,ORDCHBALANCEQUAN) as ORDCHBALANCEQUAN,Convert(numeric(18,2),ORDCHBALANCEQUAN*PRLPRICE) as PRLPRICE
+            string query = "";
+            if (CURID != "0")
+            {
+                query = String.Format(@"select distinct CDRSALID,ORDCHID,PROID, PROVAL,PRONAME,Convert(int,ORDCHBALANCEQUAN) as ORDCHBALANCEQUAN,Convert(numeric(18,2),ORDCHBALANCEQUAN*PRLPRICE) as PRLPRICE
 			     ,TESLIM.DIVNAME
-            from CUSDELIVER
-			inner join MDE_GENEL.dbo.MB_Islemler on MB_SALID = CDRSALID and CDRORDCHID = MB_ORDCHID
-            left outer join CURRENTS on CURID = CDRCURID
-            left outer join ORDERSCHILD on ORDCHID = CDRORDCHID
-            left outer join PRODUCTS on PROID = ORDCHPROID
-            left outer join WAVEPRODUCTS on WPROID = PROID and WPROUNIQ = 4 and WPROVAL in ('DD','EE','YY')
-            left outer join DEFSTORAGE WITH (NOLOCK) ON CDRSTORID = DSTORID
-            left outer join DIVISON TESLIM WITH (NOLOCK) ON TESLIM.DIVVAL = DSTORVAL AND ORDCHCOMPANY = TESLIM.DIVCOMPANY
-            outer apply (select PRLPRICE from PRICELIST prl where prl.PRLPROID = PROID and PRLDPRID = 740) as pesinfiyat
-            where CDRSALID =  '{0}' and ORDCHBALANCEQUAN >= ORDCHQUAN
-			and MB_Tamamlandi = 0        
-            order by 1 desc", SALID);
+                FROM MDE_GENEL.dbo.MB_Islemler 
+                left outer join CUSDELIVER on MB_SALID = CDRSALID and CDRORDCHID = MB_ORDCHID
+                left outer join CURRENTS on CURID = CDRCURID
+                left outer join ORDERSCHILD on ORDCHID = CDRORDCHID
+                left outer join PRODUCTS on PROID = ORDCHPROID
+                left outer join WAVEPRODUCTS on WPROID = PROID and WPROUNIQ = 4 and WPROVAL in ('DD','EE','YY')
+                left outer join DEFSTORAGE WITH (NOLOCK) ON CDRSTORID = DSTORID
+                left outer join DIVISON TESLIM WITH (NOLOCK) ON TESLIM.DIVVAL = DSTORVAL AND ORDCHCOMPANY = TESLIM.DIVCOMPANY
+                outer apply (select PRLPRICE from PRICELIST prl where prl.PRLPROID = PROID and PRLDPRID = 740) as pesinfiyat
+                where CDRSALID =  '{0}' and ORDCHBALANCEQUAN >= ORDCHQUAN
+			    and MB_Tamamlandi = 0        
+                order by 1 desc", SALID);
+            }
+            else
+            {
+                query = String.Format(@"select 0 as CDRSALID,PRDEID as ORDCHID,PRDEPROID,PROVAL,PRONAME,Convert(int,PRDEQUAN) as ORDCHBALANCEQUAN,Convert(numeric(18,2),PRDEQUAN*PRLPRICE) as PRLPRICE
+				FROM MDE_GENEL.dbo.MB_Islemler
+				left outer join PRODEMAND on PRDEID = MB_ORDCHID
+				left outer join PRODUCTS on PROID = MB_PROID
+                outer apply (select PRLPRICE from PRICELIST prl where prl.PRLPROID = PRDEPROID and PRLDPRID = 740) as pesinfiyat
+				where MB_Tamamlandi = 0 and MB_SUPCURVAL = 'T003387' and PRDEKIND= 1 and PRDESTS = 0
+				and PRDEID = '{0}'
+			    and MB_Tamamlandi = 0        
+                order by 1 desc", SALID);
+            }
             var dt = DbQuery.Query(query, ConnectionString);
             if (dt != null)
             {

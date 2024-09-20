@@ -178,7 +178,7 @@
                         // CURNAME'i tıklanabilir yapıyoruz, tıklayınca ID'yi kurulum.aspx'e gönderiyoruz
                         $("#selected-event-details").append(
                             '<div class="event-count">' +
-                                '<a class="button btn btn-block btn-success" href="Montaj.aspx?id=' + encodeURIComponent(id) + '" class="cur-name-link">'
+                                '<a class="button btn btn-block btn-success" href="Montaj.aspx?curid=&salid=' + encodeURIComponent(id) + '" class="cur-name-link">'
                                      + curName + 
                                 '</a>' +
                             '</div>'

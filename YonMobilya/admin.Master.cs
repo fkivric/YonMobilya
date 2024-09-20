@@ -29,6 +29,7 @@ namespace YonMobilya
                     if (loginRes[0].CURVAL != "YON")
                     {
                         yon.Visible = false;
+                        yon1.Visible = false;
                     }
                     else
                     {

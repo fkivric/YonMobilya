@@ -205,20 +205,20 @@
                                     <span runat="server" id="Username" class="text-dark"></span><i data-feather="chevron-down" class="svg-icon"></i></span>
                             </a>
                             <div class="dropdown-menu dropdown-menu-right user-dd animated flipInY">
-                                <a class="dropdown-item" href="KullaniciProfili.aspx"><i data-feather="user"
+                                <a class="dropdown-item" href="javascript:void(0)"><i data-feather="user"
                                     class="svg-icon mr-2 ml-1"></i>Bilgilerim</a>
                                 <a class="dropdown-item" href="javascript:void(0)"><i data-feather="credit-card"
                                     class="svg-icon mr-2 ml-1"></i>Işlemlerim</a>
                                 <a class="dropdown-item" href="javascript:void(0)"><i data-feather="mail"
                                     class="svg-icon mr-2 ml-1"></i>Bildimler</a>
                                 <div class="dropdown-divider"></div>
-                                <a class="dropdown-item" href="javascript:void(0)"><i data-feather="settings"
+                                <a class="dropdown-item" href="Ayarlar.aspx"><i data-feather="settings"
                                     class="svg-icon mr-2 ml-1"></i>Hesap Ayarı</a>
                                 <div class="dropdown-divider"></div>
                                 <a class="dropdown-item" href="Cikis.aspx"><i data-feather="power"
                                     class="svg-icon mr-2 ml-1"></i>Çıkış</a>
                                 <div class="dropdown-divider"></div>
-                                <div class="pl-4 p-3"><a href="javascript:void(0)" class="btn btn-sm btn-info">Profil Görünüm</a></div>
+                                <div class="pl-4 p-3"><a href="KullaniciProfili.aspx" class="btn btn-sm btn-info">Profil Görünüm</a></div>
                             </div>
                         </li>
                         <!-- ============================================================== -->
@@ -240,13 +240,16 @@
                 <!-- Sidebar navigation-->
                 <nav class="sidebar-nav">
                     <ul id="sidebarnav">
-                        <li class="sidebar-item"><a class="sidebar-link sidebar-link" href="frmAnaSayfa.aspx"
-                            aria-expanded="false"><i data-feather="home" class="feather-icon"></i><span
-                                class="hide-menu">Ana Panel</span></a></li>
+                        <li class="sidebar-item">
+                            <a class="sidebar-link sidebar-link" href="frmAnaSayfa.aspx" aria-expanded="false">
+                                <i data-feather="home" class="feather-icon"></i>
+                                <span class="hide-menu" style="font-size: large">Ana Panel</span>
+                            </a>
+                        </li>
                         <li class="list-divider"></li>
                         <%-- Mağaza Giriş Ekranı --%>
-                        <li class="nav-small-cap"><span class="hide-menu" style="font-size: large">Kurulum Bildirimi</span></li>
-                        <li runat="server" id="yon" class="sidebar-item"><a class="sidebar-link has-arrow" href="javascript:void(0)"
+                        <li runat="server" id="yon"  class="nav-small-cap"><span class="hide-menu" style="font-size: large">Kurulum Bildirimi</span></li>
+                        <li runat="server" id="yon1" class="sidebar-item"><a class="sidebar-link has-arrow" href="javascript:void(0)"
                             aria-expanded="false"><i data-feather="file-text" class="feather-icon"></i><span
                                 class="hide-menu">Talep Girişi </span></a>
                             <ul aria-expanded="false" class="collapse  first-level base-level-line">
@@ -264,11 +267,11 @@
                             <span class="hide-menu" style="font-size: large">Mağaza Taleb Listesi</span>
                         </li>
                         <li runat="server" id="firma" class="sidebar-item">
-                            <a class="sidebar-link has-arrow" href="javascript:void(0)" aria-expanded="false">
+<%--                            <a class="sidebar-link has-arrow" href="javascript:void(0)" aria-expanded="false">
                                 <i data-feather="file-text" class="feather-icon"></i>
                                 <span class="hide-menu">İşlem Listesi</span>
                             </a>
-                            <ul aria-expanded="false" class="collapse  first-level base-level-line">
+                            <ul aria-expanded="false" class="collapse  first-level base-level-line">--%>
                                 <li class="nav-small-cap"><span class="hide-menu" style="font-size: 14px">Mağaza Taleb Listesi</span></li>
                                 <li class="sidebar-item"><a class="sidebar-link sidebar" href="Satis.aspx"
                                     aria-expanded="false"><i class="fa fa-shopping-cart" aria-hidden="true"></i><span class="hide-menu">Müşteri <br />Randevu Atama</span></a>
@@ -284,7 +287,7 @@
                                     aria-expanded="false"><i data-feather="check-circle" class="feather-icon"></i><span class="hide-menu">Tamamlanan İşler</span> </a></li>
                                 <li class="sidebar-item"><a class="sidebar-link sidebar-link" href="javascript:void(0)"
                                     aria-expanded="false"><i data-feather="flag" class="feather-icon"></i><span class="hide-menu">Hakediş Raporları</span> </a></li>
-                            </ul>
+                            <%--</ul>--%>
                         </li>
                         <%--<li class="sidebar-item">
                             <a class="sidebar-link sidebar-link" href="authentication-login1.html" aria-expanded="false">
@@ -292,23 +295,23 @@
                             <span class="hide-menu">Login </span>
                             </a>
                         </li>--%>
-                        <li class="list-divider"></li>
+<%--                        <li class="list-divider"></li>
                         <li class="nav-small-cap"><span class="hide-menu" style="font-size: large">Sistem Ayarları</span></li>
                         <li runat="server" id="ayarlar" class="sidebar-item"><a class="sidebar-link sidebar-link"
                             href="Ayarlar.aspx" aria-expanded="false"><i data-feather="settings" class="feather-icon"></i><span class="hide-menu">Ayarlar </span></a>
-                        </li>
-                        <li class="list-divider"></li>
+                        </li>--%>
+                        <%--<li class="list-divider"></li>
                         <li class="nav-small-cap"><span class="hide-menu">Çıkış</span></li>
-                        <%--<li class="sidebar-item">
+                        <li class="sidebar-item">
                             <a class="sidebar-link sidebar-link" href="docs/docs.html" aria-expanded="false">
                                 <i data-feather="edit-3" class="feather-icon"></i>
                             <span class="hide-menu">Documentation</span>
                             </a>
-                        </li>--%>
+                        </li>
                         <li class="sidebar-item">
                             <a class="sidebar-link sidebar-link" href="Cikis.aspx" aria-expanded="false">
                                 <i data-feather="log-out" class="feather-icon"></i>
-                                <span class="hide-menu">Logout</span></a></li>
+                                <span class="hide-menu">Çıkış</span></a></li>--%>
                     </ul>
                 </nav>
                 <!-- End Sidebar navigation -->

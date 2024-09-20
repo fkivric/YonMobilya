@@ -49,6 +49,15 @@ namespace YonMobilya {
         protected global::System.Web.UI.HtmlControls.HtmlGenericControl yon;
         
         /// <summary>
+        /// yon1 denetimi.
+        /// </summary>
+        /// <remarks>
+        /// Otomatik üretilmiş alan.
+        /// Değiştirmek için, alan bildirimini tasarımcı dosyasından arka plan kod dosyasına taşıyın.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl yon1;
+        
+        /// <summary>
         /// firma denetimi.
         /// </summary>
         /// <remarks>
@@ -56,15 +65,6 @@ namespace YonMobilya {
         /// Değiştirmek için, alan bildirimini tasarımcı dosyasından arka plan kod dosyasına taşıyın.
         /// </remarks>
         protected global::System.Web.UI.HtmlControls.HtmlGenericControl firma;
-        
-        /// <summary>
-        /// ayarlar denetimi.
-        /// </summary>
-        /// <remarks>
-        /// Otomatik üretilmiş alan.
-        /// Değiştirmek için, alan bildirimini tasarımcı dosyasından arka plan kod dosyasına taşıyın.
-        /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl ayarlar;
         
         /// <summary>
         /// form1 denetimi.

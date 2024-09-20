@@ -122,7 +122,7 @@
                     <div class="form-group" style="border:solid">
                         <h3 align="center">Lütfen ürünleri seçin</h3>
                         <label class="form-control" for="customerSALID" style="text-align:center;align-items:center">Ürünler</label>
-                        <asp:GridView runat="server" ID="Musteri" AutoGenerateColumns="false" CssClass="gridView" Width="100%" CellPadding="0" CellSpacing="0">
+                        <asp:GridView runat="server" ID="Musteri" AutoGenerateColumns="false" CssClass="gridView" Width="100%" CellPadding="0" CellSpacing="0" OnRowCreated="Musteri_RowCreated">
                             <HeaderStyle HorizontalAlign="Center" VerticalAlign="Middle" />
                             <Columns>
                             <asp:TemplateField ItemStyle-CssClass="align-items-lg-center">

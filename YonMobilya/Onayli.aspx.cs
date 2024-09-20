@@ -64,8 +64,8 @@ namespace YonMobilya
                     magaza = loginRes[0].DIVVAL.ToString();
                 }
                 string q = String.Format(@"select CDRSALID,CDRCURID,CURVAL,CURNAME,ORDDATE,sum(ORDCHBALANCEQUAN) as ORDCHBALANCEQUAN,Convert(numeric(18,2),sum(ORDCHBALANCEQUAN*PRLPRICE)) as PRLPRICE,CURCHCOUNTY
-                FROM  CUSDELIVER
-                inner join MDE_GENEL.dbo.MB_Islemler on MB_SALID = CDRSALID and CDRORDCHID = MB_ORDCHID
+                FROM MDE_GENEL.dbo.MB_Islemler 
+                inner join CUSDELIVER on MB_SALID = CDRSALID and CDRORDCHID = MB_ORDCHID
                 left outer join CURRENTS on CURID = CDRCURID
                 left outer join CURRENTSCHILD on CURCHID = CURID
                 left outer join ORDERS on ORDSALID = CDRSALID
@@ -73,8 +73,16 @@ namespace YonMobilya
                 left outer join DEFSTORAGE WITH (NOLOCK) ON CDRSTORID = DSTORID
                 left outer join DIVISON TESLIM WITH (NOLOCK) ON TESLIM.DIVVAL = DSTORVAL AND ORDCHCOMPANY = TESLIM.DIVCOMPANY
                 outer apply (select PRLPRICE from PRICELIST prl where prl.PRLPROID = ORDCHPROID and PRLDPRID = 740) as pesinfiyat
-                where MB_Tamamlandi = 0 and MB_SUPCURVAL = '{0}'
+                where MB_Tamamlandi = 0 and MB_SUPCURVAL = '{0}' and ORDCHBALANCEQUAN >= ORDCHQUAN
                 group by CDRSALID,CDRCURID,CURVAL,CURNAME,ORDDATE,CURCHCOUNTY
+                union
+                select PRDEID as CDRSALID,'' as CDRCURID,DIVVAL as CURVAL,DIVNAME as CURNAME,PRDEDATE as ORDDATE,sum(PRDEQUAN) as ORDCHBALANCEQUAN,sum(PRLPRICE) as PRLPRICE,DIVADR2 as CURCHCOUNTY
+				FROM MDE_GENEL.dbo.MB_Islemler
+				left outer join PRODEMAND on PRDEID = MB_ORDCHID
+				left outer join DIVISON on DIVVAL = PRDEDIVISON
+                outer apply (select PRLPRICE from PRICELIST prl where prl.PRLPROID = PRDEPROID and PRLDPRID = 740) as pesinfiyat
+				where MB_Tamamlandi = 0 and MB_SUPCURVAL = 'T003387' and PRDEKIND= 1 and PRDESTS = 0
+				group by PRDEID,DIVVAL,DIVNAME,PRDEDATE,DIVADR2
                 order by ORDDATE,CURCHCOUNTY,CURNAME", loginRes[0].CURVAL);
                 var dt = DbQuery.Query(q, ConnectionString);
                 GridView1.DataSource = dt;
@@ -111,16 +119,18 @@ namespace YonMobilya
             {
                 e.Row.Cells[1].Visible = false;
                 e.Row.Cells[2].Visible = false;
+                e.Row.Cells[3].Visible = false;
             }
         }
 
         protected void GridView1_SelectedIndexChanged(object sender, EventArgs e)
          {
-            var Sid = GridView1.SelectedRow.Cells[1].Text;
+            var curid = GridView1.SelectedRow.Cells[2].Text;
+            var salid = GridView1.SelectedRow.Cells[1].Text;
             //String URL = string.Format("SatisDetay.aspx?id=" + Oid);
             //OpenNewWindow(this, URL, "1");
             //WebMsgBox.Show("Döküm İşlemlerini Tamamlayınız.....!");
-            Response.Redirect("Montaj.aspx?id=" + Sid);
+            Response.Redirect("Montaj.aspx?curid=" + curid + "&salid=" + salid);
         }
     }
 }

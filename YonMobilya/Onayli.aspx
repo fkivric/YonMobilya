@@ -66,7 +66,7 @@
                             </div>
                             <div class="table-responsive">
                                 <asp:GridView ID="GridView1" runat="server" AutoGenerateColumns="False" CssClass="table table-striped table-bordered no-wrap"
-                                    AllowPaging="True" PageSize="5" OnPageIndexChanging="GridView1_PageIndexChanging" OnRowCreated="GridView1_RowCreated" OnSelectedIndexChanged="GridView1_SelectedIndexChanged">
+                                    AllowPaging="True" PageSize="20" OnPageIndexChanging="GridView1_PageIndexChanging" OnRowCreated="GridView1_RowCreated" OnSelectedIndexChanged="GridView1_SelectedIndexChanged">
                                     <Columns>
                                         <asp:CommandField ShowSelectButton="True" SelectText="Kurulumu Başlat" HeaderText="Sipariş Bilgisi" ItemStyle-HorizontalAlign="Center" ButtonType="Button" ItemStyle-CssClass="f-icon" />
                                         <asp:BoundField DataField="CDRSALID" HeaderText="CDRSALID" />

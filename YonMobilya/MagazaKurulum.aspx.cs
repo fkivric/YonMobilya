@@ -114,14 +114,16 @@ namespace YonMobilya
                 int index = Convert.ToInt32(e.CommandArgument);
                 GridViewRow row = GridView1.Rows[index];
 
-                var CURID = GridView1.Rows[index].Cells[2].Text;
+                CURVAL = GridView1.Rows[index].Cells[2].Text;
                 var PRDEDATE = Convert.ToDateTime(GridView1.Rows[index].Cells[1].Text).ToString("yyyy-MM-dd");
-                CURVAL = GridView1.Rows[index].Cells[3].Text;
-                var CURNAME = System.Web.HttpUtility.HtmlDecode(GridView1.Rows[index].Cells[5].Text);
+                var CURNAME = GridView1.Rows[index].Cells[3].Text;
+                //var CURNAME = System.Web.HttpUtility.HtmlDecode(GridView1.Rows[index].Cells[5].Text);
                 // SQL Sorgusu ile veriyi al
                 var SALID = GridView1.Rows[index].Cells[1].Text;
 
-                string w = String.Format(@"select CURCHCITY,CURCHCOUNTY,CURCHADR1 + ' ' + CURCHADR2 as CURCHADR from CURRENTSCHILD where CURCHID = {0}", CURID);
+                string w = String.Format(@"select DCITYNAME as CURCHCITY,DIVADR2 as CURCHCOUNTY,upper(replace(replace(DIVADR1,DIVNAME,''),'()','')) as CURCHADR from DIVISON 
+                left outer join DEFCITY on DCITYVAL = DIVCITY
+                where DIVVAL = '{0}'", CURVAL);
                 var adr = DbQuery.Query(w, ConnectionString);
                 string City = "";
                 string County = "";
@@ -136,8 +138,8 @@ namespace YonMobilya
                 string script = $@"
             <script type='text/javascript'>
                 $(document).ready(function () {{
-                    $('#customerCURNAME').val('{CURVAL}');
-                    $('#customerCURVAL').val('{CURNAME}');
+                    $('#customerCURNAME').val('{CURNAME}');
+                    $('#customerCURVAL').val('{CURVAL}');
                     $('#customerCity').val('{City}');
                     $('#customerCounty').val('{County}');
                     $('#customerAdres').val('{Adrs}');
@@ -153,32 +155,102 @@ namespace YonMobilya
                     false
                 );
                 customerDATE.Value = DateTime.Now.ToString("yyyy-MM-dd");
-                string query = String.Format(@"select * from PRODEMAND 
+                string query = String.Format(@"select PRDEID,PROID,PROVAL,PRONAME,PRDEQUAN,PRLPRICE from PRODEMAND 
                 left outer join PRODUCTS on PROID = PRDEPROID
                 left outer join DIVISON on PRDEDIVISON = DIVVAL
                 outer apply (select PRLPRICE from PRICELIST prl where prl.PRLPROID = PROID and PRLDPRID = 740) as pesinfiyat
                 where  PRDESTS = 0 and PRDEKIND= 1 
                 AND not exists (select * from MDE_GENEL.dbo.MB_Islemler where MB_SALID = 0 AND MB_ORDCHID = PRDEID)
                 and DIVVAL = '{0}' and PRDEDATE = '{1}'
-                order by 1 desc", CURID, PRDEDATE);
+                order by 1 desc", CURVAL, PRDEDATE);
                 SqlDataAdapter da = new SqlDataAdapter(query, sql);
                 DataTable dt = new DataTable();
                 da.Fill(dt);
                 musterirow = dt.Rows.Count;
                 Musteri.DataSource = dt;
                 Musteri.DataBind();
-                ScriptManager.RegisterStartupScript(this, GetType(), "hideLoading", "hideLoading();", true);
             }
         }
 
         protected void Kapat_Click(object sender, EventArgs e)
         {
-
+            ClientScript.RegisterStartupScript(
+                this.GetType(),
+                "HideModal",
+                "HideModal();",
+                false
+            );
         }
 
         protected void Onayla_Click(object sender, EventArgs e)
         {
 
+            var loginRes = (List<LoginObj>)Session["Login"];
+            if (loginRes != null)
+            {
+                foreach (GridViewRow row in Musteri.Rows)
+                {
+                    CheckBox chkSelect = (CheckBox)row.FindControl("chkSelect");
+                    if (chkSelect != null && chkSelect.Checked)
+                    {
+                        // Seçili olan satırı işleme kodu buraya yazılır.
+                        string ORDCHID = Musteri.Rows[row.RowIndex].Cells[2].Text.ToString();
+                        var CURVAL = DbQuery.GetValue($"select CURVAL from PRODEMAND left outer join MDE_GENEL.dbo.MB_Teslimatci on MB_DIVVAL = PRDEDIVISON left outer join CURRENTS on CURID = MB_CURID where PRDEID = {ORDCHID}");
+                        if (CURVAL != "SIFIR")
+                        {
+                            var SALID = "0";
+                            var PROID = Musteri.Rows[row.RowIndex].Cells[3].Text;
+                            string cellValue = Musteri.Rows[row.RowIndex].Cells[7].Text;
+
+                            // 'TL' para birimi işaretini çıkar
+                            string cleanedValue = cellValue.Replace(" TL", "").Replace(",", "");
+
+                            // Yerel ayar kullanarak string'i double'a dönüştür
+                            double sellAmount;
+                            bool isParsed = double.TryParse(cleanedValue, NumberStyles.Any, CultureInfo.InvariantCulture, out sellAmount);
+                            if (double.TryParse(cleanedValue, NumberStyles.Any, CultureInfo.InvariantCulture, out sellAmount))
+                            {
+                                var SellAmount = sellAmount;
+                            }
+                            else
+                            {
+                                // Dönüştürme başarısız
+                                Console.WriteLine("Değeri double'a dönüştürme başarısız.");
+                            }
+                            var PlanTarih = customerDATE.Value.ToString();
+                            Dictionary<string, string> val = new Dictionary<string, string>();
+                            val.Add("@MB_CURVAL", CURVAL);
+                            val.Add("@MB_SALID", SALID);
+                            val.Add("@MB_ORDCHID", ORDCHID);
+                            val.Add("@MB_PROID", PROID);
+                            val.Add("@MB_SellAmount", sellAmount.ToString());
+                            val.Add("@MB_PlanTarih", PlanTarih);
+                            val.Add("@MB_Ekleyen", loginRes[0].SOCODE);
+                            val.Add("@ReturnDesc", "");
+                            var sonuc = DbQuery.Insert2("MB_Islemler_New", val);
+                        }
+                    }
+                    else
+                    {
+                        WebMsgBox.Show(row.RowIndex.ToString() + " Seçilmediğinden eklenmedi");
+                    }
+                }
+            }
+            else
+            {
+                Response.Redirect("NewLogin.aspx");
+            }
+            TeslimatListesi();
+        }
+
+        protected void Musteri_RowCreated(object sender, GridViewRowEventArgs e)
+        {
+            if (e.Row.Cells.Count > 1)
+            {
+                e.Row.Cells[1].Visible = false;
+                e.Row.Cells[2].Visible = false;
+                e.Row.Cells[3].Visible = false;
+            }
         }
     }
 }

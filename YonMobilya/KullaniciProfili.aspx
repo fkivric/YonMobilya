@@ -1,6 +1,19 @@
 ﻿<%@ Page Title="" Language="C#" MasterPageFile="~/admin.Master" AutoEventWireup="true" CodeBehind="KullaniciProfili.aspx.cs" Inherits="YonMobilya.KullaniciProfili" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="server">
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.gstatic.com" rel="preconnect">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
+
+  <!-- Vendor CSS Files -->
+  <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+  <link href="assets/vendor/quill/quill.snow.css" rel="stylesheet">
+  <link href="assets/vendor/quill/quill.bubble.css" rel="stylesheet">
+  <link href="assets/vendor/remixicon/remixicon.css" rel="stylesheet">
+  <link href="assets/vendor/simple-datatables/style.css" rel="stylesheet">
 </asp:Content>
 <asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder1" runat="server">
     <div runat="server" class="page-wrapper">
@@ -9,14 +22,14 @@
                 <div class="col-xl-4">
                     <div class="card">
                         <div class="card-body profile-card pt-4 d-flex flex-column align-items-center">
-                            <img src="assets/images/users/profile-pic.jpg" alt="Profile" class="rounded-circle">
-                            <h2>Kevin Anderson</h2>
-                            <h3>Web Designer</h3>
+                            <img src="assets/images/users/profile-pic.jpg" alt="Profile" class="rounded-circle" width="290">
+                            <h2 runat="server" id="ProfildeAdi">Kevin Anderson</h2>
+                            <h3 runat="server" id="ProfildeGorevi">Web Designer</h3>
                             <div class="social-links mt-2">
-                                <%--                                <a href="#" class="twitter"><i class="bi bi-twitter"></i></a>
+                                <a href="#" class="twitter"><i class="bi bi-twitter"></i></a>
                                 <a href="#" class="facebook"><i class="bi bi-facebook"></i></a>
                                 <a href="#" class="instagram"><i class="bi bi-instagram"></i></a>
-                                <a href="#" class="linkedin"><i class="bi bi-linkedin"></i></a>--%>
+                                <a href="#" class="linkedin"><i class="bi bi-linkedin"></i></a>
                             </div>
                         </div>
                     </div>
@@ -61,44 +74,44 @@
                             <div class="tab-content">
 
                                 <div class="tab-pane fade show active profile-overview" id="profile-overview">
-                                    <h5 class="card-title">About</h5>
-                                    <p class="small fst-italic">Sunt est soluta temporibus accusantium neque nam maiores cumque temporibus. Tempora libero non est unde veniam est qui dolor. Ut sunt iure rerum quae quisquam autem eveniet perspiciatis odit. Fuga sequi sed ea saepe at unde.</p>
+                                    <h5 class="card-title">Hakkında</h5>
+                                    <p class="small fst-italic"></p>
 
                                     <h5 class="card-title">Profile Details</h5>
 
                                     <div class="row">
-                                        <div class="col-lg-3 col-md-4 label ">Full Name</div>
-                                        <div class="col-lg-9 col-md-8">Kevin Anderson</div>
+                                        <div class="col-lg-3 col-md-4 label ">Ad Soyad</div>
+                                        <div runat="server" id="PrfildeAdi2" class="col-lg-9 col-md-8">Kevin Anderson</div>
                                     </div>
 
                                     <div class="row">
-                                        <div class="col-lg-3 col-md-4 label">Company</div>
-                                        <div class="col-lg-9 col-md-8">Lueilwitz, Wisoky and Leuschke</div>
+                                        <div class="col-lg-3 col-md-4 label">Şirket</div>
+                                        <div runat="server" id="ProfildeSirket" class="col-lg-9 col-md-8">Lueilwitz, Wisoky and Leuschke</div>
                                     </div>
 
                                     <div class="row">
-                                        <div class="col-lg-3 col-md-4 label">Job</div>
-                                        <div class="col-lg-9 col-md-8">Web Designer</div>
+                                        <div class="col-lg-3 col-md-4 label">İş</div>
+                                        <div runat="server" id="ProfildeIs" class="col-lg-9 col-md-8">Web Designer</div>
                                     </div>
 
                                     <div class="row">
-                                        <div class="col-lg-3 col-md-4 label">Country</div>
-                                        <div class="col-lg-9 col-md-8">USA</div>
+                                        <div class="col-lg-3 col-md-4 label">Ülke</div>
+                                        <div  runat="server" id="ProfildeUlke" class="col-lg-9 col-md-8">USA</div>
                                     </div>
 
                                     <div class="row">
-                                        <div class="col-lg-3 col-md-4 label">Address</div>
-                                        <div class="col-lg-9 col-md-8">A108 Adam Street, New York, NY 535022</div>
+                                        <div class="col-lg-3 col-md-4 label">Adres</div>
+                                        <div runat="server" id="ProfildeAdres"  class="col-lg-9 col-md-8">A108 Adam Street, New York, NY 535022</div>
                                     </div>
 
                                     <div class="row">
-                                        <div class="col-lg-3 col-md-4 label">Phone</div>
-                                        <div class="col-lg-9 col-md-8">(436) 486-3538 x29071</div>
+                                        <div class="col-lg-3 col-md-4 label">Telefon</div>
+                                        <div  runat="server" id="ProfildeTelefon" class="col-lg-9 col-md-8">(436) 486-3538 x29071</div>
                                     </div>
 
                                     <div class="row">
-                                        <div class="col-lg-3 col-md-4 label">Email</div>
-                                        <div class="col-lg-9 col-md-8">k.anderson@example.com</div>
+                                        <div class="col-lg-3 col-md-4 label">E-mail</div>
+                                        <div runat="server" id="ProfildeMail" class="col-lg-9 col-md-8">k.anderson@example.com</div>
                                     </div>
 
                                 </div>
@@ -110,7 +123,8 @@
                                     <div class="row mb-3">
                                         <label for="profileImage" class="col-md-4 col-lg-3 col-form-label">Profile Image</label>
                                         <div class="col-md-8 col-lg-9">
-                                            <img src="assets/images/users/profile-pic.jpg" alt="Profile">
+                                            <img runat="server" id="EditResim" src="assets/images/users/profile-pic.jpg" alt="image" class="rounded-circle"
+                                            width="290">
                                             <div class="pt-2">
                                                 <a href="#" class="btn btn-primary btn-sm" title="Upload new profile image"><i class="bi bi-upload"></i></a>
                                                 <a href="#" class="btn btn-danger btn-sm" title="Remove my profile image"><i class="bi bi-trash"></i></a>
@@ -119,58 +133,58 @@
                                     </div>
 
                                     <div class="row mb-3">
-                                        <label for="fullName" class="col-md-4 col-lg-3 col-form-label">Full Name</label>
+                                        <label for="fullName" class="col-md-4 col-lg-3 col-form-label">Ad Soyad</label>
                                         <div class="col-md-8 col-lg-9">
-                                            <input name="fullName" type="text" class="form-control" id="fullName" value="Kevin Anderson">
+                                            <input runat="server" id="EditAdi" name="fullName" type="text" class="form-control" value="Kevin Anderson">
                                         </div>
                                     </div>
 
                                     <div class="row mb-3">
-                                        <label for="about" class="col-md-4 col-lg-3 col-form-label">About</label>
+                                        <label for="about" class="col-md-4 col-lg-3 col-form-label">Hakkında</label>
                                         <div class="col-md-8 col-lg-9">
-                                            <textarea name="about" class="form-control" id="about" style="height: 100px">Sunt est soluta temporibus accusantium neque nam maiores cumque temporibus. Tempora libero non est unde veniam est qui dolor. Ut sunt iure rerum quae quisquam autem eveniet perspiciatis odit. Fuga sequi sed ea saepe at unde.</textarea>
+                                            <textarea runat="server" id="EditHakkinda" name="about" class="form-control" style="height: 100px">Sunt est soluta temporibus accusantium neque nam maiores cumque temporibus. Tempora libero non est unde veniam est qui dolor. Ut sunt iure rerum quae quisquam autem eveniet perspiciatis odit. Fuga sequi sed ea saepe at unde.</textarea>
                                         </div>
                                     </div>
 
                                     <div class="row mb-3">
-                                        <label for="company" class="col-md-4 col-lg-3 col-form-label">Company</label>
+                                        <label for="company" class="col-md-4 col-lg-3 col-form-label">Şirket</label>
                                         <div class="col-md-8 col-lg-9">
-                                            <input name="company" type="text" class="form-control" id="company" value="Lueilwitz, Wisoky and Leuschke">
+                                            <input runat="server" id="EditSirket" name="company" type="text" class="form-control" value="Lueilwitz, Wisoky and Leuschke" />
                                         </div>
                                     </div>
 
                                     <div class="row mb-3">
-                                        <label for="Job" class="col-md-4 col-lg-3 col-form-label">Job</label>
+                                        <label for="Job" class="col-md-4 col-lg-3 col-form-label">İş</label>
                                         <div class="col-md-8 col-lg-9">
-                                            <input name="job" type="text" class="form-control" id="Job" value="Web Designer">
+                                            <input runat="server" id="EditIs" name="job" type="text" class="form-control" value="Web Designer">
                                         </div>
                                     </div>
 
                                     <div class="row mb-3">
-                                        <label for="Country" class="col-md-4 col-lg-3 col-form-label">Country</label>
+                                        <label for="Country" class="col-md-4 col-lg-3 col-form-label">Ülke</label>
                                         <div class="col-md-8 col-lg-9">
-                                            <input name="country" type="text" class="form-control" id="Country" value="USA">
+                                            <input runat="server" id="EditUlke" name="country" type="text" class="form-control" value="USA">
                                         </div>
                                     </div>
 
                                     <div class="row mb-3">
-                                        <label for="Address" class="col-md-4 col-lg-3 col-form-label">Address</label>
+                                        <label for="Address" class="col-md-4 col-lg-3 col-form-label">Adres</label>
                                         <div class="col-md-8 col-lg-9">
-                                            <input name="address" type="text" class="form-control" id="Address" value="A108 Adam Street, New York, NY 535022">
+                                            <input runat="server" id="EditAdres" name="address" type="text" class="form-control" value="A108 Adam Street, New York, NY 535022">
                                         </div>
                                     </div>
 
                                     <div class="row mb-3">
-                                        <label for="Phone" class="col-md-4 col-lg-3 col-form-label">Phone</label>
+                                        <label for="Phone" class="col-md-4 col-lg-3 col-form-label">Telefon</label>
                                         <div class="col-md-8 col-lg-9">
-                                            <input name="phone" type="text" class="form-control" id="Phone" value="(436) 486-3538 x29071">
+                                            <input runat="server" id="EditTelefon" name="phone" type="text" class="form-control" value="(436) 486-3538 x29071">
                                         </div>
                                     </div>
 
                                     <div class="row mb-3">
-                                        <label for="Email" class="col-md-4 col-lg-3 col-form-label">Email</label>
+                                        <label for="Email" class="col-md-4 col-lg-3 col-form-label">E-mail</label>
                                         <div class="col-md-8 col-lg-9">
-                                            <input name="email" type="email" class="form-control" id="Email" value="k.anderson@example.com">
+                                            <input runat="server" id="EditMail" name="email" type="email" class="form-control" value="k.anderson@example.com">
                                         </div>
                                     </div>
 
@@ -203,7 +217,7 @@
                                     </div>
 
                                     <div class="text-center">
-                                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                                        <button type="submit" class="btn btn-primary">Değişiklikleri Kaydet</button>
                                     </div>
                                     <!-- End Profile Edit Form -->
 
@@ -215,37 +229,37 @@
 
 
                                     <div class="row mb-3">
-                                        <label for="fullName" class="col-md-4 col-lg-3 col-form-label">Email Notifications</label>
+                                        <label for="fullName" class="col-md-4 col-lg-3 col-form-label">E-posta Bildirimleri</label>
                                         <div class="col-md-8 col-lg-9">
                                             <div class="form-check">
                                                 <input class="form-check-input" type="checkbox" id="changesMade" checked>
                                                 <label class="form-check-label" for="changesMade">
-                                                    Changes made to your account
+                                                    Hesabınızda yapılan değişiklikler
                                                 </label>
                                             </div>
                                             <div class="form-check">
                                                 <input class="form-check-input" type="checkbox" id="newProducts" checked>
                                                 <label class="form-check-label" for="newProducts">
-                                                    Information on new products and services
+                                                    Yeni ürün ve hizmetler hakkında bilgi
                                                 </label>
                                             </div>
                                             <div class="form-check">
                                                 <input class="form-check-input" type="checkbox" id="proOffers">
                                                 <label class="form-check-label" for="proOffers">
-                                                    Marketing and promo offers
+                                                    Pazarlama ve promosyon teklifleri
                                                 </label>
                                             </div>
                                             <div class="form-check">
                                                 <input class="form-check-input" type="checkbox" id="securityNotify" checked disabled>
                                                 <label class="form-check-label" for="securityNotify">
-                                                    Security alerts
+                                                    Güvenlik uyarıları
                                                 </label>
                                             </div>
                                         </div>
                                     </div>
 
                                     <div class="text-center">
-                                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                                        <button type="submit" class="btn btn-primary">Değişiklikleri Kaydet</button>
                                     </div>
                                     <!-- End settings Form -->
 
@@ -256,21 +270,21 @@
 
 
                                     <div class="row mb-3">
-                                        <label for="currentPassword" class="col-md-4 col-lg-3 col-form-label">Current Password</label>
+                                        <label for="currentPassword" class="col-md-4 col-lg-3 col-form-label">Geçerli Şifre</label>
                                         <div class="col-md-8 col-lg-9">
                                             <input name="password" type="password" class="form-control" id="currentPassword">
                                         </div>
                                     </div>
 
                                     <div class="row mb-3">
-                                        <label for="newPassword" class="col-md-4 col-lg-3 col-form-label">New Password</label>
+                                        <label for="newPassword" class="col-md-4 col-lg-3 col-form-label">Yeni Şifre Girin</label>
                                         <div class="col-md-8 col-lg-9">
                                             <input name="newpassword" type="password" class="form-control" id="newPassword">
                                         </div>
                                     </div>
 
                                     <div class="row mb-3">
-                                        <label for="renewPassword" class="col-md-4 col-lg-3 col-form-label">Re-enter New Password</label>
+                                        <label for="renewPassword" class="col-md-4 col-lg-3 col-form-label">Yeni Şifreyi Yeniden Girin</label>
                                         <div class="col-md-8 col-lg-9">
                                             <input name="renewpassword" type="password" class="form-control" id="renewPassword">
                                         </div>

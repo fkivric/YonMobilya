@@ -104,9 +104,8 @@ namespace YonMobilya
              AND ORDERSCHILD.ORDCHBEYOND = 0
              AND PROUVAL = '111'
              AND SALDIVISON in ({0})
-             AND DSHIPSOCODE = '{1}'
              AND not exists (select * from MDE_GENEL.dbo.MB_Islemler where MB_SALID = SALID AND MB_ORDCHID = CDRORDCHID)
-			 group by SALID,SALCURID,CUSCUR.CURVAL,CUSCUR.CURNAME,SALDATE,TESLIM.DIVNAME,SATIS.DIVNAME,DSHIPNAME,CURCHCOUNTY", magaza, loginRes[0].SOCODE);
+			 group by SALID,SALCURID,CUSCUR.CURVAL,CUSCUR.CURNAME,SALDATE,TESLIM.DIVNAME,SATIS.DIVNAME,DSHIPNAME,CURCHCOUNTY", magaza);
             SqlDataAdapter da = new SqlDataAdapter(q, ConnectionString);
             DataTable dt = new DataTable();
             da.Fill(dt);
