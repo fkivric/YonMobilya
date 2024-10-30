@@ -48,6 +48,8 @@
     <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.13.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
+    <Reference Include="System.Net" />
+    <Reference Include="System.Net.Http" />
     <Reference Include="System.Web.DynamicData" />
     <Reference Include="System.Web.Entity" />
     <Reference Include="System.Web.ApplicationServices" />
@@ -640,6 +642,7 @@
     <Content Include="frmAnaSayfa.aspx" />
     <Content Include="img\islem_gerceklestiriliyor.gif" />
     <Content Include="img\yonavmlogo.png" />
+    <Content Include="KullaniciEkleme.aspx" />
     <Content Include="KullaniciProfili.aspx" />
     <Content Include="Kurulum.aspx" />
     <Content Include="MagazaKurulum.aspx" />
@@ -689,6 +692,13 @@
       <DependentUpon>frmAnaSayfa.aspx</DependentUpon>
     </Compile>
     <Compile Include="Helper.cs" />
+    <Compile Include="KullaniciEkleme.aspx.cs">
+      <DependentUpon>KullaniciEkleme.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="KullaniciEkleme.aspx.designer.cs">
+      <DependentUpon>KullaniciEkleme.aspx</DependentUpon>
+    </Compile>
     <Compile Include="KullaniciProfili.aspx.cs">
       <DependentUpon>KullaniciProfili.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>

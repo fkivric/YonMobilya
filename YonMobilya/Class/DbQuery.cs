@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
+using System.Net.Mail;
 using System.Web;
 
 namespace YonMobilya.Class
@@ -106,6 +107,7 @@ namespace YonMobilya.Class
                     if (query != null)
                         cmd.ExecuteNonQuery();
                 }
+                conn.Close();
             }
         }
         public static string GetValue(string query)
@@ -123,6 +125,37 @@ namespace YonMobilya.Class
                 {
                     return null;
                 }
+            }
+        }
+        public static bool SendEmail(string recipientEmail, string subject, string body)
+        {
+            try
+            {
+                // SMTP istemcisi oluştur
+                SmtpClient smtpClient = new SmtpClient("smtp.yandex.com", 587); // SMTP sunucusu ve portu
+
+                // Gönderici e-posta bilgileri
+                smtpClient.Credentials = new System.Net.NetworkCredential("merkezbilgilendirme@yonavm.com.tr", "Mb!654?123");
+                smtpClient.EnableSsl = true; // SSL kullanmak için
+
+                // E-posta mesajı oluştur
+                MailMessage mail = new MailMessage();
+                mail.From = new MailAddress("merkezbilgilendirme@yonavm.com.tr", "YönAVM®");
+                mail.To.Add(recipientEmail); // Alıcı e-posta adresi
+                mail.Subject = subject; // E-posta başlığı
+                mail.Body = body; // E-posta içeriği
+                mail.IsBodyHtml = true; // Eğer HTML formatında göndermek istiyorsanız bunu true yapın
+
+                // E-postayı gönder
+                smtpClient.Send(mail);
+
+                // Başarılı olduğunda bir mesaj gösterebilirsiniz
+                return true;
+            }
+            catch (Exception ex)
+            {
+                // Hata durumunda loglama veya hata mesajı gösterebilirsiniz
+                return false;
             }
         }
     }

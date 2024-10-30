@@ -72,6 +72,7 @@ namespace YonMobilya
             outer apply (select PRLPRICE from PRICELIST prl where prl.PRLPROID = PROID and PRLDPRID = 740) as pesinfiyat
             where PRDESTS = 0 and PRDEKIND= 1
             AND PRDEDIVISON in ({0})
+            AND not exists (select * from MDE_GENEL.dbo.MB_Islemler where MB_ORDCHID = PRDEID)
             group by outd.DIVVAL,outd.DIVNAME,PRDEDATE,ind.DIVNAME", magaza);
             SqlDataAdapter da = new SqlDataAdapter(q, ConnectionString);
             DataTable dt = new DataTable();

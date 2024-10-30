@@ -1,10 +1,15 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Globalization;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Text;
+using System.Threading.Tasks;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
@@ -19,7 +24,10 @@ namespace YonMobilya
         public static string ConnectionString2 = "Server=192.168.4.24;Database=MDE_GENEL;User Id=sa;Password=MagicUser2023!;";
         SqlConnection sql = new SqlConnection(ConnectionString);
         SqlConnection sql2 = new SqlConnection(ConnectionString);
+        HttpClient httpClient = new HttpClient();
 
+        public static string SmsUrl = "https://restapi.ttmesaj.com/";
+        public static string SmsToken = "";
         protected void Page_Load(object sender, EventArgs e)
         {
             if (!IsPostBack)
@@ -30,6 +38,21 @@ namespace YonMobilya
                     ScriptManager.RegisterStartupScript(this, GetType(), "showLoading", "showLoading();", true);
                     TeslimatListesi();
                     ScriptManager.RegisterStartupScript(this, GetType(), "hideLoading", "hideLoading();", true);
+                    string Token = Session["Smstoken"] as string;
+                    if (Token == "" || Token == null)
+                    {
+                        List<SmstokenObj> smstokenObjs = new List<SmstokenObj>();
+                        SMSToken();
+                        Session.Add("Smstoken", SmsToken);
+                        SmstokenObj obj = new SmstokenObj();
+                        obj.SmsUrl = SmsUrl;
+                        obj.SmsUser = "yon.kara";
+                        obj.SmsPassword = "N6K9L3A55";
+                        obj.TokenSMS = SmsToken;
+                        smstokenObjs.Add(obj);
+                        Session.Add("SMS", smstokenObjs);
+                        Session.Add("Smstoken", SmsToken);
+                    }
                 }
                 else
                 {
@@ -41,6 +64,34 @@ namespace YonMobilya
             else
             {
 
+            }
+        }
+
+        private void SMSToken()
+        {
+            var login = new Dictionary<string, string>
+               {
+                   {"grant_type", "password"},
+                   {"username", "ttapiuser1"},//TT Mesaj Tarfından Size Verilen Api Kullanıcı Adı
+                   {"password", "ttapiuser1123"},//TT Mesaj Tarfından Size Verilen Api Şifre
+               };
+
+
+            using (HttpClient httpClient = new HttpClient())
+            {
+
+                var response = httpClient.PostAsync(SmsUrl + "ttmesajToken", new FormUrlEncodedContent(login)).Result;
+
+                if (response.IsSuccessStatusCode)
+                {
+                    Dictionary<string, string> tokenDetails = JsonConvert.DeserializeObject<Dictionary<string, string>>(response.Content.ReadAsStringAsync().Result);
+
+                    SmsToken = tokenDetails.FirstOrDefault().Value;
+                }
+                else
+                {
+                    WebMsgBox.Show("Sms Token Bilgisi Okunamadı Çıkış Yapıp Tekrar Girin");
+                }
             }
         }
         void TeslimatListesi()
@@ -103,6 +154,7 @@ namespace YonMobilya
              AND ORDERSCHILD.ORDCHBALANCEQUAN > 0 
              AND ORDERSCHILD.ORDCHBEYOND = 0
              AND PROUVAL = '111'
+			 AND CDRSHIPVAL = 'ANTMOB'
              AND SALDIVISON in ({0})
              AND not exists (select * from MDE_GENEL.dbo.MB_Islemler where MB_SALID = SALID AND MB_ORDCHID = CDRORDCHID)
 			 group by SALID,SALCURID,CUSCUR.CURVAL,CUSCUR.CURNAME,SALDATE,TESLIM.DIVNAME,SATIS.DIVNAME,DSHIPNAME,CURCHCOUNTY", magaza);
@@ -203,6 +255,7 @@ namespace YonMobilya
         public static string CURVAL = "";
         protected void GridView1_RowCommand(object sender, GridViewCommandEventArgs e)
         {
+            var loginRes = (List<LoginObj>)Session["Login"];
             ScriptManager.RegisterStartupScript(this, GetType(), "showLoading", "showLoading();", true);
             if (e.CommandName != "Page")
             {
@@ -267,6 +320,31 @@ namespace YonMobilya
                 musterirow = dt.Rows.Count;
                 Musteri.DataSource = dt;
                 Musteri.DataBind();
+
+                Montajci.DataSource = null;
+                Montajci.Items.Clear(); // Eklenen bu satır, mevcut öğeleri temizler
+                string q = string.Format(@"select 0 as OFFCURID, 'Genel Kurulumcu...' as OFFCURNAME
+			    union
+                select OFFCURID,OFFCURNAME from OFFICALCUR
+                left outer join CURRENTS on OFFCURCURID = CURID
+			    left outer join SOCIAL on SOCURID = CURID  and 'TT-'+Cast(OFFCURID as varchar(20)) = SOCODE
+			    where CURVAL = '{0}' and CURSTS = 1 and OFFCURPOSITION = 'MONTAJCI'", loginRes[0].CURVAL);
+                var dt2 = DbQuery.Query(q, ConnectionString);
+                if (dt2 != null && dt.Rows.Count > 0) // Sorgudan dönen veri kontrolü
+                {
+                    Montajci.DataValueField = "OFFCURID";
+                    Montajci.DataTextField = "OFFCURNAME";
+                    Montajci.DataSource = dt2;
+                    Montajci.DataBind();
+                }
+                else
+                {
+                    Montajci.ClearSelection();
+                    Montajci.DataSource = null;
+                    Montajci.DataBind();
+                }
+
+
                 ScriptManager.RegisterStartupScript(this, GetType(), "hideLoading", "hideLoading();", true);
             }
         }
@@ -280,16 +358,18 @@ namespace YonMobilya
             var loginRes = (List<LoginObj>)Session["Login"];
             if (loginRes != null)
             {
-                foreach (GridViewRow row in Musteri.Rows)
+                try
                 {
-                    CheckBox chkSelect = (CheckBox)row.FindControl("chkSelect");
-                    if (chkSelect != null && chkSelect.Checked)
+                    foreach (GridViewRow row in Musteri.Rows)
                     {
-                        // Seçili olan satırı işleme kodu buraya yazılır.
-                        string SALID = Musteri.Rows[row.RowIndex].Cells[1].Text.ToString();
-                        var CURID = DbQuery.GetValue($"select CURVAL from SALES left outer join MDE_GENEL.dbo.MB_Teslimatci on MB_DIVVAL = SALDIVISON left outer join CURRENTS on CURID = MB_CURID where SALID = {SALID}");
-                        if (CURID != "SIFIR")
+                        CheckBox chkSelect = (CheckBox)row.FindControl("chkSelect");
+                        if (chkSelect != null && chkSelect.Checked)
                         {
+                            // Seçili olan satırı işleme kodu buraya yazılır.
+                            string SALID = Musteri.Rows[row.RowIndex].Cells[1].Text.ToString();
+                            var CURID = DbQuery.GetValue($"select CURVAL from SALES left outer join MDE_GENEL.dbo.MB_Teslimatci on MB_DIVVAL = SALDIVISON left outer join CURRENTS on CURID = MB_CURID where SALID = {SALID}");
+                            if (CURID != "SIFIR")
+                            {
                                 var ORDCHID = Musteri.Rows[row.RowIndex].Cells[2].Text;
                                 var PROID = Musteri.Rows[row.RowIndex].Cells[3].Text;
                                 string cellValue = Musteri.Rows[row.RowIndex].Cells[7].Text;
@@ -320,18 +400,41 @@ namespace YonMobilya
                                 val.Add("@MB_Ekleyen", loginRes[0].SOCODE);
                                 val.Add("@ReturnDesc", "");
                                 var sonuc = DbQuery.Insert2("MB_Islemler_New", val);
-                            
-                        }
-                        else
-                        {
-                            WebMsgBox.Show("Mağaza Teslimatcısı Tanımlanmamış");
+
+                                var PROVAL = Musteri.Rows[row.RowIndex].Cells[4].Text;
+                                var PRONAME = Musteri.Rows[row.RowIndex].Cells[5].Text;
+                                var CURGSM = DbQuery.GetValue($"select isnull(isnull(CURCHGSM1,CURCHGSM2),CURCHGSM3) from CURRENTSCHILD where CURCHID in (select SALCURID from SALES where SALID = {SALID})");
+                                var CURNAME = DbQuery.GetValue($"select CURNAME from CURRENTS where CURID  in (select SALCURID from SALES where SALID = {SALID})");
+                                string Musmetin = "Yön Avm® den almış oldugunuz " + Environment.NewLine + PRONAME + " Ürünüz " + PlanTarih + Environment.NewLine + "tarihinde Telimat için planlanmıştır.";
+                                var BGMUDURGSM = DbQuery.GetValue($"select substring(DIVPHN2,3,10) as DIVPHN2 from DIVISON where DIVVAL in (select SALDIVISON from SALES where SALID = {SALID})");
+                                var MGMUDURGSM = DbQuery.GetValue($"select DIVPHN1 from DIVISON where DIVVAL in (select SALDIVISON from SALES where SALID = {SALID})");
+
+
+                                if (smsvar != null && smsvar.Checked)
+                                {
+                                    var MUSTERİSMS = SMS("5547414216", Musmetin);
+                                }
+                                //var snc = SMS("5547414216", Musmetin);
+                                var BGMSMS = SMS(BGMUDURGSM, CURNAME + " Müşterinin " + PRONAME + " ürünü " + PlanTarih + Environment.NewLine + "tarihinde teslimat için Planlanmıştır.");
+                                var MGMSMS = SMS(MGMUDURGSM, CURNAME + " Müşterinin " + PRONAME + " ürünü " + PlanTarih + Environment.NewLine + "tarihinde teslimat için Planlanmıştır.");
+                            }
+                            else
+                            {
+                                WebMsgBox.Show("Mağaza Teslimatcısı Tanımlanmamış");
+                            }
                         }
                     }
-                }
 
-                //var SALID = Musteri.Rows[0].Cells[0].Text;
-                //var CURID = DbQuery.GetValue($"select CURVAL from SALES left outer join MDE_GENEL.dbo.MB_Teslimatci on MB_DIVVAL = SALDIVISON left outer join CURRENTS on CURID = MB_CURID where SALID = {SALID}");
-                
+                    //var SALID = Musteri.Rows[0].Cells[0].Text;
+                    //var CURID = DbQuery.GetValue($"select CURVAL from SALES left outer join MDE_GENEL.dbo.MB_Teslimatci on MB_DIVVAL = SALDIVISON left outer join CURRENTS on CURID = MB_CURID where SALID = {SALID}");
+
+
+                }
+                catch (Exception)
+                {
+
+                    throw;
+                }
             }
             else
             {
@@ -413,6 +516,103 @@ namespace YonMobilya
                 "HideModal();",
                 false
             );
+        }
+        private string SmmsToken = "";
+        private async Task SMS(string gsm, string Message)
+        {
+            var SMSRes = (List<SmstokenObj>)Session["SMS"];
+            var loginRes = (List<LoginObj>)Session["Login"];
+            SmmsToken = SMSRes[0].TokenSMS;
+            try
+            {
+                string description = string.Empty;
+
+                //isNotification parametresinin doldurulması
+                bool? isNotificationValue = null;
+
+
+                //recipentType parametresinin doldurulması
+                string recipentTypeValue = string.Empty;
+                var data = new
+                {
+                    username = SMSRes[0].SmsUser,
+                    password = SMSRes[0].SmsPassword,
+                    numbers = "0" + gsm,
+                    message = Message,
+                    origin = "YON AVM",
+                    sd = "0",
+                    ed = "0",
+                    isNotification = isNotificationValue,
+                    recipentType = recipentTypeValue,
+                    brandCode = ""
+                };
+
+                var content = new StringContent(JsonConvert.SerializeObject(data), Encoding.UTF8, "application/json");
+
+                using (HttpClient httpClient = new HttpClient())
+                {
+                    if (string.IsNullOrEmpty(SmmsToken))
+                    {
+                        WebMsgBox.Show("Token Hatalı");
+                    }
+                    else
+                    {
+                        httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", SmmsToken);
+                        var httppost = await httpClient.PostAsync(SMSRes[0].SmsUrl + "api/SendSms/SendSingle", content);
+                        string responseContent = await httppost.Content.ReadAsStringAsync();
+
+                        if (httppost.IsSuccessStatusCode)
+                        {
+                            try
+                            {
+                                var response = JsonConvert.DeserializeObject<SmsSonuc>(responseContent);
+
+                                if (response.Sonuc.Contains("*OK*")) // success
+                                {
+                                    description = response.Sonuc.Replace("*OK*", "");
+                                    List<SmsGiden> smsSonucs = new List<SmsGiden>();
+                                    SmsGiden sonuc = new SmsGiden();
+                                    sonuc.SOCODE = loginRes[0].SOCODE;
+                                    sonuc.Sonuc = description;
+                                    smsSonucs.Add(sonuc);
+                                    Session.Add("SMSGONDERIM", smsSonucs);
+                                }
+                                else
+                                {
+                                    WebMsgBox.Show("SMS gönderimi başarısız: " + response.Sonuc);
+                                }
+                            }
+                            catch (JsonException ex)
+                            {
+                                WebMsgBox.Show("JSON parse hatası: " + ex.Message);
+                            }
+                        }
+                        else
+                        {
+                            WebMsgBox.Show("HTTP Hatası: " + httppost.StatusCode + " - " + responseContent);
+                        }
+                    }
+                    //else
+                    //{
+                    //    httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", SmmsToken);
+                    //    var httppost = httpClient.PostAsync(ApiUrl + "api/SendSms/SendSingle", content).Result;
+                    //    var response = JsonConvert.DeserializeObject<SmsSonuc>(httppost.Content.ReadAsStringAsync().Result);
+
+                    //    if (response.Sonuc.Contains("*OK*")) // success
+                    //    {
+                    //        description = response.Sonuc.Replace("*OK*", "");                            
+                    //    }
+                    //    else
+                    //    {
+
+                    //    }
+                    //}
+                }
+            }
+            catch (Exception ex)
+            {
+
+            }
         }
     }
 }

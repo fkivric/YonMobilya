@@ -37,6 +37,7 @@ namespace YonMobilya
                     ClientScript.RegisterStartupScript(this.GetType(), "load", script, true);
                     SALID = Request.QueryString["salid"];
                     CURID = Request.QueryString["curid"]; //DbQuery.GetValue($"select SALCURID from SALES where SALID = {SALID}");
+                    Dosyalar();
                     var ftp = (List<Ftp>)Session["FTP"];
                     if (ftp != null)
                     {
@@ -104,6 +105,68 @@ namespace YonMobilya
                 tamlandı.Visible = false;
             }
         }
+        internal void Dosyalar()
+        {
+            string q = String.Format(@"select 
+	             d.MB_CURID as CURID
+	            ,CURNAME
+	            ,FileTypeName
+	            ,MB_FileName as FileName
+            from MDE_GENEL.dbo.MB_BayiDosyaları d
+            left outer join MDE_GENEL.dbo.MB_DosyaTipi t on t.id = MB_FileType
+            left outer join VDB_YON01.dbo.CURRENTS c on c.CURID = d.MB_CURID
+            where d.MB_CURID = {0}
+            order by MB_FileType", CURID);
+            var dt = DbQuery.Query(q,ConnectionString);
+            if (dt != null)
+            {
+                FileLoad.Visible = true;
+                table.DataSource = dt;
+                table.DataBind();
+            }
+        }
+        public bool FTPCechkFolder(string folderPath)
+        {
+            string server = ftpUrl;//"ftp.example.com"; // FTP sunucu adresi
+            string username = ftpUsername; //"Yon"; // FTP kullanıcı adı
+            string password = ftpPassword;//"Yonavm123"; // FTP şifre
+            try
+            {
+                // FTP sunucusuna bağlan
+                FtpWebRequest ftpRequest = (FtpWebRequest)WebRequest.Create($"{server}/{folderPath}");
+                ftpRequest.Method = WebRequestMethods.Ftp.ListDirectory;
+                ftpRequest.Credentials = new NetworkCredential(username, password);
+
+                using (FtpWebResponse ftpResponse = (FtpWebResponse)ftpRequest.GetResponse())
+                {
+                    using (Stream responseStream = ftpResponse.GetResponseStream())
+                    {
+                        using (StreamReader reader = new StreamReader(responseStream))
+                        {
+                            // Sunucuda belirtilen klasörün dosya listesini al
+                            string fileList = reader.ReadToEnd();
+
+                            // Klasörün var olup olmadığını kontrol et
+                            bool folderExists = !string.IsNullOrEmpty(fileList);
+
+                            // Sonucu kullanıcıya göster
+                            if (folderExists)
+                            {
+                                return true;
+                            }
+                            else
+                            {
+                                return false;
+                            }
+                        }
+                    }
+                }
+            }
+            catch (WebException)
+            {
+                return false;
+            }
+        }
         public void CreateFolderFTP(string FileNAme)
         {
             try
@@ -127,15 +190,15 @@ namespace YonMobilya
             string strFolder;
             string ftpFolder;
             string ftpFilePath;
-            strFolder = Server.MapPath("./UploadedFiles/" + CURID + "/Mobilya Kurulum/");
+            strFolder = Server.MapPath("./UploadedFiles/Mobilya Kurulum/" + CURID + "/" + SALID + "/TAMAMLANAN/");
             // Get the name of the file that is posted.
             strFileName = oFile.PostedFile.FileName;
             //strFileName = Path.GetFileName(strFileName);
             if (oFile.Value != "")
             {
-                if (!Directory.Exists(Server.MapPath("./UploadedFiles/" + CURID)))
+                if (!Directory.Exists(Server.MapPath("./UploadedFiles/Mobilya Kurulum/" + CURID)))
                 {
-                    Directory.CreateDirectory(Server.MapPath("./UploadedFiles/" + CURID));
+                    Directory.CreateDirectory(Server.MapPath("./UploadedFiles/Mobilya Kurulum/" + CURID));
                 }
                 // Create the directory if it does not exist.
                 if (!Directory.Exists(strFolder))
@@ -151,54 +214,71 @@ namespace YonMobilya
                 else
                 {
                     oFile.PostedFile.SaveAs(strFilePath);
-                    lblUploadResult.Text = strFileName + " Dosya Kaydedildi";
                 }
 
                 try
                 {
-                    ftpFolder = Server.MapPath("./UploadedFiles/" + CURID + "/FTPGiden/");
+                    ftpFolder = Server.MapPath("./UploadedFiles/Mobilya Kurulum/" + CURID + "/FTPGiden/TAMAMLANAN/");
                     ftpFilePath = ftpFolder + strFileName;
-                    CreateFolderFTP(CURID);
-                    CreateFolderFTP(CURID + "/Mobilya Montaj");
                     if (!Directory.Exists(ftpFolder))
                     {
                         Directory.CreateDirectory(ftpFolder);
                     }
                     if (!File.Exists(ftpFilePath))
                         oFile.PostedFile.SaveAs(ftpFilePath);
-                    string sira = "";
-                    string qq = String.Format(@"select FileTypeName,COUNT(*) as adet
-                    from KrediPuan.dbo.MusteriBayiDosyaları d
-                    left outer join MDE_GENEL.dbo.MB_DosyaTipi t on t.id = [FileType]
-                    left outer join VDB_OTOBIL01.dbo.CURRENTS c on c.CURID = d.CURID
-                    where d.CURID = {0}
-                    group by FileTypeName,[FileType]
-                    order by [FileType] ", CURID);
-                    dosyalar = DbQuery.Query(qq, ConnectionString2);
-                    if (dosyalar == null)
+
+                    if (!FTPCechkFolder(CURID))
                     {
-                        sira = "";
+                        CreateFolderFTP(CURID);
+                        if (!FTPCechkFolder(CURID + "/Mobilya Montaj"))
+                        {
+                            CreateFolderFTP(CURID + "/Mobilya Montaj");
+                        }
+                        if (!FTPCechkFolder(CURID + "/Mobilya Montaj/TAMAMLANAN"))
+                        {
+                            CreateFolderFTP(CURID + "/Mobilya Montaj/TAMAMLANAN");
+                        }
                     }
                     else
                     {
-                        if (dosyalar.Rows.Count > 0)
+                        if (!FTPCechkFolder(CURID + "/Mobilya Montaj"))
                         {
-                            for (int i = 0; i < dosyalar.Rows.Count; i++)
-                            {
-                                if (dosyalar.Rows[i]["FileTypeName"].ToString() == "RUHSAT")
-                                {
-                                    sira = (int.Parse(dosyalar.Rows[i]["adet"].ToString()) + 1).ToString();
-                                }
-                            }
+                            CreateFolderFTP(CURID + "/Mobilya Montaj");
+                        }
+                        if (!FTPCechkFolder(CURID + "/Mobilya Montaj/TAMAMLANAN"))
+                        {
+                            CreateFolderFTP(CURID + "/Mobilya Montaj/TAMAMLANAN");
                         }
                     }
-                    string newFileName = "Ruhsat" + sira + Path.GetExtension(strFileName); // Örneğin "newFileName.ext"
+                    string sira = "";
+                    string qq = String.Format(@"select COUNT(*) as adet
+                    from MDE_GENEL.dbo.MB_BayiDosyaları d
+                    left outer join MDE_GENEL.dbo.MB_DosyaTipi t on t.id = MB_FileType
+                    left outer join VDB_YON01.dbo.CURRENTS c on c.CURID = d.MB_CURID
+                    where d.MB_CURID = {0} and t.id = 1", CURID);
+                    dosyalar = DbQuery.Query(qq, ConnectionString2);
+                    if (dosyalar == null)
+                    {
+                        sira = "0";
+                    }
+                    else
+                    {
+                        if (dosyalar.Rows.Count == 1)
+                        {
+                            sira = "0";
+                        }
+                        else
+                        {
+                            sira = (int.Parse(dosyalar.Rows[0]["adet"].ToString()) + 1).ToString();
+                        }
+                    }
+                    string newFileName = SALID +"_"+ sira + Path.GetExtension(strFileName); // Örneğin "newFileName.ext"
                     string newFilePath = Path.Combine(ftpFolder, newFileName);
 
                     // Rename the file
                     File.Move(ftpFilePath, newFilePath);
                     // Upload the file to FTP server
-                    string ftpFullUrl = ftpUrl + "/" + CURID + "/Bayi Dosyaları/" + newFileName;
+                    string ftpFullUrl = ftpUrl + "/" + CURID + "/Mobilya Montaj/TAMAMLANAN/" + newFileName;
                     FtpWebRequest ftpRequest = (FtpWebRequest)WebRequest.Create(ftpFullUrl);
                     ftpRequest.Method = WebRequestMethods.Ftp.UploadFile;
                     ftpRequest.Credentials = new NetworkCredential(ftpUsername, ftpPassword);
@@ -213,10 +293,12 @@ namespace YonMobilya
 
                     using (FtpWebResponse response = (FtpWebResponse)ftpRequest.GetResponse())
                     {
-                        string q = String.Format(@"insert into KrediPuan.dbo.MusteriBayiDosyaları values ({0},1,'{1}')", CURID, newFileName);
+                        string q = String.Format(@"insert into MDE_GENEL.dbo.MB_BayiDosyaları values ({0},{1},1,'{2}')", CURID, SALID, newFileName);
                         DbQuery.insertquery(q, ConnectionString2);
+                        lblUploadResult.Text = strFileName + " Dosya Kaydedildi";
                     }
                     // Delete the local file after upload
+                    File.Delete(newFilePath);
                 }
                 catch (Exception ex)
                 {
@@ -230,122 +312,124 @@ namespace YonMobilya
             // Display the result of the upload.
             //File.Delete(ftpFilePath);
             frmConfirmation.Visible = true;
+            FileLoad.Visible = true;
+            Dosyalar();
         }
 
-        protected void btnUpload2_Click(object sender, EventArgs e)
-        {
-            string strFileName;
-            string strFilePath;
-            string strFolder;
-            string ftpFolder;
-            string ftpFilePath;
-            strFolder = Server.MapPath("./UploadedFiles/" + CURID + "/BayiYüklenen/");
-            // Get the name of the file that is posted.
-            strFileName = oFile2.PostedFile.FileName;
-            //strFileName = Path.GetFileName(strFileName);
-            if (oFile2.Value != "")
-            {
-                if (!Directory.Exists(Server.MapPath("./UploadedFiles/" + CURID)))
-                {
-                    Directory.CreateDirectory(Server.MapPath("./UploadedFiles/" + CURID));
-                }
-                // Create the directory if it does not exist.
-                if (!Directory.Exists(strFolder))
-                {
-                    Directory.CreateDirectory(strFolder);
-                }
-                // Save the uploaded file to the server.
-                strFilePath = strFolder + strFileName;
-                if (File.Exists(strFilePath))
-                {
-                    lblUploadResult2.Text = strFileName + " Bu Dosya Daha Önce Yüklenmiş.....!";
-                }
-                else
-                {
-                    oFile2.PostedFile.SaveAs(strFilePath);
-                    lblUploadResult2.Text = strFileName + " dosyası Tramer olarak kaydedildi";
+        //protected void btnUpload2_Click(object sender, EventArgs e)
+        //{
+        //    string strFileName;
+        //    string strFilePath;
+        //    string strFolder;
+        //    string ftpFolder;
+        //    string ftpFilePath;
+        //    strFolder = Server.MapPath("./UploadedFiles/" + CURID + "/BayiYüklenen/");
+        //    // Get the name of the file that is posted.
+        //    strFileName = oFile2.PostedFile.FileName;
+        //    //strFileName = Path.GetFileName(strFileName);
+        //    if (oFile2.Value != "")
+        //    {
+        //        if (!Directory.Exists(Server.MapPath("./UploadedFiles/" + CURID)))
+        //        {
+        //            Directory.CreateDirectory(Server.MapPath("./UploadedFiles/" + CURID));
+        //        }
+        //        // Create the directory if it does not exist.
+        //        if (!Directory.Exists(strFolder))
+        //        {
+        //            Directory.CreateDirectory(strFolder);
+        //        }
+        //        // Save the uploaded file to the server.
+        //        strFilePath = strFolder + strFileName;
+        //        if (File.Exists(strFilePath))
+        //        {
+        //            lblUploadResult2.Text = strFileName + " Bu Dosya Daha Önce Yüklenmiş.....!";
+        //        }
+        //        else
+        //        {
+        //            oFile2.PostedFile.SaveAs(strFilePath);
+        //            lblUploadResult2.Text = strFileName + " dosyası Tramer olarak kaydedildi";
 
 
-                    try
-                    {
-                        ftpFolder = Server.MapPath("./UploadedFiles/" + CURID + "/FTPGiden/");
-                        ftpFilePath = ftpFolder + strFileName;
-                        CreateFolderFTP(CURID);
-                        CreateFolderFTP(CURID + "/Bayi Dosyaları");
-                        if (!Directory.Exists(ftpFolder))
-                        {
-                            Directory.CreateDirectory(ftpFolder);
-                        }
-                        if (!File.Exists(ftpFilePath))
-                            oFile2.PostedFile.SaveAs(ftpFilePath);
+        //            try
+        //            {
+        //                ftpFolder = Server.MapPath("./UploadedFiles/" + CURID + "/FTPGiden/");
+        //                ftpFilePath = ftpFolder + strFileName;
+        //                CreateFolderFTP(CURID);
+        //                CreateFolderFTP(CURID + "/Bayi Dosyaları");
+        //                if (!Directory.Exists(ftpFolder))
+        //                {
+        //                    Directory.CreateDirectory(ftpFolder);
+        //                }
+        //                if (!File.Exists(ftpFilePath))
+        //                    oFile2.PostedFile.SaveAs(ftpFilePath);
 
-                        string sira = "";
-                        string qq = String.Format(@"select FileTypeName,COUNT(*) as adet
-                        from KrediPuan.dbo.MusteriBayiDosyaları d
-                        left outer join KrediPuan.dbo.KrediPuan_DosyaTipi t on t.id = [FileType]
-                        left outer join VDB_OTOBIL01.dbo.CURRENTS c on c.CURID = d.CURID
-                        where d.CURID = {0}
-                        group by FileTypeName,[FileType]
-                        order by [FileType] ", CURID);
-                        dosyalar = DbQuery.Query(qq, ConnectionString2);
-                        if (dosyalar == null)
-                        {
-                            sira = "";
-                        }
-                        else
-                        {
-                            if (dosyalar.Rows.Count > 0)
-                            {
-                                for (int i = 0; i < dosyalar.Rows.Count; i++)
-                                {
-                                    if (dosyalar.Rows[i]["FileTypeName"].ToString() == "TRAMER")
-                                    {
-                                        sira = (int.Parse(dosyalar.Rows[i]["adet"].ToString()) + 1).ToString();
-                                    }
-                                }
-                            }
-                        }
-                        string newFileName = "Tramer" + sira + Path.GetExtension(strFileName); // Örneğin "newFileName.ext"
-                        string newFilePath = Path.Combine(ftpFolder, newFileName);
+        //                string sira = "";
+        //                string qq = String.Format(@"select FileTypeName,COUNT(*) as adet
+        //                from KrediPuan.dbo.MusteriBayiDosyaları d
+        //                left outer join KrediPuan.dbo.KrediPuan_DosyaTipi t on t.id = [FileType]
+        //                left outer join VDB_OTOBIL01.dbo.CURRENTS c on c.CURID = d.CURID
+        //                where d.CURID = {0}
+        //                group by FileTypeName,[FileType]
+        //                order by [FileType] ", CURID);
+        //                dosyalar = DbQuery.Query(qq, ConnectionString2);
+        //                if (dosyalar == null)
+        //                {
+        //                    sira = "";
+        //                }
+        //                else
+        //                {
+        //                    if (dosyalar.Rows.Count > 0)
+        //                    {
+        //                        for (int i = 0; i < dosyalar.Rows.Count; i++)
+        //                        {
+        //                            if (dosyalar.Rows[i]["FileTypeName"].ToString() == "Tamamlanan")
+        //                            {
+        //                                sira = (int.Parse(dosyalar.Rows[i]["adet"].ToString()) + 1).ToString();
+        //                            }
+        //                        }
+        //                    }
+        //                }
+        //                string newFileName = "Tamamlanan" + sira + Path.GetExtension(strFileName); // Örneğin "newFileName.ext"
+        //                string newFilePath = Path.Combine(ftpFolder, newFileName);
 
-                        // Rename the file
-                        File.Move(ftpFilePath, newFilePath);
-                        // Upload the file to FTP server
-                        string ftpFullUrl = ftpUrl + "/" + CURID + "/Bayi Dosyaları/" + newFileName;
-                        FtpWebRequest ftpRequest = (FtpWebRequest)WebRequest.Create(ftpFullUrl);
-                        ftpRequest.Method = WebRequestMethods.Ftp.UploadFile;
-                        ftpRequest.Credentials = new NetworkCredential(ftpUsername, ftpPassword);
+        //                // Rename the file
+        //                File.Move(ftpFilePath, newFilePath);
+        //                // Upload the file to FTP server
+        //                string ftpFullUrl = ftpUrl + "/" + CURID + "/Bayi Dosyaları/" + newFileName;
+        //                FtpWebRequest ftpRequest = (FtpWebRequest)WebRequest.Create(ftpFullUrl);
+        //                ftpRequest.Method = WebRequestMethods.Ftp.UploadFile;
+        //                ftpRequest.Credentials = new NetworkCredential(ftpUsername, ftpPassword);
 
-                        byte[] fileContents = File.ReadAllBytes(newFilePath);
-                        ftpRequest.ContentLength = fileContents.Length;
+        //                byte[] fileContents = File.ReadAllBytes(newFilePath);
+        //                ftpRequest.ContentLength = fileContents.Length;
 
-                        using (Stream requestStream = ftpRequest.GetRequestStream())
-                        {
-                            requestStream.Write(fileContents, 0, fileContents.Length);
-                        }
+        //                using (Stream requestStream = ftpRequest.GetRequestStream())
+        //                {
+        //                    requestStream.Write(fileContents, 0, fileContents.Length);
+        //                }
 
-                        using (FtpWebResponse response = (FtpWebResponse)ftpRequest.GetResponse())
-                        {
-                            string q = String.Format(@"insert into KrediPuan.dbo.MusteriBayiDosyaları values ({0},2,'{1}')", CURID, newFileName);
-                            DbQuery.insertquery(q, ConnectionString2);
-                        }
+        //                using (FtpWebResponse response = (FtpWebResponse)ftpRequest.GetResponse())
+        //                {
+        //                    string q = String.Format(@"insert into MDE_GENEL.dbo.MB_BayiDosyaları values ({0},{1},1,'{1}')", CURID, SALID, newFileName);
+        //                    DbQuery.insertquery(q, ConnectionString2);
+        //                }
 
-                        // Delete the local file after upload
-                        //File.Delete(newFilePath);
-                    }
-                    catch (Exception ex)
-                    {
-                        lblUploadResult2.Text = "Bir hata oluştu:" + ex.Message;
-                    }
-                }
-            }
-            else
-            {
-                lblUploadResult2.Text = "Yüklenecek dosyayı seçmek için 'Gözat'a tıklayın.";
-            }
-            // Display the result of the upload.
-            frmConfirmation2.Visible = true;
-        }
+        //                // Delete the local file after upload
+        //                //File.Delete(newFilePath);
+        //            }
+        //            catch (Exception ex)
+        //            {
+        //                lblUploadResult2.Text = "Bir hata oluştu:" + ex.Message;
+        //            }
+        //        }
+        //    }
+        //    else
+        //    {
+        //        lblUploadResult2.Text = "Yüklenecek dosyayı seçmek için 'Gözat'a tıklayın.";
+        //    }
+        //    // Display the result of the upload.
+        //    frmConfirmation2.Visible = true;
+        //}
 
         protected void btnUpload3_Click(object sender, EventArgs e)
         {
@@ -354,15 +438,15 @@ namespace YonMobilya
             string strFolder;
             string ftpFolder;
             string ftpFilePath;
-            strFolder = Server.MapPath("./UploadedFiles/" + CURID + "/");
+            strFolder = Server.MapPath("./UploadedFiles/Mobilya Kurulum/" + CURID + "/" + SALID + "/SSH/");
             // Get the name of the file that is posted.
             strFileName = oFile3.PostedFile.FileName;
             //strFileName = Path.GetFileName(strFileName);
             if (oFile3.Value != "")
             {
-                if (!Directory.Exists(Server.MapPath("./UploadedFiles/" + CURID)))
+                if (!Directory.Exists(Server.MapPath("./UploadedFiles/Mobilya Kurulum/" + CURID)))
                 {
-                    Directory.CreateDirectory(Server.MapPath("./UploadedFiles/" + CURID));
+                    Directory.CreateDirectory(Server.MapPath("./UploadedFiles/Mobilya Kurulum/" + CURID));
                 }
                 // Create the directory if it does not exist.
                 if (!Directory.Exists(strFolder))
@@ -380,54 +464,71 @@ namespace YonMobilya
                     oFile3.PostedFile.SaveAs(strFilePath);
 
                     // Rename the file
-                    lblUploadResult3.Text = strFileName + " dosyası Kimlik olarak kaydedildi";
+                    lblUploadResult3.Text = strFileName + " dosyası kaydedildi";
                 }
                 try
                 {
-                    ftpFolder = Server.MapPath("./UploadedFiles/" + CURID + "/FTPGiden/");
+                    ftpFolder = Server.MapPath("./UploadedFiles/Mobilya Kurulum/" + CURID + "/FTPGiden/SSH/");
                     ftpFilePath = ftpFolder + strFileName;
-                    CreateFolderFTP(CURID);
-                    CreateFolderFTP(CURID + "/Bayi Dosyaları");
                     if (!Directory.Exists(ftpFolder))
                     {
                         Directory.CreateDirectory(ftpFolder);
                     }
                     if (!File.Exists(ftpFilePath))
-                        oFile3.PostedFile.SaveAs(ftpFilePath);
+                        oFile.PostedFile.SaveAs(ftpFilePath);
 
+                    if (!FTPCechkFolder(CURID))
+                    {
+                        CreateFolderFTP(CURID);
+                        if (!FTPCechkFolder(CURID + "/Mobilya Montaj/FTPGiden"))
+                        {
+                            CreateFolderFTP(CURID + "/Mobilya Montaj/FTPGiden");
+                        }
+                        if (!FTPCechkFolder(CURID + "/Mobilya Montaj/FTPGiden/SSH"))
+                        {
+                            CreateFolderFTP(CURID + "/Mobilya Montaj/FTPGiden/SSH");
+                        }
+                    }
+                    else
+                    {
+                        if (!FTPCechkFolder(CURID + "/Mobilya Montaj/FTPGiden"))
+                        {
+                            CreateFolderFTP(CURID + "/Mobilya Montaj/FTPGiden");
+                        }
+                        if (!FTPCechkFolder(CURID + "/Mobilya Montaj/FTPGiden/SSH"))
+                        {
+                            CreateFolderFTP(CURID + "/Mobilya Montaj/FTPGiden/SSH");
+                        }
+                    }
                     string sira = "";
-                    string qq = String.Format(@"select FileTypeName,COUNT(*) as adet
-                    from KrediPuan.dbo.MusteriBayiDosyaları d
-                    left outer join KrediPuan.dbo.KrediPuan_DosyaTipi t on t.id = [FileType]
-                    left outer join VDB_OTOBIL01.dbo.CURRENTS c on c.CURID = d.CURID
-                    where d.CURID = {0}
-                    group by FileTypeName,[FileType]
-                    order by [FileType] ", CURID);
+                    string qq = String.Format(@"select COUNT(*) as adet
+                    from MDE_GENEL.dbo.MB_BayiDosyaları d
+                    left outer join MDE_GENEL.dbo.MB_DosyaTipi t on t.id = MB_FileType
+                    left outer join VDB_YON01.dbo.CURRENTS c on c.CURID = d.MB_CURID
+                    where d.MB_CURID = {0} and t.id = 2", CURID);
                     dosyalar = DbQuery.Query(qq, ConnectionString2);
                     if (dosyalar == null)
                     {
-                        sira = "";
+                        sira = "0";
                     }
                     else
                     {
                         if (dosyalar.Rows.Count > 0)
                         {
-                            for (int i = 0; i < dosyalar.Rows.Count; i++)
-                            {
-                                if (dosyalar.Rows[i]["FileTypeName"].ToString() == "KİMLİK")
-                                {
-                                    sira = (int.Parse(dosyalar.Rows[i]["adet"].ToString()) + 1).ToString();
-                                }
-                            }
+                            sira = (int.Parse(dosyalar.Rows[0]["adet"].ToString()) + 1).ToString();
+                        }
+                        else
+                        {
+                            sira = "0";
                         }
                     }
-                    string newFileName = "Kimlik" + sira + Path.GetExtension(strFileName); // Örneğin "newFileName.ext"
+                    string newFileName = SALID + "_" + sira + Path.GetExtension(strFileName); // Örneğin "newFileName.ext"
                     string newFilePath = Path.Combine(ftpFolder, newFileName);
 
                     // Rename the file
                     File.Move(ftpFilePath, newFilePath);
                     // Upload the file to FTP server
-                    string ftpFullUrl = ftpUrl + "/" + CURID + "/Bayi Dosyaları/" + newFileName;
+                    string ftpFullUrl = ftpUrl + "/" + CURID + "/Mobilya Montaj/SSH/" + newFileName;
                     FtpWebRequest ftpRequest = (FtpWebRequest)WebRequest.Create(ftpFullUrl);
                     ftpRequest.Method = WebRequestMethods.Ftp.UploadFile;
                     ftpRequest.Credentials = new NetworkCredential(ftpUsername, ftpPassword);
@@ -442,7 +543,7 @@ namespace YonMobilya
 
                     using (FtpWebResponse response = (FtpWebResponse)ftpRequest.GetResponse())
                     {
-                        string q = String.Format(@"insert into KrediPuan.dbo.MusteriBayiDosyaları values ({0},3,'{1}')", CURID, newFileName);
+                        string q = String.Format(@"insert into MDE_GENEL.dbo.MB_BayiDosyaları values ({0},{1},2,'{1}')", CURID, SALID, newFileName);
                         DbQuery.insertquery(q, ConnectionString2);
                     }
 
@@ -462,119 +563,119 @@ namespace YonMobilya
             frmConfirmation3.Visible = true;
         }
 
-        protected void btnUpload4_Click(object sender, EventArgs e)
-        {
-            string strFileName;
-            string strFilePath;
-            string strFolder;
-            string ftpFolder;
-            string ftpFilePath;
-            strFolder = Server.MapPath("./UploadedFiles/" + CURID + "/");
-            // Get the name of the file that is posted.
-            strFileName = oFile4.PostedFile.FileName;
-            strFileName = Path.GetFileName(strFileName);
-            if (oFile4.Value != "")
-            {
-                if (!Directory.Exists(Server.MapPath("./UploadedFiles/" + CURID)))
-                {
-                    Directory.CreateDirectory(Server.MapPath("./UploadedFiles/" + CURID));
-                }
-                // Create the directory if it does not exist.
-                if (!Directory.Exists(strFolder))
-                {
-                    Directory.CreateDirectory(strFolder);
-                }
-                // Save the uploaded file to the server.
-                strFilePath = strFolder + strFileName;
-                if (File.Exists(strFilePath))
-                {
-                    lblUploadResult4.Text = strFileName + " Bu Dosya Daha Önce Yüklenmiş.....!";
-                }
-                else
-                {
-                    oFile4.PostedFile.SaveAs(strFilePath);
+        //protected void btnUpload4_Click(object sender, EventArgs e)
+        //{
+        //    string strFileName;
+        //    string strFilePath;
+        //    string strFolder;
+        //    string ftpFolder;
+        //    string ftpFilePath;
+        //    strFolder = Server.MapPath("./UploadedFiles/" + CURID + "/");
+        //    // Get the name of the file that is posted.
+        //    strFileName = oFile4.PostedFile.FileName;
+        //    strFileName = Path.GetFileName(strFileName);
+        //    if (oFile4.Value != "")
+        //    {
+        //        if (!Directory.Exists(Server.MapPath("./UploadedFiles/" + CURID)))
+        //        {
+        //            Directory.CreateDirectory(Server.MapPath("./UploadedFiles/" + CURID));
+        //        }
+        //        // Create the directory if it does not exist.
+        //        if (!Directory.Exists(strFolder))
+        //        {
+        //            Directory.CreateDirectory(strFolder);
+        //        }
+        //        // Save the uploaded file to the server.
+        //        strFilePath = strFolder + strFileName;
+        //        if (File.Exists(strFilePath))
+        //        {
+        //            lblUploadResult4.Text = strFileName + " Bu Dosya Daha Önce Yüklenmiş.....!";
+        //        }
+        //        else
+        //        {
+        //            oFile4.PostedFile.SaveAs(strFilePath);
 
-                    // Rename the file
-                    lblUploadResult4.Text = strFileName + " dosyası EkBelge olarak kaydedildi";
-                }
-                try
-                {
-                    ftpFolder = Server.MapPath("./UploadedFiles/" + CURID + "/FTPGiden/");
-                    ftpFilePath = ftpFolder + strFileName;
-                    CreateFolderFTP(CURID);
-                    CreateFolderFTP(CURID + "/Bayi Dosyaları");
-                    if (!Directory.Exists(ftpFolder))
-                    {
-                        Directory.CreateDirectory(ftpFolder);
-                    }
-                    if (!File.Exists(ftpFilePath))
-                        oFile4.PostedFile.SaveAs(ftpFilePath);
+        //            // Rename the file
+        //            lblUploadResult4.Text = strFileName + " dosyası EkBelge olarak kaydedildi";
+        //        }
+        //        try
+        //        {
+        //            ftpFolder = Server.MapPath("./UploadedFiles/" + CURID + "/FTPGiden/");
+        //            ftpFilePath = ftpFolder + strFileName;
+        //            CreateFolderFTP(CURID);
+        //            CreateFolderFTP(CURID + "/Bayi Dosyaları");
+        //            if (!Directory.Exists(ftpFolder))
+        //            {
+        //                Directory.CreateDirectory(ftpFolder);
+        //            }
+        //            if (!File.Exists(ftpFilePath))
+        //                oFile4.PostedFile.SaveAs(ftpFilePath);
 
-                    string sira = "";
-                    string qq = String.Format(@"select FileTypeName,COUNT(*) as adet
-                    from KrediPuan.dbo.MusteriBayiDosyaları d
-                    left outer join KrediPuan.dbo.KrediPuan_DosyaTipi t on t.id = [FileType]
-                    left outer join VDB_OTOBIL01.dbo.CURRENTS c on c.CURID = d.CURID
-                    where d.CURID = {0}
-                    group by FileTypeName,[FileType]
-                    order by [FileType] ", CURID);
-                    dosyalar = DbQuery.Query(qq, ConnectionString2); if (dosyalar == null)
-                    {
-                        sira = "";
-                    }
-                    else
-                    {
-                        if (dosyalar.Rows.Count > 0)
-                        {
-                            for (int i = 0; i < dosyalar.Rows.Count; i++)
-                            {
-                                if (dosyalar.Rows[i]["FileTypeName"].ToString() == "EKDOSYA")
-                                {
-                                    sira = (int.Parse(dosyalar.Rows[i]["adet"].ToString()) + 1).ToString();
-                                }
-                            }
-                        }
-                    }
-                    string newFileName = "EkBelge" + sira + Path.GetExtension(strFileName); // Örneğin "newFileName.ext"
-                    string newFilePath = Path.Combine(ftpFolder, newFileName);
+        //            string sira = "";
+        //            string qq = String.Format(@"select FileTypeName,COUNT(*) as adet
+        //            from KrediPuan.dbo.MusteriBayiDosyaları d
+        //            left outer join KrediPuan.dbo.KrediPuan_DosyaTipi t on t.id = [FileType]
+        //            left outer join VDB_OTOBIL01.dbo.CURRENTS c on c.CURID = d.CURID
+        //            where d.CURID = {0}
+        //            group by FileTypeName,[FileType]
+        //            order by [FileType] ", CURID);
+        //            dosyalar = DbQuery.Query(qq, ConnectionString2); if (dosyalar == null)
+        //            {
+        //                sira = "";
+        //            }
+        //            else
+        //            {
+        //                if (dosyalar.Rows.Count > 0)
+        //                {
+        //                    for (int i = 0; i < dosyalar.Rows.Count; i++)
+        //                    {
+        //                        if (dosyalar.Rows[i]["FileTypeName"].ToString() == "EkResimler")
+        //                        {
+        //                            sira = (int.Parse(dosyalar.Rows[i]["adet"].ToString()) + 1).ToString();
+        //                        }
+        //                    }
+        //                }
+        //            }
+        //            string newFileName = "EkBelge" + sira + Path.GetExtension(strFileName); // Örneğin "newFileName.ext"
+        //            string newFilePath = Path.Combine(ftpFolder, newFileName);
 
-                    // Rename the file
-                    File.Move(ftpFilePath, newFilePath);
-                    // Upload the file to FTP server
-                    string ftpFullUrl = ftpUrl + "/" + CURID + "/Bayi Dosyaları/" + newFileName;
-                    FtpWebRequest ftpRequest = (FtpWebRequest)WebRequest.Create(ftpFullUrl);
-                    ftpRequest.Method = WebRequestMethods.Ftp.UploadFile;
-                    ftpRequest.Credentials = new NetworkCredential(ftpUsername, ftpPassword);
+        //            // Rename the file
+        //            File.Move(ftpFilePath, newFilePath);
+        //            // Upload the file to FTP server
+        //            string ftpFullUrl = ftpUrl + "/" + CURID + "/Bayi Dosyaları/" + newFileName;
+        //            FtpWebRequest ftpRequest = (FtpWebRequest)WebRequest.Create(ftpFullUrl);
+        //            ftpRequest.Method = WebRequestMethods.Ftp.UploadFile;
+        //            ftpRequest.Credentials = new NetworkCredential(ftpUsername, ftpPassword);
 
-                    byte[] fileContents = File.ReadAllBytes(newFilePath);
-                    ftpRequest.ContentLength = fileContents.Length;
+        //            byte[] fileContents = File.ReadAllBytes(newFilePath);
+        //            ftpRequest.ContentLength = fileContents.Length;
 
-                    using (Stream requestStream = ftpRequest.GetRequestStream())
-                    {
-                        requestStream.Write(fileContents, 0, fileContents.Length);
-                    }
+        //            using (Stream requestStream = ftpRequest.GetRequestStream())
+        //            {
+        //                requestStream.Write(fileContents, 0, fileContents.Length);
+        //            }
 
-                    using (FtpWebResponse response = (FtpWebResponse)ftpRequest.GetResponse())
-                    {
-                        string q = String.Format(@"insert into KrediPuan.dbo.MusteriBayiDosyaları values ({0},4,'{1}')", CURID, newFileName);
-                        DbQuery.insertquery(q, ConnectionString2);
-                    }
+        //            using (FtpWebResponse response = (FtpWebResponse)ftpRequest.GetResponse())
+        //            {
+        //                string q = String.Format(@"insert into MDE_GENEL.dbo.MB_BayiDosyaları values ({0},{1},1,'{1}')", CURID, SALID, newFileName);
+        //                DbQuery.insertquery(q, ConnectionString2);
+        //            }
 
-                    // Delete the local file after upload
-                    //File.Delete(newFilePath);
-                }
-                catch (Exception ex)
-                {
-                    lblUploadResult4.Text = "Bir hata oluştu:" + ex.Message;
-                }
-            }
-            else
-            {
-                lblUploadResult4.Text = "Yüklenecek dosyayı seçmek için 'Gözat'a tıklayın.";
-            }
-            // Display the result of the upload.
-            frmConfirmation4.Visible = true;
-        }
+        //            // Delete the local file after upload
+        //            //File.Delete(newFilePath);
+        //        }
+        //        catch (Exception ex)
+        //        {
+        //            lblUploadResult4.Text = "Bir hata oluştu:" + ex.Message;
+        //        }
+        //    }
+        //    else
+        //    {
+        //        lblUploadResult4.Text = "Yüklenecek dosyayı seçmek için 'Gözat'a tıklayın.";
+        //    }
+        //    // Display the result of the upload.
+        //    frmConfirmation4.Visible = true;
+        //}
 
         protected void grid_SelectedIndexChanged(object sender, EventArgs e)
         {
@@ -725,7 +826,7 @@ namespace YonMobilya
             {
                 GridViewRow row = grid.Rows[i];
                 DropDownList ddl = (DropDownList)row.FindControl("chkSelect");
-                if (ddl == null || ddl.SelectedValue == "0")
+                if (ddl == null || ddl.SelectedValue == "")
                 {
                     tamam = false;
                 }
@@ -735,10 +836,113 @@ namespace YonMobilya
                 uploadarea.Visible = true;
                 grid.Visible = false;
                 tamlandı.Visible = false;
+                Kaydet.Visible = true;
             }
             else
             {
                 ScriptManager.RegisterStartupScript(this, GetType(), "showalert", "alert('Tüm Ürünlerde Sonuç Seçimi Yapınız...');", true);
+            }
+        }
+
+        protected void table_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            ScriptManager.RegisterStartupScript(this, GetType(), "showLoading", "showLoading();", true);
+            // Retrieve the URL from ViewState
+            var Filename = table.SelectedRow.Cells[4].Text;
+            var FileType = table.SelectedRow.Cells[3].Text.ToUpper();
+
+            string uploadedFileUrl = ftpUrl + "/" + CURID + "/Mobilya Montaj/"+ FileType + "/" + Filename;
+            try
+            {
+                if (Filename.EndsWith("pdf") == true || Filename.EndsWith("PDF") == true)
+                {
+                    WebClient ftpClient = new WebClient();
+                    ftpClient.Credentials = new NetworkCredential(ftpUsername, ftpPassword);
+                    byte[] imageByte = ftpClient.DownloadData(uploadedFileUrl);
+
+
+                    var tempFileName = Path.GetTempFileName().Replace("tmp", "pdf");
+
+                    System.IO.File.WriteAllBytes(tempFileName, imageByte);
+
+                    string webFolderPath = Server.MapPath("~/TempImages/");
+                    if (!Directory.Exists(webFolderPath))
+                    {
+                        Directory.CreateDirectory(webFolderPath);
+                    }
+                    string webFilePath = Path.Combine(webFolderPath, Path.GetFileName(tempFileName));
+                    File.Copy(tempFileName, webFilePath, true);
+
+                    string relativeFilePath = "~/TempImages/" + Path.GetFileName(tempFileName);
+
+                    // Use iframe to display the PDF
+                    string pdfIframe = $"<iframe src='{ResolveUrl(relativeFilePath)}' type='application/pdf' width='600' height='500'></iframe>";
+                    iframe.Src = $"{ResolveUrl(relativeFilePath)}";
+                    pdfViewerPlaceHolder.Controls.Clear();
+                    pdfViewerPlaceHolder.Controls.Add(new Literal { Text = pdfIframe });
+                    iframe.Visible = false;
+                    imgViewer.Visible = false;
+                    pdfViewerPlaceHolder.Visible = false;
+
+                }
+                else if (Filename.EndsWith("jpg") || Filename.EndsWith("jpeg") || Filename.EndsWith("png"))
+                {
+                    //System.Threading.Thread.Sleep(5000);
+                    WebClient ftpClient = new WebClient();
+                    ftpClient.Credentials = new NetworkCredential(ftpUsername, ftpPassword);
+                    byte[] imageByte = ftpClient.DownloadData(uploadedFileUrl);
+
+
+                    var tempFileName = Path.GetTempFileName();
+                    System.IO.File.WriteAllBytes(tempFileName, imageByte);
+
+                    // Save the file in a web accessible folder
+                    string webFolderPath = Server.MapPath("~/TempImages/");
+                    if (!Directory.Exists(webFolderPath))
+                    {
+                        Directory.CreateDirectory(webFolderPath);
+                    }
+
+                    string webFilePath = Path.Combine(webFolderPath, Path.GetFileName(tempFileName) + ".jpg");
+                    File.Copy(tempFileName, webFilePath, true);
+
+                    // Set the ImageUrl to the web accessible file path
+                    imgViewer.ImageUrl = "~/TempImages/" + Path.GetFileName(webFilePath);
+                    imgViewer.Visible = true;
+                    // İşlem tamamlandığında yükleme ekranını gizle
+                    ScriptManager.RegisterStartupScript(this, GetType(), "hideLoading", "hideLoading();", true);
+
+                }
+                else
+                {
+                    imgViewer.Visible = false;
+                    pdfViewerPlaceHolder.Visible = false;
+                }
+            }
+            catch (Exception ex)
+            {
+                // Hata durumunda yükleme ekranını gizle
+                ScriptManager.RegisterStartupScript(this, GetType(), "hideLoading", "hideLoading();", true);
+                FileLoad.Visible = true;
+                FileLoad.Text = "Error: " + ex.Message;
+            }
+        }
+
+        protected void table_RowCreated(object sender, GridViewRowEventArgs e)
+        {
+            e.Row.Cells[1].Visible = false;
+        }
+
+        protected void Kaydet_Click(object sender, EventArgs e)
+        {
+            var loginRes = (List<LoginObj>)Session["Login"];
+            if (loginRes != null)
+            {
+                foreach (GridViewRow row in grid.Rows)
+                {
+                    DropDownList chkSelect = (DropDownList)row.FindControl("chkSelect");
+                    var ss = chkSelect.SelectedValue;
+                }
             }
         }
     }

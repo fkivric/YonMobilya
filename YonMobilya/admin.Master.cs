@@ -30,9 +30,18 @@ namespace YonMobilya
                     {
                         yon.Visible = false;
                         yon1.Visible = false;
+                        if (loginRes[0].SOADMIN == "1")
+                        {
+                            adminbar.Visible = true;
+                        }
+                        else
+                        {
+                            adminbar.Visible = false;
+                        }
                     }
                     else
                     {
+                        adminbar.Visible = false;
                         firma.Visible = false;
                     }
                 }

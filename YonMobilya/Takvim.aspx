@@ -174,11 +174,12 @@
                     ids.forEach(function(item) {
                         var curName = item.CURNAME;  // İlgili kişinin adı
                         var id = item.ID;  // İlgili kişinin ID'si
+                        var CURID = item.CURID;
                         
                         // CURNAME'i tıklanabilir yapıyoruz, tıklayınca ID'yi kurulum.aspx'e gönderiyoruz
                         $("#selected-event-details").append(
                             '<div class="event-count">' +
-                                '<a class="button btn btn-block btn-success" href="Montaj.aspx?curid=&salid=' + encodeURIComponent(id) + '" class="cur-name-link">'
+                                '<a class="button btn btn-block btn-success" href="Montaj.aspx?curid='+CURID+'&salid=' + encodeURIComponent(id) + '" class="cur-name-link">'
                                      + curName + 
                                 '</a>' +
                             '</div>'

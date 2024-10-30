@@ -115,11 +115,11 @@
                         <div runat="server" id="secililiste" class="details">
                             <div class="recentOrders" style="overflow: auto">
                                 <div class="cardHeader">
-                                    <div class="col-md-12">
-                                        <div class="form-group">
-                                            <h2>seçili liste</h2>
-                                        </div>
+                                    <div class="form-group">
+                                        <h2>seçili liste</h2>
                                     </div>
+                                </div>
+                                <div class="col-md-12">
                                     <asp:GridView ID="Selected" runat="server" CssClass="table table-striped table-bordered no-wrap"
                                         AutoGenerateColumns="False"
                                         AllowPaging="True"

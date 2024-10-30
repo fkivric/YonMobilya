@@ -14,7 +14,25 @@
             background-color: White;
             z-index: 999;
         }
+        .ddl
+        {
+            border:2px solid #7d6754;
+            border-radius:5px;
+            padding:3px;
+            -webkit-appearance: none; 
+            background-image:url('Images/Arrowhead-Down-01.png');
+            background-position:88px;
+            background-repeat:no-repeat;
+            text-indent: 0.01px;/*In Firefox*/
+            text-overflow: '';/*In Firefox*/
+        }
     </style>
+    <script type="text/javascript">
+        function openDatePicker() {
+            var dateInput = document.getElementById('<%= customerDATE.ClientID %>');
+            dateInput.click(); // Takvimi açmak için tıklama simülasyonu
+        }
+    </script>
 </asp:Content>
 <asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder1" runat="server">
     <div class="loading" id="loadingDiv" align="center" style="display: none;">
@@ -95,6 +113,9 @@
                                     </div>
                                 </div>
                             </div>
+                            <div class="loading" align="center">
+                                <img src="img/islem_gerceklestiriliyor.gif" alt="" />
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -166,8 +187,12 @@
                             </div>
                     <div class="form-group">
                         <label for="customerDATE">Plananlanan Kurulum Tarihi</label><br />
-                        <input class="form-control" type="date" id="customerDATE" runat="server" />
-                    </div>                    
+                        <input class="col-md-4" type="date" id="customerDATE" runat="server" />
+                        <label for="smsvar">Müşteri Randevu Bilgi Mesajı Gidecek</label>
+                        <asp:CheckBox runat="server" ID="smsvar" Checked="true"  CssClass="col-md-3" />
+                        <label for="Montajci">Gidecek Montajcı</label>
+                        <asp:DropDownList runat="server" ID="Montajci" CssClass="ddl col-md-4"></asp:DropDownList>
+                    </div>
                 </div>
                 <div class="row gx-3 gy-2 align-items-center form-group text-center">
                     <asp:Button runat="server" ID="Onayla" CssClass="btn btn-outline-success" Width="50%" Text="Onayla" OnClick="Onayla_Click" />
@@ -209,6 +234,23 @@
             /*border: none;*/
         }
     </style>
+    <script type="text/javascript">
+    function ShowProgress() {
+        setTimeout(function () {
+            var modal = $('<div />');
+            modal.addClass("modal");
+            $('body').append(modal);
+            var loading = $(".loading");
+            loading.show();
+            var top = Math.max($(window).height() / 2 - loading[0].offsetHeight / 2, 0);
+            var left = Math.max($(window).width() / 2 - loading[0].offsetWidth / 2, 0);
+            loading.css({ top: top, left: left });
+        }, 200);
+    }
+    $('form').live("submit", function () {
+        ShowProgress();
+    });
+    </script>
     <script type="text/javascript">
     function showModal() { 
         // Modal'ı göster

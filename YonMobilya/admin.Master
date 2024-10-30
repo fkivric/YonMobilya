@@ -205,20 +205,16 @@
                                     <span runat="server" id="Username" class="text-dark"></span><i data-feather="chevron-down" class="svg-icon"></i></span>
                             </a>
                             <div class="dropdown-menu dropdown-menu-right user-dd animated flipInY">
-                                <a class="dropdown-item" href="javascript:void(0)"><i data-feather="user"
-                                    class="svg-icon mr-2 ml-1"></i>Bilgilerim</a>
-                                <a class="dropdown-item" href="javascript:void(0)"><i data-feather="credit-card"
-                                    class="svg-icon mr-2 ml-1"></i>Işlemlerim</a>
-                                <a class="dropdown-item" href="javascript:void(0)"><i data-feather="mail"
-                                    class="svg-icon mr-2 ml-1"></i>Bildimler</a>
+                                <%--<div class="pl-4 p-3"><a href="KullaniciProfili.aspx" class="btn btn-sm btn-info">Profil Görünüm</a></div>--%>
+                                <a class="dropdown-item" href="KullaniciProfili.aspx"><i data-feather="user" class="svg-icon mr-2 ml-1"></i>Bilgilerim</a>
+                                <a class="dropdown-item" href="javascript:void(0)"><i data-feather="mail" class="svg-icon mr-2 ml-1"></i>Bildimler</a>
                                 <div class="dropdown-divider"></div>
-                                <a class="dropdown-item" href="Ayarlar.aspx"><i data-feather="settings"
-                                    class="svg-icon mr-2 ml-1"></i>Hesap Ayarı</a>
+                                <a class="dropdown-item" href="KullaniciEkleme.aspx"><i data-feather="credit-card" class="svg-icon mr-2 ml-1"></i>Yeni Kullanıcı Ekleme</a>
                                 <div class="dropdown-divider"></div>
-                                <a class="dropdown-item" href="Cikis.aspx"><i data-feather="power"
-                                    class="svg-icon mr-2 ml-1"></i>Çıkış</a>
+                                <a class="dropdown-item" href="Ayarlar.aspx"><i data-feather="settings" class="svg-icon mr-2 ml-1"></i>Mevcut Kullanıcı Ayarı</a>
                                 <div class="dropdown-divider"></div>
-                                <div class="pl-4 p-3"><a href="KullaniciProfili.aspx" class="btn btn-sm btn-info">Profil Görünüm</a></div>
+                                <a class="dropdown-item" href="Cikis.aspx"><i data-feather="power" class="svg-icon mr-2 ml-1"></i>Çıkış</a>
+                                
                             </div>
                         </li>
                         <!-- ============================================================== -->
@@ -263,30 +259,30 @@
                         </li>
                         <%-- Kurulmucu Atanmış Liste Ekranı --%>
                         <li class="list-divider"></li>
-                        <li class="nav-small-cap">
-                            <span class="hide-menu" style="font-size: large">Mağaza Taleb Listesi</span>
-                        </li>
-                        <li runat="server" id="firma" class="sidebar-item">
-<%--                            <a class="sidebar-link has-arrow" href="javascript:void(0)" aria-expanded="false">
-                                <i data-feather="file-text" class="feather-icon"></i>
-                                <span class="hide-menu">İşlem Listesi</span>
-                            </a>
-                            <ul aria-expanded="false" class="collapse  first-level base-level-line">--%>
+                        <li runat="server" id="adminbar" class="sidebar-item">
                                 <li class="nav-small-cap"><span class="hide-menu" style="font-size: 14px">Mağaza Taleb Listesi</span></li>
                                 <li class="sidebar-item"><a class="sidebar-link sidebar" href="Satis.aspx"
                                     aria-expanded="false"><i class="fa fa-shopping-cart" aria-hidden="true"></i><span class="hide-menu">Müşteri <br />Randevu Atama</span></a>
                                 </li>
                                 <li class="sidebar-item"><a class="sidebar-link sidebar-link" href="MagazaKurulum.aspx"
                                     aria-expanded="false"><i data-feather="refresh-cw" class="feather-icon"></i><span class="hide-menu">Mağaza Kurulumu <br />Randevu Atama</span></a></li>
+                                <li class="sidebar-item"><a class="sidebar-link sidebar-link" href="javascript:void(0)"
+                                    aria-expanded="false"><i data-feather="check-circle" class="feather-icon"></i><span class="hide-menu">Tamamlanan İşler</span> </a></li>
+                                <li class="sidebar-item"><a class="sidebar-link sidebar-link" href="javascript:void(0)"
+                                    aria-expanded="false"><i data-feather="flag" class="feather-icon"></i><span class="hide-menu">Hakediş Raporları</span> </a></li>
+                        </li>
+                        <li runat="server" id="firma" class="sidebar-item">
+                            
+<%--                            <a class="sidebar-link has-arrow" href="javascript:void(0)" aria-expanded="false">
+                                <i data-feather="file-text" class="feather-icon"></i>
+                                <span class="hide-menu">İşlem Listesi</span>
+                            </a>
+                            <ul aria-expanded="false" class="collapse  first-level base-level-line">--%>
                                 <li class="nav-small-cap"><span class="hide-menu" style="font-size: 14px">Onaylı İş Planı</span></li>
                                 <li class="sidebar-item"><a class="sidebar-link sidebar-link" href="Takvim.aspx"
                                     aria-expanded="false"><i data-feather="calendar" class="feather-icon"></i><span class="hide-menu">Bekleyen <br />Kurulum Takvimi</span></a></li>
                                 <li class="sidebar-item"><a class="sidebar-link sidebar-link" href="Onayli.aspx"
                                     aria-expanded="false"><i data-feather="list" class="feather-icon"></i><span class="hide-menu">İşlem Listesi</span></a></li>
-                                <li class="sidebar-item"><a class="sidebar-link sidebar-link" href="javascript:void(0)"
-                                    aria-expanded="false"><i data-feather="check-circle" class="feather-icon"></i><span class="hide-menu">Tamamlanan İşler</span> </a></li>
-                                <li class="sidebar-item"><a class="sidebar-link sidebar-link" href="javascript:void(0)"
-                                    aria-expanded="false"><i data-feather="flag" class="feather-icon"></i><span class="hide-menu">Hakediş Raporları</span> </a></li>
                             <%--</ul>--%>
                         </li>
                         <%--<li class="sidebar-item">

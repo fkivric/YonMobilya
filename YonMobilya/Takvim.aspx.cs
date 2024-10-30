@@ -194,7 +194,8 @@ namespace YonMobilya
             SELECT DISTINCT 
                 MB_PlanTarih AS PlanTarih, 
                 MB_SALID AS ID, 
-                CURNAME 
+                CURNAME,
+                CURID
             FROM MDE_GENEL.dbo.MB_Islemler
             LEFT OUTER JOIN SALES ON SALID = MB_SALID
             LEFT OUTER JOIN CURRENTS ON CURID = SALCURID
@@ -217,6 +218,7 @@ namespace YonMobilya
 
                     Islem.ID = reader["ID"].ToString();
                     Islem.CURNAME = reader["CURNAME"].ToString();
+                    Islem.CURID = int.Parse(reader["CURID"].ToString());
                     int id = Convert.ToInt32(reader["ID"]);
                     string curName = reader["CURNAME"].ToString();
 

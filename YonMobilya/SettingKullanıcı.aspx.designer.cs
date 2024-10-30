@@ -31,6 +31,15 @@ namespace YonMobilya {
         protected global::System.Web.UI.HtmlControls.HtmlInputText OFFICURNAME;
         
         /// <summary>
+        /// OFFICURSURNAME denetimi.
+        /// </summary>
+        /// <remarks>
+        /// Otomatik üretilmiş alan.
+        /// Değiştirmek için, alan bildirimini tasarımcı dosyasından arka plan kod dosyasına taşıyın.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlInputText OFFICURSURNAME;
+        
+        /// <summary>
         /// OFFCUREMAIL denetimi.
         /// </summary>
         /// <remarks>

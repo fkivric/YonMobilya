@@ -59,37 +59,43 @@
             <div class="card">
                 <div class="card-body">
                     <div class="row mb-3">
-                        <label for="inputText" class="col-sm-2 ">Kullanıcı Ad Soyad</label>
+                        <label for="OFFICURNAME" class="col-sm-2 ">Kullanıcı Ad</label>
                         <div class="col-sm-10">
                             <input type="text" runat="server" id="OFFICURNAME" class="form-control" />
                         </div>
                     </div>
                     <div class="row mb-3">
-                        <label for="inputEmail" class="col-sm-2 col-form-label">E-mail</label>
+                        <label for="OFFICURSURNAME" class="col-sm-2 ">Kullanıcı Soyad</label>
+                        <div class="col-sm-10">
+                            <input type="text" runat="server" id="OFFICURSURNAME" class="form-control" />
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <label for="OFFCUREMAIL" class="col-sm-2 col-form-label">E-mail</label>
                         <div class="col-sm-10">
                             <input type="email" runat="server" id="OFFCUREMAIL" class="form-control" placeholder="@" required />
                         </div>
                     </div>
                     <div class="row mb-3">
-                        <label for="inputPassword" class="col-sm-2">Parola</label>
+                        <label for="SOENTERKEY" class="col-sm-2">Parola</label>
                         <div class="col-sm-10">
                             <input type="password" runat="server" id="SOENTERKEY" class="form-control" />
                         </div>
                     </div>
                     <div class="row mb-3">
-                        <label for="inputNumber" class="col-sm-2 col-form-label">Telefon Numası</label>
+                        <label for="OFFCURPHONE" class="col-sm-2 col-form-label">Telefon Numası</label>
                         <div class="col-sm-10">
                             <input type="number" runat="server" id="OFFCURPHONE" class="form-control" maxlength="10" placeholder="5xxxxxxxxx" required />
                         </div>
                     </div>
                     <div class="row mb-3">
-                        <label for="inputNumber" class="col-sm-2 col-form-label">GSM Numası</label>
+                        <label for="OFFCURGSM" class="col-sm-2 col-form-label">GSM Numası</label>
                         <div class="col-sm-10">
                             <input type="number" runat="server" id="OFFCURGSM" class="form-control" maxlength="10" placeholder="5xxxxxxxxx" required />
                         </div>
                     </div>
                     <div class="row mb-3">
-                        <label for="inputPassword" class="col-sm-2 col-form-label">Kullanıcı Notu</label>
+                        <label for="OFFCURNOTE" class="col-sm-2 col-form-label">Kullanıcı Notu</label>
                         <div class="col-sm-10">
                             <textarea runat="server" id="OFFCURNOTE" class="form-control" style="height: 100px"></textarea>
                         </div>
@@ -97,7 +103,7 @@
                     <fieldset class="row mb-3">
                         <label class="col-sm-2 col-form-label">Pozisyon</label>
                         <div class="col-sm-10">
-                            <label class="form-check-label" for="gridRadios3">Seçiniz..</label>
+                            <label class="form-check-label" for="OFFCURPOSITION">Seçiniz..</label>
                             <select runat="server" id="OFFCURPOSITION" class="form-select form-control" multiple-aria-label="multiple select example">
                                 <option selected="selected" value="MONTAJCI">MONTAJCI</option>
                                 <option value="YETKİLİ">YETKİLİ</option>

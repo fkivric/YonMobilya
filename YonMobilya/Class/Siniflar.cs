@@ -26,7 +26,7 @@ namespace YonMobilya.Class
                 var notifications = new List<Notification>();
 
                 using (var connection = new SqlConnection(_connectionString))
-                {
+                {                    
                     connection.Open();
                     var query = $"SELECT MB_Baslik, MB_Bildiri, MB_Zaman FROM MDE_GENEL.dbo.MB_Notification where MB_Userid = '{_id}'";
                     using (var command = new SqlCommand(query, connection))
@@ -62,6 +62,26 @@ namespace YonMobilya.Class
             public string SOADMIN { get; set; }
         }
 
+        public class SmstokenObj
+        {
+            public string SmsUrl { get; set; }
+            public string SmsUser { get; set; }
+            public string SmsPassword { get; set; }
+            public string TokenSMS { get; set; }
+        }
+        public class SmsSonuc
+        {
+            public string Sonuc { get; set; }
+            public string Kontor { get; set; }
+            public string Message { get; set; }
+
+        }
+        public class SmsGiden
+        {
+            public string SOCODE { get; set; }
+            public string Sonuc { get; set; }
+
+        }
         public class Ftp
         {
             public string VolFtpHost { get; set; }
@@ -80,6 +100,7 @@ namespace YonMobilya.Class
         {
             public string ID { get; set; }
             public string CURNAME { get; set; }
+            public int CURID { get; set; }
         }
     }
 }

@@ -101,10 +101,12 @@ namespace YonMobilya
             SELECT DISTINCT 
                 MB_PlanTarih AS PlanTarih, 
                 MB_SALID AS ID, 
-                CURNAME 
+                CURNAME,
+				CURID 
             FROM MDE_GENEL.dbo.MB_Islemler
             LEFT OUTER JOIN SALES ON SALID = MB_SALID
-            LEFT OUTER JOIN CURRENTS ON CURID = SALCURID";
+            LEFT OUTER JOIN CURRENTS ON CURID = SALCURID
+            where MB_SALID != 0";
 
             // Sonuçları tutacak bir sözlük
             Dictionary<string, List<Islemler>> eventCounts = new Dictionary<string, List<Islemler>>();
@@ -122,8 +124,10 @@ namespace YonMobilya
 
                     Islem.ID = reader["ID"].ToString();
                     Islem.CURNAME = reader["CURNAME"].ToString();
+                    Islem.CURID = int.Parse(reader["CURID"].ToString());
                     int id = Convert.ToInt32(reader["ID"]);
                     string curName = reader["CURNAME"].ToString();
+                    int CURID = int.Parse(reader["CURID"].ToString());
 
                     // Eğer bu tarih zaten varsa, listeye yeni bir değer ekliyoruz
                     if (!eventCounts.ContainsKey(planTarih))

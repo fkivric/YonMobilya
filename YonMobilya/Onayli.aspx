@@ -32,7 +32,7 @@
             <div class="row">
                 <div class="col-12">
                     <div class="card">
-                        <h2 class="card-text">Ay içi İşlem Adeti</h2>
+                        <h2 class="card-text">Montaj Bekleyen İşlemler</h2>
                         <div class="card-body">
                             <div class="row">
                                 <!-- Column -->
@@ -75,7 +75,7 @@
                                         <asp:BoundField DataField="CURNAME" HeaderText="MÜŞTERİ" />
                                         <asp:BoundField DataField="ORDDATE" HeaderText="SATIŞ TARİHİ" DataFormatString="{0:yyyy/MM/dd}" />
                                         <asp:BoundField DataField="ORDCHBALANCEQUAN" HeaderText="ADET" />
-                                        <asp:BoundField DataField="PRLPRICE" HeaderText="FİYAT" />
+                                        <asp:BoundField DataField="ADRESS" HeaderText="ADRES" />
                                         <asp:BoundField DataField="CURCHCOUNTY" HeaderText="SEMT" />
                                     </Columns>
                                     <PagerSettings Mode="Numeric" Position="Bottom" />

@@ -25,6 +25,10 @@
                             <img src="assets/images/users/profile-pic.jpg" alt="Profile" class="rounded-circle" width="290">
                             <h2 runat="server" id="ProfildeAdi">Kevin Anderson</h2>
                             <h3 runat="server" id="ProfildeGorevi">Web Designer</h3>
+                            <div class="pt-2">
+                                <a href="#" class="btn btn-primary btn-sm" title="Upload new profile image"><i class="bi bi-upload"></i></a>
+                                <a href="#" class="btn btn-danger btn-sm" title="Remove my profile image"><i class="bi bi-trash"></i></a>
+                            </div>
                             <div class="social-links mt-2">
                                 <a href="#" class="twitter"><i class="bi bi-twitter"></i></a>
                                 <a href="#" class="facebook"><i class="bi bi-facebook"></i></a>
@@ -33,70 +37,47 @@
                             </div>
                         </div>
                     </div>
-
                 </div>
-
                 <div class="col-xl-8">
-
                     <div class="card">
                         <div class="card-body pt-3">
                             <!-- Bordered Tabs -->
                             <ul class="nav nav-tabs nav-pills bg-nav-pills nav-justified">
                                 <li class="nav-item">
-                                    <a href="#profile-overview" data-toggle="tab" aria-expanded="false" class="nav-link active">
+                                    <a runat="server" id="profileoverview" href="#profile_overview" data-toggle="tab" aria-expanded="false" class="nav-link active">
                                         <i class="mdi mdi-home-variant d-lg-none d-block mr-1"></i>
                                         <span class="d-none d-lg-block">Genel Bakış</span>
                                     </a>
                                 </li>
-
                                 <li class="nav-item">
-                                    <a href="#profile-edit" data-toggle="tab" aria-expanded="false" class="nav-link">
+                                    <a runat="server" id="profileedit" href="#profile_edit" data-toggle="tab" aria-expanded="false" class="nav-link">
                                         <i class="mdi mdi-home-variant d-lg-none d-block mr-1"></i>
                                         <span class="d-none d-lg-block">Profil Düzenle</span>
                                     </a>
                                 </li>
-
                                 <li class="nav-item">
-                                    <a href="#profile-settings" data-toggle="tab" aria-expanded="false" class="nav-link">
+                                    <a runat="server" id="profilesettings" href="#profile_settings" data-toggle="tab" aria-expanded="false" class="nav-link">
                                         <i class="mdi mdi-home-variant d-lg-none d-block mr-1"></i>
                                         <span class="d-none d-lg-block">Ayarlar</span>
                                     </a>
                                 </li>
-
                                 <li class="nav-item">
-                                    <a href="#profile-change-password" data-toggle="tab" aria-expanded="false" class="nav-link">
+                                    <a runat="server" id="profilepassword" href="#profile_changepassword" data-toggle="tab" aria-expanded="false" class="nav-link">
                                         <i class="mdi mdi-home-variant d-lg-none d-block mr-1"></i>
                                         <span class="d-none d-lg-block">Şifre Değiştir</span>
                                     </a>
                                 </li>
-
                             </ul>
                             <div class="tab-content">
-
-                                <div class="tab-pane fade show active profile-overview" id="profile-overview">
+                                <div class="tab-pane fade show active" id="profile_overview">
                                     <h5 class="card-title">Hakkında</h5>
                                     <p class="small fst-italic"></p>
 
                                     <h5 class="card-title">Profile Details</h5>
 
                                     <div class="row">
-                                        <div class="col-lg-3 col-md-4 label ">Ad Soyad</div>
-                                        <div runat="server" id="PrfildeAdi2" class="col-lg-9 col-md-8">Kevin Anderson</div>
-                                    </div>
-
-                                    <div class="row">
                                         <div class="col-lg-3 col-md-4 label">Şirket</div>
                                         <div runat="server" id="ProfildeSirket" class="col-lg-9 col-md-8">Lueilwitz, Wisoky and Leuschke</div>
-                                    </div>
-
-                                    <div class="row">
-                                        <div class="col-lg-3 col-md-4 label">İş</div>
-                                        <div runat="server" id="ProfildeIs" class="col-lg-9 col-md-8">Web Designer</div>
-                                    </div>
-
-                                    <div class="row">
-                                        <div class="col-lg-3 col-md-4 label">Ülke</div>
-                                        <div  runat="server" id="ProfildeUlke" class="col-lg-9 col-md-8">USA</div>
                                     </div>
 
                                     <div class="row">
@@ -115,22 +96,9 @@
                                     </div>
 
                                 </div>
-
-                                <div class="tab-pane fade profile-edit pt-3" id="profile-edit">
+                                <div class="tab-pane fade pt-3" id="profile_edit">
 
                                     <!-- Profile Edit Form -->
-
-                                    <div class="row mb-3">
-                                        <label for="profileImage" class="col-md-4 col-lg-3 col-form-label">Profile Image</label>
-                                        <div class="col-md-8 col-lg-9">
-                                            <img runat="server" id="EditResim" src="assets/images/users/profile-pic.jpg" alt="image" class="rounded-circle"
-                                            width="290">
-                                            <div class="pt-2">
-                                                <a href="#" class="btn btn-primary btn-sm" title="Upload new profile image"><i class="bi bi-upload"></i></a>
-                                                <a href="#" class="btn btn-danger btn-sm" title="Remove my profile image"><i class="bi bi-trash"></i></a>
-                                            </div>
-                                        </div>
-                                    </div>
 
                                     <div class="row mb-3">
                                         <label for="fullName" class="col-md-4 col-lg-3 col-form-label">Ad Soyad</label>
@@ -142,7 +110,7 @@
                                     <div class="row mb-3">
                                         <label for="about" class="col-md-4 col-lg-3 col-form-label">Hakkında</label>
                                         <div class="col-md-8 col-lg-9">
-                                            <textarea runat="server" id="EditHakkinda" name="about" class="form-control" style="height: 100px">Sunt est soluta temporibus accusantium neque nam maiores cumque temporibus. Tempora libero non est unde veniam est qui dolor. Ut sunt iure rerum quae quisquam autem eveniet perspiciatis odit. Fuga sequi sed ea saepe at unde.</textarea>
+                                            <textarea runat="server" id="EditHakkinda" readonly="readonly" name="about" class="form-control" style="height: 100px">Sunt est soluta temporibus accusantium neque nam maiores cumque temporibus. Tempora libero non est unde veniam est qui dolor. Ut sunt iure rerum quae quisquam autem eveniet perspiciatis odit. Fuga sequi sed ea saepe at unde.</textarea>
                                         </div>
                                     </div>
 
@@ -161,7 +129,7 @@
                                     </div>
 
                                     <div class="row mb-3">
-                                        <label for="Country" class="col-md-4 col-lg-3 col-form-label">Ülke</label>
+                                        <label for="Country" class="col-md-4 col-lg-3 col-form-label">İl</label>
                                         <div class="col-md-8 col-lg-9">
                                             <input runat="server" id="EditUlke" name="country" type="text" class="form-control" value="USA">
                                         </div>
@@ -216,14 +184,13 @@
                                         </div>
                                     </div>
 
-                                    <div class="text-center">
-                                        <button type="submit" class="btn btn-primary">Değişiklikleri Kaydet</button>
+                                    <div class="text-center">                                        
+                                        <asp:button runat="server" id="EditKaydet" onclick="EditKaydet_Click" type="submit" class="btn btn-primary" Text="Değişiklikleri Kaydet"/>
                                     </div>
                                     <!-- End Profile Edit Form -->
 
                                 </div>
-
-                                <div class="tab-pane fade pt-3" id="profile-settings">
+                                <div class="tab-pane fade pt-3" id="profile_settings">
 
                                     <!-- Settings Form -->
 
@@ -259,13 +226,12 @@
                                     </div>
 
                                     <div class="text-center">
-                                        <button type="submit" class="btn btn-primary">Değişiklikleri Kaydet</button>
+                                        <asp:button runat="server" ID="SettingsKaydet" OnClick="SettingsKaydet_Click" type="submit" class="btn btn-primary" Text="Değişiklikleri Kaydet"/>
                                     </div>
                                     <!-- End settings Form -->
 
                                 </div>
-
-                                <div class="tab-pane fade pt-3" id="profile-change-password">
+                                <div class="tab-pane fade pt-3" id="profile_changepassword">
                                     <!-- Change Password Form -->
 
 
@@ -279,27 +245,25 @@
                                     <div class="row mb-3">
                                         <label for="newPassword" class="col-md-4 col-lg-3 col-form-label">Yeni Şifre Girin</label>
                                         <div class="col-md-8 col-lg-9">
-                                            <input name="newpassword" type="password" class="form-control" id="newPassword">
+                                            <input runat="server" name="newpassword" type="password" class="form-control" id="newPassword">
                                         </div>
                                     </div>
 
                                     <div class="row mb-3">
                                         <label for="renewPassword" class="col-md-4 col-lg-3 col-form-label">Yeni Şifreyi Yeniden Girin</label>
                                         <div class="col-md-8 col-lg-9">
-                                            <input name="renewpassword" type="password" class="form-control" id="renewPassword">
+                                            <input runat="server" name="renewpassword" type="password" class="form-control" id="renewPassword">
                                         </div>
                                     </div>
 
                                     <div class="text-center">
-                                        <button type="submit" class="btn btn-primary">Change Password</button>
+                                        <asp:button runat="server" ID="ParolaKaydet" OnClick="ParolaKaydet_Click" type="submit" class="btn btn-primary" Text="Şifre Değiştir"/>
                                     </div>
                                     <!-- End Change Password Form -->
 
                                 </div>
-
                             </div>
                             <!-- End Bordered Tabs -->
-
                         </div>
                     </div>
 
@@ -307,5 +271,16 @@
             </div>
         </div>
     </div>
+    <script>
+        function activateTab(tabId) {
+            // Tüm sekmeleri devre dışı bırak
+            $('.nav-link').removeClass('active');
+            $('.tab-pane').removeClass('active show');
+
+            // Belirtilen sekmeyi aktif et
+            $('#' + tabId).addClass('active');
+            $('#' + tabId).addClass('show');
+        }
+    </script>
     <script src="assets/libs/jquery/dist/jquery.min.js"></script>
 </asp:Content>

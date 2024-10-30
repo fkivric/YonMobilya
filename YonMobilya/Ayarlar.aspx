@@ -13,13 +13,13 @@
                             <span class="d-none d-lg-block">Mevcut Kullanıcı Güncelle</span>
                         </a>
                     </li>
-                    <li class="nav-item">
+                    <%--<li class="nav-item">
                         <a href="#profile1" data-toggle="tab" aria-expanded="false"
                             class="nav-link rounded-0">
                             <i class="mdi mdi-account-circle d-lg-none d-block mr-1"></i>
                             <span class="d-none d-lg-block">Kullanıcı Ekle</span>
                         </a>
-                    </li>
+                    </li>--%>
                 </ul>
 
                 <div class="tab-content">
@@ -75,7 +75,7 @@
                         </div>
                     </div>
                     <div class="tab-pane" id="profile1">
-                        <iframe runat="server" id="Iframe2" style="width: 100%; height: 800px" src="SettingKullanıcı.aspx"></iframe>
+                        <%--<iframe runat="server" id="Iframe2" style="width: 100%; height: 800px" src="SettingKullanıcı.aspx"></iframe>--%>
                     </div>
                     <div class="tab-pane" id="settings1">
                         <p class="mb-0">

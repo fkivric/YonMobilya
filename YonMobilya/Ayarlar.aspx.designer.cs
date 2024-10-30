@@ -20,14 +20,5 @@ namespace YonMobilya {
         /// Değiştirmek için, alan bildirimini tasarımcı dosyasından arka plan kod dosyasına taşıyın.
         /// </remarks>
         protected global::System.Web.UI.HtmlControls.HtmlIframe Iframe1;
-        
-        /// <summary>
-        /// Iframe2 denetimi.
-        /// </summary>
-        /// <remarks>
-        /// Otomatik üretilmiş alan.
-        /// Değiştirmek için, alan bildirimini tasarımcı dosyasından arka plan kod dosyasına taşıyın.
-        /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlIframe Iframe2;
     }
 }

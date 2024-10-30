@@ -1,177 +1,224 @@
 ﻿//------------------------------------------------------------------------------
-// <otomatik üretildi>
+// <otomatik olarak oluşturulmuş>
 //     Bu kod bir araç tarafından oluşturuldu.
 //
-//     Bu dosyada yapılacak değişiklikler yanlış davranışa neden olabilir ve
+//     Bu dosyada yapılacak değişiklikler hatalı davranışa neden olabilir ve
 //     kod tekrar üretildi. 
-// </otomatik üretildi>
+// </otomatik olarak oluşturulmuş>
 //------------------------------------------------------------------------------
 
-namespace YonMobilya {
-    
-    
-    public partial class KullaniciProfili {
-        
+namespace YonMobilya
+{
+
+
+    public partial class KullaniciProfili
+    {
+
         /// <summary>
         /// ProfildeAdi denetimi.
         /// </summary>
         /// <remarks>
-        /// Otomatik üretilmiş alan.
+        /// Otomatik olarak oluşturulan alan.
         /// Değiştirmek için, alan bildirimini tasarımcı dosyasından arka plan kod dosyasına taşıyın.
         /// </remarks>
         protected global::System.Web.UI.HtmlControls.HtmlGenericControl ProfildeAdi;
-        
+
         /// <summary>
         /// ProfildeGorevi denetimi.
         /// </summary>
         /// <remarks>
-        /// Otomatik üretilmiş alan.
+        /// Otomatik olarak oluşturulan alan.
         /// Değiştirmek için, alan bildirimini tasarımcı dosyasından arka plan kod dosyasına taşıyın.
         /// </remarks>
         protected global::System.Web.UI.HtmlControls.HtmlGenericControl ProfildeGorevi;
-        
+
         /// <summary>
-        /// PrfildeAdi2 denetimi.
+        /// profileoverview denetimi.
         /// </summary>
         /// <remarks>
-        /// Otomatik üretilmiş alan.
+        /// Otomatik olarak oluşturulan alan.
         /// Değiştirmek için, alan bildirimini tasarımcı dosyasından arka plan kod dosyasına taşıyın.
         /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl PrfildeAdi2;
-        
+        protected global::System.Web.UI.HtmlControls.HtmlAnchor profileoverview;
+
+        /// <summary>
+        /// profileedit denetimi.
+        /// </summary>
+        /// <remarks>
+        /// Otomatik olarak oluşturulan alan.
+        /// Değiştirmek için, alan bildirimini tasarımcı dosyasından arka plan kod dosyasına taşıyın.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlAnchor profileedit;
+
+        /// <summary>
+        /// profilesettings denetimi.
+        /// </summary>
+        /// <remarks>
+        /// Otomatik olarak oluşturulan alan.
+        /// Değiştirmek için, alan bildirimini tasarımcı dosyasından arka plan kod dosyasına taşıyın.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlAnchor profilesettings;
+
+        /// <summary>
+        /// profilepassword denetimi.
+        /// </summary>
+        /// <remarks>
+        /// Otomatik olarak oluşturulan alan.
+        /// Değiştirmek için, alan bildirimini tasarımcı dosyasından arka plan kod dosyasına taşıyın.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlAnchor profilepassword;
+
         /// <summary>
         /// ProfildeSirket denetimi.
         /// </summary>
         /// <remarks>
-        /// Otomatik üretilmiş alan.
+        /// Otomatik olarak oluşturulan alan.
         /// Değiştirmek için, alan bildirimini tasarımcı dosyasından arka plan kod dosyasına taşıyın.
         /// </remarks>
         protected global::System.Web.UI.HtmlControls.HtmlGenericControl ProfildeSirket;
-        
-        /// <summary>
-        /// ProfildeIs denetimi.
-        /// </summary>
-        /// <remarks>
-        /// Otomatik üretilmiş alan.
-        /// Değiştirmek için, alan bildirimini tasarımcı dosyasından arka plan kod dosyasına taşıyın.
-        /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl ProfildeIs;
-        
-        /// <summary>
-        /// ProfildeUlke denetimi.
-        /// </summary>
-        /// <remarks>
-        /// Otomatik üretilmiş alan.
-        /// Değiştirmek için, alan bildirimini tasarımcı dosyasından arka plan kod dosyasına taşıyın.
-        /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl ProfildeUlke;
-        
+
         /// <summary>
         /// ProfildeAdres denetimi.
         /// </summary>
         /// <remarks>
-        /// Otomatik üretilmiş alan.
+        /// Otomatik olarak oluşturulan alan.
         /// Değiştirmek için, alan bildirimini tasarımcı dosyasından arka plan kod dosyasına taşıyın.
         /// </remarks>
         protected global::System.Web.UI.HtmlControls.HtmlGenericControl ProfildeAdres;
-        
+
         /// <summary>
         /// ProfildeTelefon denetimi.
         /// </summary>
         /// <remarks>
-        /// Otomatik üretilmiş alan.
+        /// Otomatik olarak oluşturulan alan.
         /// Değiştirmek için, alan bildirimini tasarımcı dosyasından arka plan kod dosyasına taşıyın.
         /// </remarks>
         protected global::System.Web.UI.HtmlControls.HtmlGenericControl ProfildeTelefon;
-        
+
         /// <summary>
         /// ProfildeMail denetimi.
         /// </summary>
         /// <remarks>
-        /// Otomatik üretilmiş alan.
+        /// Otomatik olarak oluşturulan alan.
         /// Değiştirmek için, alan bildirimini tasarımcı dosyasından arka plan kod dosyasına taşıyın.
         /// </remarks>
         protected global::System.Web.UI.HtmlControls.HtmlGenericControl ProfildeMail;
-        
-        /// <summary>
-        /// EditResim denetimi.
-        /// </summary>
-        /// <remarks>
-        /// Otomatik üretilmiş alan.
-        /// Değiştirmek için, alan bildirimini tasarımcı dosyasından arka plan kod dosyasına taşıyın.
-        /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlImage EditResim;
-        
+
         /// <summary>
         /// EditAdi denetimi.
         /// </summary>
         /// <remarks>
-        /// Otomatik üretilmiş alan.
+        /// Otomatik olarak oluşturulan alan.
         /// Değiştirmek için, alan bildirimini tasarımcı dosyasından arka plan kod dosyasına taşıyın.
         /// </remarks>
         protected global::System.Web.UI.HtmlControls.HtmlInputText EditAdi;
-        
+
         /// <summary>
         /// EditHakkinda denetimi.
         /// </summary>
         /// <remarks>
-        /// Otomatik üretilmiş alan.
+        /// Otomatik olarak oluşturulan alan.
         /// Değiştirmek için, alan bildirimini tasarımcı dosyasından arka plan kod dosyasına taşıyın.
         /// </remarks>
         protected global::System.Web.UI.HtmlControls.HtmlTextArea EditHakkinda;
-        
+
         /// <summary>
         /// EditSirket denetimi.
         /// </summary>
         /// <remarks>
-        /// Otomatik üretilmiş alan.
+        /// Otomatik olarak oluşturulan alan.
         /// Değiştirmek için, alan bildirimini tasarımcı dosyasından arka plan kod dosyasına taşıyın.
         /// </remarks>
         protected global::System.Web.UI.HtmlControls.HtmlInputText EditSirket;
-        
+
         /// <summary>
         /// EditIs denetimi.
         /// </summary>
         /// <remarks>
-        /// Otomatik üretilmiş alan.
+        /// Otomatik olarak oluşturulan alan.
         /// Değiştirmek için, alan bildirimini tasarımcı dosyasından arka plan kod dosyasına taşıyın.
         /// </remarks>
         protected global::System.Web.UI.HtmlControls.HtmlInputText EditIs;
-        
+
         /// <summary>
         /// EditUlke denetimi.
         /// </summary>
         /// <remarks>
-        /// Otomatik üretilmiş alan.
+        /// Otomatik olarak oluşturulan alan.
         /// Değiştirmek için, alan bildirimini tasarımcı dosyasından arka plan kod dosyasına taşıyın.
         /// </remarks>
         protected global::System.Web.UI.HtmlControls.HtmlInputText EditUlke;
-        
+
         /// <summary>
         /// EditAdres denetimi.
         /// </summary>
         /// <remarks>
-        /// Otomatik üretilmiş alan.
+        /// Otomatik olarak oluşturulan alan.
         /// Değiştirmek için, alan bildirimini tasarımcı dosyasından arka plan kod dosyasına taşıyın.
         /// </remarks>
         protected global::System.Web.UI.HtmlControls.HtmlInputText EditAdres;
-        
+
         /// <summary>
         /// EditTelefon denetimi.
         /// </summary>
         /// <remarks>
-        /// Otomatik üretilmiş alan.
+        /// Otomatik olarak oluşturulan alan.
         /// Değiştirmek için, alan bildirimini tasarımcı dosyasından arka plan kod dosyasına taşıyın.
         /// </remarks>
         protected global::System.Web.UI.HtmlControls.HtmlInputText EditTelefon;
-        
+
         /// <summary>
         /// EditMail denetimi.
         /// </summary>
         /// <remarks>
-        /// Otomatik üretilmiş alan.
+        /// Otomatik olarak oluşturulan alan.
         /// Değiştirmek için, alan bildirimini tasarımcı dosyasından arka plan kod dosyasına taşıyın.
         /// </remarks>
         protected global::System.Web.UI.HtmlControls.HtmlInputGenericControl EditMail;
+
+        /// <summary>
+        /// EditKaydet denetimi.
+        /// </summary>
+        /// <remarks>
+        /// Otomatik olarak oluşturulan alan.
+        /// Değiştirmek için, alan bildirimini tasarımcı dosyasından arka plan kod dosyasına taşıyın.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button EditKaydet;
+
+        /// <summary>
+        /// SettingsKaydet denetimi.
+        /// </summary>
+        /// <remarks>
+        /// Otomatik olarak oluşturulan alan.
+        /// Değiştirmek için, alan bildirimini tasarımcı dosyasından arka plan kod dosyasına taşıyın.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button SettingsKaydet;
+
+        /// <summary>
+        /// newPassword denetimi.
+        /// </summary>
+        /// <remarks>
+        /// Otomatik olarak oluşturulan alan.
+        /// Değiştirmek için, alan bildirimini tasarımcı dosyasından arka plan kod dosyasına taşıyın.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlInputPassword newPassword;
+
+        /// <summary>
+        /// renewPassword denetimi.
+        /// </summary>
+        /// <remarks>
+        /// Otomatik olarak oluşturulan alan.
+        /// Değiştirmek için, alan bildirimini tasarımcı dosyasından arka plan kod dosyasına taşıyın.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlInputPassword renewPassword;
+
+        /// <summary>
+        /// ParolaKaydet denetimi.
+        /// </summary>
+        /// <remarks>
+        /// Otomatik olarak oluşturulan alan.
+        /// Değiştirmek için, alan bildirimini tasarımcı dosyasından arka plan kod dosyasına taşıyın.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button ParolaKaydet;
     }
 }

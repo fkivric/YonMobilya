@@ -63,7 +63,7 @@ namespace YonMobilya
                 {
                     magaza = loginRes[0].DIVVAL.ToString();
                 }
-                string q = String.Format(@"select CDRSALID,CDRCURID,CURVAL,CURNAME,ORDDATE,sum(ORDCHBALANCEQUAN) as ORDCHBALANCEQUAN,Convert(numeric(18,2),sum(ORDCHBALANCEQUAN*PRLPRICE)) as PRLPRICE,CURCHCOUNTY
+                string q = String.Format(@"select CDRSALID,CDRCURID,CURVAL,CURNAME,ORDDATE,sum(ORDCHBALANCEQUAN) as ORDCHBALANCEQUAN,Convert(numeric(18,2),sum(ORDCHBALANCEQUAN*PRLPRICE)) as PRLPRICE,CURCHCOUNTY,CURCHADR1 + CURCHADR2 as ADRESS
                 FROM MDE_GENEL.dbo.MB_Islemler 
                 inner join CUSDELIVER on MB_SALID = CDRSALID and CDRORDCHID = MB_ORDCHID
                 left outer join CURRENTS on CURID = CDRCURID
@@ -74,15 +74,15 @@ namespace YonMobilya
                 left outer join DIVISON TESLIM WITH (NOLOCK) ON TESLIM.DIVVAL = DSTORVAL AND ORDCHCOMPANY = TESLIM.DIVCOMPANY
                 outer apply (select PRLPRICE from PRICELIST prl where prl.PRLPROID = ORDCHPROID and PRLDPRID = 740) as pesinfiyat
                 where MB_Tamamlandi = 0 and MB_SUPCURVAL = '{0}' and ORDCHBALANCEQUAN >= ORDCHQUAN
-                group by CDRSALID,CDRCURID,CURVAL,CURNAME,ORDDATE,CURCHCOUNTY
+                group by CDRSALID,CDRCURID,CURVAL,CURNAME,ORDDATE,CURCHCOUNTY,CURCHADR1 + CURCHADR2
                 union
-                select PRDEID as CDRSALID,'' as CDRCURID,DIVVAL as CURVAL,DIVNAME as CURNAME,PRDEDATE as ORDDATE,sum(PRDEQUAN) as ORDCHBALANCEQUAN,sum(PRLPRICE) as PRLPRICE,DIVADR2 as CURCHCOUNTY
+                select PRDEID as CDRSALID,'' as CDRCURID,DIVVAL as CURVAL,DIVNAME as CURNAME,PRDEDATE as ORDDATE,sum(PRDEQUAN) as ORDCHBALANCEQUAN,sum(PRLPRICE) as PRLPRICE,DIVADR2 as CURCHCOUNTY,DIVADR1 as ADRESS
 				FROM MDE_GENEL.dbo.MB_Islemler
 				left outer join PRODEMAND on PRDEID = MB_ORDCHID
 				left outer join DIVISON on DIVVAL = PRDEDIVISON
                 outer apply (select PRLPRICE from PRICELIST prl where prl.PRLPROID = PRDEPROID and PRLDPRID = 740) as pesinfiyat
 				where MB_Tamamlandi = 0 and MB_SUPCURVAL = 'T003387' and PRDEKIND= 1 and PRDESTS = 0
-				group by PRDEID,DIVVAL,DIVNAME,PRDEDATE,DIVADR2
+				group by PRDEID,DIVVAL,DIVNAME,PRDEDATE,DIVADR2,DIVADR1
                 order by ORDDATE,CURCHCOUNTY,CURNAME", loginRes[0].CURVAL);
                 var dt = DbQuery.Query(q, ConnectionString);
                 GridView1.DataSource = dt;
