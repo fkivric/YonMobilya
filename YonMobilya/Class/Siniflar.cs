@@ -1,10 +1,14 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using System.Drawing;
 using System.Linq;
+using System.Net.Http;
 using System.Reflection;
 using System.Web;
+using System.Windows.Forms;
 
 namespace YonMobilya.Class
 {
@@ -26,7 +30,7 @@ namespace YonMobilya.Class
                 var notifications = new List<Notification>();
 
                 using (var connection = new SqlConnection(_connectionString))
-                {                    
+                {
                     connection.Open();
                     var query = $"SELECT MB_Baslik, MB_Bildiri, MB_Zaman FROM MDE_GENEL.dbo.MB_Notification where MB_Userid = '{_id}'";
                     using (var command = new SqlCommand(query, connection))
@@ -50,8 +54,34 @@ namespace YonMobilya.Class
                 return notifications;
             }
         }
+        public static string SmsUrl = "https://restapi.ttmesaj.com/";
+        public string SMSToken()
+        {
+            var login = new Dictionary<string, string>
+               {
+                   {"grant_type", "password"},
+                   {"username", "ttapiuser1"},//TT Mesaj Tarfından Size Verilen Api Kullanıcı Adı
+                   {"password", "ttapiuser1123"},//TT Mesaj Tarfından Size Verilen Api Şifre
+               };
 
 
+            using (HttpClient httpClient = new HttpClient())
+            {
+
+                var response = httpClient.PostAsync(SmsUrl + "ttmesajToken", new FormUrlEncodedContent(login)).Result;
+
+                if (response.IsSuccessStatusCode)
+                {
+                    Dictionary<string, string> tokenDetails = JsonConvert.DeserializeObject<Dictionary<string, string>>(response.Content.ReadAsStringAsync().Result);
+
+                    return tokenDetails.FirstOrDefault().Value;
+                }
+                else
+                {
+                    return "";
+                }
+            }
+        }
         public class LoginObj
         {
             public string CURVAL { get; set; }
@@ -101,6 +131,7 @@ namespace YonMobilya.Class
             public string ID { get; set; }
             public string CURNAME { get; set; }
             public int CURID { get; set; }
+            public bool COMPLATE { get; set; }
         }
     }
 }

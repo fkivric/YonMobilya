@@ -54,7 +54,7 @@
                                 <div class="col-md-6 col-lg-4 col-xlg-4">
                                     <div class="card card-hover">
                                         <div class="p-2 bg-primary text-center">
-                                            <h6 class="text-white">Toplam İşlem Adeti</h6>
+                                            <h6 class="text-white">Atama Bekleyen İşlem Adeti</h6>
                                             <h1 runat="server" id="toplamadet" class="font-light text-white"></h1>
                                         </div>
                                     </div>
@@ -63,7 +63,7 @@
                                 <div class="col-md-6 col-lg-4 col-xlg-4">
                                     <div class="card card-hover">
                                         <div class="p-2 bg-cyan text-center">
-                                            <h6 class="text-white">Toplam İşlem Ciirosu</h6>
+                                            <h6 class="text-white">Atama Bekleyen İşlem Ciirosu</h6>
                                             <h1 runat="server" id="toplamciro" class="font-light text-white"></h1>
                                         </div>
                                     </div>
@@ -72,19 +72,48 @@
                                 <div class="col-md-6 col-lg-4 col-xlg-4">
                                     <div class="card card-hover">
                                         <div class="p-2 bg-success text-center">
-                                            <h6 class="text-white">Toplam İşlem Hakedişi</h6>
+                                            <h6 class="text-white">Atama Bekleyen İşlem Hakedişi</h6>
                                             <h1 runat="server" id="hakedis" class="font-light text-white"></h1>
                                         </div>
                                     </div>
                                 </div>
                                 <!-- Column -->
                             </div>
+                            <div class="row">
+                                <!-- Column -->
+                                <div class="col-md-6 col-lg-4 col-xlg-3">
+                                    <div class="card card-hover">
+                                        <div class="p-2 bg-success text-center">
+                                            <h6 class="text-white">Atanan İşlem Adeti</h6>
+                                            <h1 runat="server" id="tamamlananadet" class="font-light text-white"></h1>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Column -->
+                                <div class="col-md-6 col-lg-4 col-xlg-3">
+                                    <div class="card card-hover">
+                                        <div class="p-2 bg-success text-center">
+                                            <h6 class="text-white">Atanan İşlem Ciirosu</h6>
+                                            <h1 runat="server" id="tamamalananciro" class="font-light text-white"></h1>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Column -->
+                                <div class="col-md-6 col-lg-4 col-xlg-3">
+                                    <div class="card card-hover">
+                                        <div class="p-2 bg-success text-center">
+                                            <h6 class="text-white">Atanan İşlem Hakedişi</h6>
+                                            <h1 runat="server" id="tamamlananhakedis" class="font-light text-white"></h1>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                             <div class="ml-auto">
                                 <div class="recentOrders" style="overflow: auto">
                                     <div class="cardHeader">
                                         <div class="col-md-12">
                                             <div class="form-group">
-                                                <h2 align="center">İlk 20 müşteri</h2>
+                                                <h2 align="center">Bekleyen Müşteriler</h2>
                                             </div>
                                         </div>
                                     </div>
@@ -105,6 +134,7 @@
                                                 <asp:BoundField ItemStyle-CssClass="td" DataField="CURCHCOUNTY" HeaderText="İlçe" />
                                                 <asp:BoundField ItemStyle-CssClass="td" DataField="CURNAME" HeaderText="Müşteri Adı" />
                                                 <asp:BoundField ItemStyle-CssClass="td" DataField="SALDATE" DataFormatString="{0:d}" HeaderText="Tarih" />
+                                                <asp:BoundField ItemStyle-CssClass="td" DataField="SATISDIVNAME" HeaderText="SATIŞ Mağaza" />
                                                 <asp:BoundField ItemStyle-CssClass="td" DataField="TESLIMDIVNAME" HeaderText="Alım Noktası" />
                                             </Columns>
                                             <FooterStyle BackColor="#CCCCCC" />
@@ -115,6 +145,41 @@
                             </div>
                             <div class="loading" align="center">
                                 <img src="img/islem_gerceklestiriliyor.gif" alt="" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="ml-auto">
+                                <div class="recentOrders" style="overflow: auto">
+                                    <div class="cardHeader">
+                                        <div class="col-md-12">
+                                            <div class="form-group">
+                                                <h2 align="center">Atanan Müşteriler</h2>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="scroll">
+                                        <asp:GridView runat="server" ID="GridView2" CssClass="table table-striped table-bordered no-wrap" BorderStyle="Solid" Width="100%" 
+                                            AutoGenerateColumns="false" 
+                                            AllowPaging="True" PageSize="20"
+                                            ShowFooter="True" ShowHeaderWhenEmpty="True" OnPageIndexChanging="GridView2_PageIndexChanging" OnRowCreated="GridView2_RowCreated" OnRowCommand="GridView2_RowCommand">
+                                            <Columns>
+                                                <asp:CommandField ShowSelectButton="True" SelectText="Siparişi İncele" HeaderText="Sipariş Bilgisi" ItemStyle-HorizontalAlign="Center" ButtonType="Button"/>
+                                                <asp:BoundField ItemStyle-CssClass="td" DataField="MB_SALID" ReadOnly="True" />
+                                                <asp:BoundField ItemStyle-CssClass="td" DataField="CURID" ReadOnly="True" />
+                                                <asp:BoundField ItemStyle-CssClass="td" DataField="OFFCURID" ReadOnly="True" />
+                                                <asp:BoundField ItemStyle-CssClass="td" DataField="CURVAL" HeaderText="Müşteri Kodu" />
+                                                <asp:BoundField ItemStyle-CssClass="td" DataField="CURNAME" HeaderText="Müşteri Adı" />
+                                                <asp:BoundField ItemStyle-CssClass="td" DataField="MB_PlanTarih" DataFormatString="{0:d}" HeaderText="Plan Tarihi" />
+                                                <asp:BoundField ItemStyle-CssClass="td" DataField="OFFCURNAME" HeaderText="Montajcı Adı" />
+                                                <asp:BoundField ItemStyle-CssClass="td" DataField="PRLPRICE" DataFormatString="{0:n2}" HeaderText="Satış Mağaza" />
+                                            </Columns>
+                                            <FooterStyle BackColor="#CCCCCC" />
+                                            <PagerSettings Mode="Numeric" Position="Bottom" PageButtonCount="10" />   
+                                        </asp:GridView>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -136,21 +201,23 @@
                         </span>
                     </a>
                 </div>
+                <div runat="server" id="NewOrOld" hidden="hidden"></div>
                 <div class="modal-body">
-                    <div class="form-group">
-                        <label for="customerCURNAME">Müşteri Sistem Numarası</label>
-                        <input class="form-control" type="text" id="customerCURNAME" required="">
-                    </div>
 
                     <div class="form-group">
+                        <label for="customerCURNAME">Müşteri Sistem Numarası</label>
+                        <input class="form-control" type="text" id="customerCURNAME" required="" readonly="readonly">
+<%--                    </div>
+
+                    <div class="form-group">--%>
                         <label for="customerCURVAL">Müşteri Adı</label>
-                        <input class="form-control" type="text" id="customerCURVAL" required="" />
+                        <input class="form-control" type="text" id="customerCURVAL" required=""  readonly="readonly"/>
                     </div>
 
                     <div class="form-group" style="border:solid">
                         <h3 align="center">Lütfen ürünleri seçin</h3>
-                        <label class="form-control" for="customerSALID" style="text-align:center;align-items:center">Ürünler</label>
-                        <asp:GridView runat="server" ID="Musteri" AutoGenerateColumns="false" CssClass="gridView" Width="100%" CellPadding="0" CellSpacing="0" OnRowCreated="Musteri_RowCreated">
+                        <%--<label class="form-control" for="customerSALID" style="text-align:center;align-items:center">Ürünler</label>--%>
+                        <asp:GridView runat="server" ID="Musteri" AutoGenerateColumns="false" CssClass="gridView" Width="100%" CellPadding="0" CellSpacing="0" OnRowCreated="Musteri_RowCreated" OnRowDataBound="Musteri_RowDataBound">
                             <HeaderStyle HorizontalAlign="Center" VerticalAlign="Middle" />
                             <Columns>
                             <asp:TemplateField ItemStyle-CssClass="align-items-lg-center">
@@ -174,15 +241,15 @@
                             <div class="row gx-3 gy-2 align-items-center">
                                 <div class="col-md-3">
                                     <label for="City">Teslimat İl</label>
-                                    <input class="form-control" type="text" id="customerCity" required="" />
+                                    <input class="form-control" type="text" id="customerCity" required=""  readonly="readonly"/>
                                 </div>
                                 <div class="col-md-3">
                                     <label for="County">Teslimat İlçe</label>
-                                    <input class="form-control" type="text" id="customerCounty" required="" />
+                                    <input class="form-control" type="text" id="customerCounty" required=""  readonly="readonly"/>
                                 </div>
                                 <div class="col-md-6">
                                     <label for="Adres">Teslimat Adres</label>
-                                    <textarea class="form-control" style="vertical-align:unset" id="customerAdres" rows="4" required=""></textarea>
+                                    <textarea class="form-control" style="vertical-align:unset" id="customerAdres" rows="4" required="" readonly="readonly"></textarea>
                                 </div>
                             </div>
                     <div class="form-group">

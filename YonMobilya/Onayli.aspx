@@ -13,6 +13,34 @@
             z-index: 999;
         }
     </style>
+    <style>
+        /* GridView kontrolünüz için genel stil */
+        .gridView {
+            width: 100%; /* GridView'in tam genişlikte olmasını sağlar */
+            table-layout:auto; /* Sütun genişliklerini korur */
+            border-collapse:collapse;            
+        }
+
+            .gridView .td1 .td2 {
+                word-wrap: break-word;
+                white-space: normal;
+                overflow-wrap: break-word;
+            }
+
+        .td1 {
+            width:30%;
+            table-layout:fixed;
+            word-wrap: break-word; /* Uzun kelimeleri satır sonuna sarmak için */
+            white-space: normal; /* Satır sonu karakterlerini ve boşlukları işleyin */
+            overflow-wrap: break-word; /* Uzun kelimeleri alt satıra geçirin */            
+            /*border: solid;*/
+            /* max-width: 150px; İsteğe bağlı: sütun genişliğini sınırlandırın */
+        }
+        .td2 {
+            table-layout:auto;
+            /*border: none;*/
+        }
+    </style>
 </asp:Content>
 <asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder1" runat="server">
     <script type="text/javascript">
@@ -64,22 +92,26 @@
                                 </div>
                                 <!-- Column -->
                             </div>
-                            <div class="table-responsive">
-                                <asp:GridView ID="GridView1" runat="server" AutoGenerateColumns="False" CssClass="table table-striped table-bordered no-wrap"
+                            
+                            <div class="row">
+                           <div class="table-responsive">
+                                <asp:GridView ID="GridView1" runat="server" AutoGenerateColumns="False" CssClass="gridView"
                                     AllowPaging="True" PageSize="20" OnPageIndexChanging="GridView1_PageIndexChanging" OnRowCreated="GridView1_RowCreated" OnSelectedIndexChanged="GridView1_SelectedIndexChanged">
                                     <Columns>
                                         <asp:CommandField ShowSelectButton="True" SelectText="Kurulumu Başlat" HeaderText="Sipariş Bilgisi" ItemStyle-HorizontalAlign="Center" ButtonType="Button" ItemStyle-CssClass="f-icon" />
-                                        <asp:BoundField DataField="CDRSALID" HeaderText="CDRSALID" />
-                                        <asp:BoundField DataField="CDRCURID" HeaderText="CDRCURID" />
-                                        <asp:BoundField DataField="CURVAL" HeaderText="CURVAL" />
-                                        <asp:BoundField DataField="CURNAME" HeaderText="MÜŞTERİ" />
-                                        <asp:BoundField DataField="ORDDATE" HeaderText="SATIŞ TARİHİ" DataFormatString="{0:yyyy/MM/dd}" />
-                                        <asp:BoundField DataField="ORDCHBALANCEQUAN" HeaderText="ADET" />
-                                        <asp:BoundField DataField="ADRESS" HeaderText="ADRES" />
-                                        <asp:BoundField DataField="CURCHCOUNTY" HeaderText="SEMT" />
+                                        <asp:BoundField ItemStyle-CssClass="td2" DataField ="CDRSALID" HeaderText="CDRSALID" />
+                                        <asp:BoundField ItemStyle-CssClass="td2" DataField="CDRCURID" HeaderText="CDRCURID" />
+                                        <asp:BoundField ItemStyle-CssClass="td2" DataField="CURVAL" HeaderText="CURVAL" />
+                                        <asp:BoundField ItemStyle-CssClass="td2" DataField="CURNAME" HeaderText="MÜŞTERİ" />
+                                        <asp:BoundField ItemStyle-CssClass="td2" DataField="CURCHCOUNTY" HeaderText="SEMT" />
+                                        <asp:BoundField ItemStyle-CssClass="td2" DataField="DIVNAME" HeaderText="ALINACAK YER" />
+                                        <asp:BoundField ItemStyle-CssClass="td2" DataField="ORDDATE" HeaderText="SATIŞ TARİHİ" DataFormatString="{0:yyyy/MM/dd}" />
+                                        <asp:BoundField ItemStyle-CssClass="td2" DataField="ORDCHBALANCEQUAN" HeaderText="ADET" />
+                                        <asp:BoundField ItemStyle-CssClass="td1" DataField="ADRESS" HeaderText="ADRES" />
                                     </Columns>
                                     <PagerSettings Mode="Numeric" Position="Bottom" />
                                 </asp:GridView>
+                            </div>
                             </div>
                             <div id="paginationContainer" class="float-right"></div>
                         </div>

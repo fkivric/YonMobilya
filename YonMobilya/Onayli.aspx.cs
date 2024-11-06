@@ -36,6 +36,7 @@ namespace YonMobilya
             }
             else
             {
+                ScriptManager.RegisterStartupScript(this, GetType(), "hideLoading", "hideLoading();", true);
             }
         }
         private void BindGrid()
@@ -63,26 +64,30 @@ namespace YonMobilya
                 {
                     magaza = loginRes[0].DIVVAL.ToString();
                 }
-                string q = String.Format(@"select CDRSALID,CDRCURID,CURVAL,CURNAME,ORDDATE,sum(ORDCHBALANCEQUAN) as ORDCHBALANCEQUAN,Convert(numeric(18,2),sum(ORDCHBALANCEQUAN*PRLPRICE)) as PRLPRICE,CURCHCOUNTY,CURCHADR1 + CURCHADR2 as ADRESS
-                FROM MDE_GENEL.dbo.MB_Islemler 
-                inner join CUSDELIVER on MB_SALID = CDRSALID and CDRORDCHID = MB_ORDCHID
-                left outer join CURRENTS on CURID = CDRCURID
-                left outer join CURRENTSCHILD on CURCHID = CURID
-                left outer join ORDERS on ORDSALID = CDRSALID
-                left outer join ORDERSCHILD on ORDCHORDID = ORDID and ORDCHID = MB_ORDCHID and CDRORDCHID = ORDCHID
+                string q = String.Format(@"select CDRSALID,CDRCURID,CURVAL,CURNAME,MB_PlanTarih as ORDDATE,sum(ORDCHQUAN) as ORDCHBALANCEQUAN,Convert(numeric(18,2),sum(ORDCHQUAN*PRLPRICE)) as PRLPRICE,CURCHCOUNTY,CURCHADR1 + CURCHADR2 as ADRESS
+                ,TESLIM.DIVNAME
+                FROM MDE_GENEL.dbo.MB_Islemler WITH (NOLOCK)
+                inner join CUSDELIVER t WITH (NOLOCK) on MB_SALID = t.CDRSALID and t.CDRORDCHID = MB_ORDCHID
+                left outer join CURRENTS WITH (NOLOCK) on CURID = t.CDRCURID
+                left outer join CURRENTSCHILD WITH (NOLOCK) on CURCHID = CURID
+                left outer join ORDERS WITH (NOLOCK) on ORDSALID = t.CDRSALID
+                left outer join ORDERSCHILD WITH (NOLOCK) on ORDCHORDID = ORDID and ORDCHID = MB_ORDCHID and CDRORDCHID = ORDCHID
                 left outer join DEFSTORAGE WITH (NOLOCK) ON CDRSTORID = DSTORID
                 left outer join DIVISON TESLIM WITH (NOLOCK) ON TESLIM.DIVVAL = DSTORVAL AND ORDCHCOMPANY = TESLIM.DIVCOMPANY
-                outer apply (select PRLPRICE from PRICELIST prl where prl.PRLPROID = ORDCHPROID and PRLDPRID = 740) as pesinfiyat
-                where MB_Tamamlandi = 0 and MB_SUPCURVAL = '{0}' and ORDCHBALANCEQUAN >= ORDCHQUAN
-                group by CDRSALID,CDRCURID,CURVAL,CURNAME,ORDDATE,CURCHCOUNTY,CURCHADR1 + CURCHADR2
+                outer apply (select PRLPRICE from PRICELIST prl WITH (NOLOCK) where prl.PRLPROID = ORDCHPROID and PRLDPRID = 740) as pesinfiyat
+                where MB_Tamamlandi = 0 and MB_SUPCURVAL = '{0}' AND CDRSHIPVAL = 'ANTMOB' and CDRBASECANID is NULL
+				and not exists (select top 1 * from CUSDELIVER i WITH (NOLOCK) where i.CDRBASECANID = t.CDRID and MB_SALID = i.CDRSALID and i.CDRORDCHID = MB_ORDCHID)
+                group by CDRSALID,CDRCURID,CURVAL,CURNAME,MB_PlanTarih,CURCHCOUNTY,CURCHADR1 + CURCHADR2,TESLIM.DIVNAME
                 union
-                select PRDEID as CDRSALID,'' as CDRCURID,DIVVAL as CURVAL,DIVNAME as CURNAME,PRDEDATE as ORDDATE,sum(PRDEQUAN) as ORDCHBALANCEQUAN,sum(PRLPRICE) as PRLPRICE,DIVADR2 as CURCHCOUNTY,DIVADR1 as ADRESS
+                select PRDEID as CDRSALID,'' as CDRCURID,ISTEYEN.DIVVAL as CURVAL,ISTEYEN.DIVNAME as CURNAME,MB_PlanTarih as ORDDATE,sum(PRDEQUAN) as ORDCHBALANCEQUAN,sum(PRLPRICE) as PRLPRICE,ISTEYEN.DIVADR2 as CURCHCOUNTY,ISTEYEN.DIVADR1 as ADRESS,TESLIM.DIVNAME
 				FROM MDE_GENEL.dbo.MB_Islemler
 				left outer join PRODEMAND on PRDEID = MB_ORDCHID
-				left outer join DIVISON on DIVVAL = PRDEDIVISON
+				left outer join DIVISON ISTEYEN on ISTEYEN .DIVVAL = PRDEDIVISON
+				left outer join DEFSTORAGE on DSTORID = PRDEDSTORIDOUT
+                left outer join DIVISON TESLIM WITH (NOLOCK) ON TESLIM.DIVVAL = DSTORDIVISON
                 outer apply (select PRLPRICE from PRICELIST prl where prl.PRLPROID = PRDEPROID and PRLDPRID = 740) as pesinfiyat
-				where MB_Tamamlandi = 0 and MB_SUPCURVAL = 'T003387' and PRDEKIND= 1 and PRDESTS = 0
-				group by PRDEID,DIVVAL,DIVNAME,PRDEDATE,DIVADR2,DIVADR1
+				where MB_Tamamlandi = 0 and MB_SUPCURVAL = '{0}' and PRDEKIND= 1 and PRDESTS = 0
+				group by PRDEID,ISTEYEN.DIVVAL,ISTEYEN.DIVNAME,MB_PlanTarih,ISTEYEN.DIVADR2,ISTEYEN.DIVADR1,TESLIM.DIVNAME
                 order by ORDDATE,CURCHCOUNTY,CURNAME", loginRes[0].CURVAL);
                 var dt = DbQuery.Query(q, ConnectionString);
                 GridView1.DataSource = dt;

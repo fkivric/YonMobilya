@@ -87,7 +87,7 @@
                     <div class="card">
                         <h2 class="card-text">Ay içi İşlem Adeti</h2>
                         <div class="card-body">
-                            <div class="row">
+<%--                            <div class="row">
                                 <!-- Column -->
                                 <div class="col-md-6 col-lg-4 col-xlg-4">
                                     <div class="card card-hover">
@@ -116,7 +116,7 @@
                                     </div>
                                 </div>
                                 <!-- Column -->
-                            </div>
+                            </div>--%>
                             <div class="table-responsive">
                                 <!-- Takvim burada olacak -->
                                 <div id="calendar"></div>

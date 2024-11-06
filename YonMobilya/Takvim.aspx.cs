@@ -41,7 +41,7 @@ namespace YonMobilya
                     //string jsonData2 = Newtonsoft.Json.JsonConvert.SerializeObject(calendarData2);
                     //ClientScript.RegisterStartupScript(this.GetType(), "eventCounts", $"var eventCounts = {jsonData2};", true);
                     LoadEventCounts();
-                    BindGrid();
+                    //BindGrid();
                 }
                 else
                 {
@@ -155,37 +155,40 @@ namespace YonMobilya
                 {
                     magaza = loginRes[0].DIVVAL.ToString();
                 }
-                string q = String.Format(@"select CDRSALID,CDRCURID,CURVAL,CURNAME,ORDDATE,sum(ORDCHBALANCEQUAN) as ORDCHBALANCEQUAN,Convert(numeric(18,2),sum(ORDCHBALANCEQUAN*PRLPRICE)) as PRLPRICE,CURCHCOUNTY
-                FROM  CUSDELIVER
-                inner join MDE_GENEL.dbo.MB_Islemler on MB_SALID = CDRSALID and CDRORDCHID = MB_ORDCHID
-                left outer join CURRENTS on CURID = CDRCURID
-                left outer join CURRENTSCHILD on CURCHID = CURID
-                left outer join ORDERS on ORDSALID = CDRSALID
-                left outer join ORDERSCHILD on ORDCHORDID = ORDID and ORDCHID = MB_ORDCHID and CDRORDCHID = ORDCHID
-                left outer join DEFSTORAGE WITH (NOLOCK) ON CDRSTORID = DSTORID
-                left outer join DIVISON TESLIM WITH (NOLOCK) ON TESLIM.DIVVAL = DSTORVAL AND ORDCHCOMPANY = TESLIM.DIVCOMPANY
-                outer apply (select PRLPRICE from PRICELIST prl where prl.PRLPROID = ORDCHPROID and PRLDPRID = 740) as pesinfiyat
-                where MB_Tamamlandi = 0 and MB_SUPCURVAL = '{0}'
-                group by CDRSALID,CDRCURID,CURVAL,CURNAME,ORDDATE,CURCHCOUNTY
-                order by ORDDATE,CURCHCOUNTY,CURNAME", loginRes[0].CURVAL);
-                var dt = DbQuery.Query(q, ConnectionString);
-                if (dt != null)
-                {
-                    toplamadet.InnerText = dt.Rows.Count.ToString();
-                    double ciro = 0;
-                    for (int i = 0; i < dt.Rows.Count; i++)
-                    {
-                        ciro = ciro + double.Parse(dt.Rows[0]["PRLPRICE"].ToString());
-                    }
-                    toplamciro.InnerText = ciro.ToString("C", new CultureInfo("tr-TR"));
-                    hakedis.InnerText = (ciro * 0.08).ToString("C", new CultureInfo("tr-TR"));
-                }
-                else
-                {
-                    toplamadet.InnerText = "0";
-                    toplamciro.InnerText = "0";
-                    hakedis.InnerText = "0";
-                }
+                string q = String.Format(@"select count(adet) as Toplamadet, sum(tutar) as Toplamtutar from (
+                select distinct Convert(varchar(50),MB_SALID) as adet, sum(PRLPRICE) as tutar from MDE_GENEL..MB_Islemler
+                outer apply (select PRLPRICE from PRICELIST prl where prl.PRLPROID = MB_PROID and PRLDPRID = 740) as pesinfiyat
+                where MB_Tamamlandi = 0 and MB_SALID != 0 and MB_SUPCURVAL = '{0}'
+                group by MB_SALID
+                --union
+                --select outd.DIVNAME as ISTEYEN,sum(PRLPRICE) as TUTAR
+                --            from PRODEMAND 
+                --            left outer join PRODUCTS on PROID = PRDEPROID
+                --            left outer join DEFSTORAGE outs on outs.DSTORID = PRDEDSTORIDOUT
+                --            left outer join DEFSTORAGE ins on ins.DSTORID = PRDEDSTORIDIN
+                --            left outer join DIVISON outd on outd.DIVVAL = ins.DSTORDIVISON
+                --            left outer join DIVISON ind on ind.DIVVAL = outs.DSTORDIVISON
+			    --            inner join MDE_GENEL.dbo.MB_Islemler on MB_ORDCHID = PRDEID
+                --            outer apply (select PRLPRICE from PRICELIST prl where prl.PRLPROID = PROID and PRLDPRID = 740) as pesinfiyat
+                --            where PRDESTS = 0 and PRDEKIND= 1 and MB_Tamamlandi = 0 
+                --            and MB_SUPCURVAL = '{0}'
+                --            group by outd.DIVVAL,outd.DIVNAME,MB_PlanTarih,ind.DIVNAME
+                ) sonuc", loginRes[0].CURVAL);
+                //var dt = DbQuery.Query(q, ConnectionString);
+                //if (dt != null)
+                //{
+                //    toplamadet.InnerText = dt.Rows[0]["Toplamadet"].ToString();
+                //    double ciro = 0;
+                //    ciro = double.Parse(dt.Rows[0]["Toplamtutar"].ToString());
+                //    toplamciro.InnerText = ciro.ToString("C", new CultureInfo("tr-TR"));
+                //    hakedis.InnerText = (ciro * 0.08).ToString("C", new CultureInfo("tr-TR"));
+                //}
+                //else
+                //{
+                //    toplamadet.InnerText = "0";
+                //    toplamciro.InnerText = "0";
+                //    hakedis.InnerText = "0";
+                //}
             }
         }
         private void LoadEventCounts()
@@ -200,7 +203,7 @@ namespace YonMobilya
             LEFT OUTER JOIN SALES ON SALID = MB_SALID
             LEFT OUTER JOIN CURRENTS ON CURID = SALCURID
 			LEFT OUTER JOIN ORDERSCHILD on ORDCHORDID = (select ORDID from ORDERS where ORDSALID = SALID)
-			where ORDCHBALANCEQUAN > 0 and MB_Tamamlandi = 0";
+			where MB_SALID != 0 and MB_Tamamlandi = 0";
 
             // Sonuçları tutacak bir sözlük
             Dictionary<string, List<Islemler>> eventCounts = new Dictionary<string, List<Islemler>>();

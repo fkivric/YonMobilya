@@ -75,7 +75,7 @@ namespace YonMobilya
                 select OFFCURID,OFFCURNAME from OFFICALCUR
                 left outer join CURRENTS on OFFCURCURID = CURID
 			    left outer join SOCIAL on SOCURID = CURID  and 'TT-'+Cast(OFFCURID as varchar(20)) = SOCODE
-			    where OFFCURCURID = '{0}' and CURSTS = 1
+			    where OFFCURCURID = '{0}' and CURSTS = 1 and SOSTS = 1
                 and SOCIAL.SOCODE != '{1}'", Bayiler.SelectedValue, loginRes[0].SOCODE);
                 var dt = DbQuery.Query(q, ConnectionString);
                 if (dt != null && dt.Rows.Count > 0) // Sorgudan dönen veri kontrolü

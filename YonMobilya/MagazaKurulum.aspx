@@ -13,7 +13,25 @@
             background-color: White;
             z-index: 999;
         }
+        .ddl
+        {
+            border:2px solid #7d6754;
+            border-radius:5px;
+            padding:3px;
+            -webkit-appearance: none; 
+            background-image:url('Images/Arrowhead-Down-01.png');
+            background-position:88px;
+            background-repeat:no-repeat;
+            text-indent: 0.01px;/*In Firefox*/
+            text-overflow: '';/*In Firefox*/
+        }
     </style>
+    <script type="text/javascript">
+        function openDatePicker() {
+            var dateInput = document.getElementById('<%= customerDATE.ClientID %>');
+            dateInput.click(); // Takvimi açmak için tıklama simülasyonu
+        }
+    </script>
 </asp:Content>
 <asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder1" runat="server">
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
@@ -57,6 +75,35 @@
                                 </div>
                                 <!-- Column -->
                             </div>
+                            <div class="row">
+                                <!-- Column -->
+                                <div class="col-md-6 col-lg-4 col-xlg-3">
+                                    <div class="card card-hover">
+                                        <div class="p-2 bg-success text-center">
+                                            <h6 class="text-white">Atanan İşlem Adeti</h6>
+                                            <h1 runat="server" id="tamamlananadet" class="font-light text-white"></h1>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Column -->
+                                <div class="col-md-6 col-lg-4 col-xlg-3">
+                                    <div class="card card-hover">
+                                        <div class="p-2 bg-success text-center">
+                                            <h6 class="text-white">Atanan İşlem Ciirosu</h6>
+                                            <h1 runat="server" id="tamamalananciro" class="font-light text-white"></h1>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Column -->
+                                <div class="col-md-6 col-lg-4 col-xlg-3">
+                                    <div class="card card-hover">
+                                        <div class="p-2 bg-success text-center">
+                                            <h6 class="text-white">Atanan İşlem Hakedişi</h6>
+                                            <h1 runat="server" id="tamamlananhakedis" class="font-light text-white"></h1>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                             <div class="ml-auto">
                                 <div class="recentOrders" style="overflow: auto">
                                     <div class="cardHeader">
@@ -88,6 +135,43 @@
                                     </div>
                                 </div>
                             </div>
+                            <div class="loading" align="center">
+                                <img src="img/islem_gerceklestiriliyor.gif" alt="" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="ml-auto">
+                                <div class="recentOrders" style="overflow: auto">
+                                    <div class="cardHeader">
+                                        <div class="col-md-12">
+                                            <div class="form-group">
+                                                <h2 align="center">Montaj Bekleyen Atanan İşlemler</h2>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="scroll">
+                                        <asp:GridView runat="server" ID="GridView2" CssClass="table table-striped table-bordered no-wrap" BorderStyle="Solid" Width="100%" 
+                                            AutoGenerateColumns="false" 
+                                            AllowPaging="True" PageSize="20"
+                                            ShowFooter="True" ShowHeaderWhenEmpty="True" OnPageIndexChanging="GridView2_PageIndexChanging" OnRowCreated="GridView2_RowCreated" OnRowCommand="GridView2_RowCommand">
+                                            <Columns>
+                                                <asp:CommandField ShowSelectButton="True" SelectText="Siparişi İncele" HeaderText="Sipariş Bilgisi" ItemStyle-HorizontalAlign="Center" ButtonType="Button"/>
+                                                <asp:BoundField ItemStyle-CssClass="td" DataField="MB_PlanTarih" DataFormatString="{0:d}" HeaderText="Planlanan Tarih"/>
+                                                <asp:BoundField ItemStyle-CssClass="td" DataField="DIVVAL" ReadOnly="True" />
+                                                <asp:BoundField ItemStyle-CssClass="td" DataField="ISTEYEN" HeaderText="ISTEYEN" />
+                                                <asp:BoundField ItemStyle-CssClass="td" DataField="VEREN" HeaderText="VEREN" />
+                                                <asp:BoundField ItemStyle-CssClass="td" DataField="ADET" HeaderText="ADET" />
+                                                <asp:BoundField ItemStyle-CssClass="td" DataField="TUTAR"  DataFormatString="{0:C2}" HeaderText="TUTAR" />
+                                                <asp:BoundField ItemStyle-CssClass="td" DataField="MB_Ekleyen"/>
+                                            </Columns>
+                                            <FooterStyle BackColor="#CCCCCC" />
+                                            <PagerSettings Mode="Numeric" Position="Bottom" PageButtonCount="10" />   
+                                        </asp:GridView>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -108,21 +192,22 @@
                         </span>
                     </a>
                 </div>
+                <div runat="server" id="NewOrOld" hidden="hidden"></div>
                 <div class="modal-body">
                     <div class="form-group">
                         <label for="customerCURNAME">Müşteri Sistem Numarası</label>
-                        <input class="form-control" type="text" id="customerCURNAME" required="">
+                        <input class="form-control" type="text" id="customerCURNAME" required="" readonly="readonly">
                     </div>
 
                     <div class="form-group">
                         <label for="customerCURVAL">Müşteri Adı</label>
-                        <input class="form-control" type="text" id="customerCURVAL" required="" />
+                        <input class="form-control" type="text" id="customerCURVAL" required="" readonly="readonly"/>
                     </div>
 
                     <div class="form-group" style="border:solid">
                         <h3 align="center">Lütfen ürünleri seçin</h3>
                         <label class="form-control" for="customerSALID" style="text-align:center;align-items:center">Ürünler</label>
-                        <asp:GridView runat="server" ID="Musteri" AutoGenerateColumns="false" CssClass="gridView" Width="100%" CellPadding="0" CellSpacing="0" OnRowCreated="Musteri_RowCreated">
+                        <asp:GridView runat="server" ID="Musteri" AutoGenerateColumns="false" CssClass="gridView" Width="100%" CellPadding="0" CellSpacing="0" OnRowCreated="Musteri_RowCreated" OnRowDataBound="Musteri_RowDataBound">
                             <HeaderStyle HorizontalAlign="Center" VerticalAlign="Middle" />
                             <Columns>
                             <asp:TemplateField ItemStyle-CssClass="align-items-lg-center">
@@ -139,28 +224,32 @@
                                 <asp:BoundField DataField ="PROID" />
                                 <asp:BoundField ItemStyle-CssClass="td2" DataField="PROVAL" HeaderText="Ürün kodu" ItemStyle-VerticalAlign="Middle" ItemStyle-HorizontalAlign="Left"/>
                                 <asp:BoundField ItemStyle-CssClass="td1" DataField="PRONAME" HeaderText="Ürün adı" ItemStyle-VerticalAlign="Middle"  ItemStyle-HorizontalAlign="Left"/>
-                                <asp:BoundField ItemStyle-CssClass="td2" DataField="PRDEQUAN" HeaderText="Adet"  ItemStyle-VerticalAlign="Middle" ItemStyle-HorizontalAlign="Center"/>
-                                <asp:BoundField ItemStyle-CssClass="td2" DataField="PRLPRICE" DataFormatString="{0:C2}" HeaderText="Tutar"  ItemStyle-VerticalAlign="Middle" ItemStyle-HorizontalAlign="Right"/>
+                                <asp:BoundField ItemStyle-CssClass="td1" DataField="PRDEQUAN" HeaderText="Adet"  ItemStyle-VerticalAlign="Middle" ItemStyle-HorizontalAlign="Center"/>
+                                <asp:BoundField ItemStyle-CssClass="td1" DataField="PRLPRICE" DataFormatString="{0:C2}" HeaderText="Tutar"  ItemStyle-VerticalAlign="Middle" ItemStyle-HorizontalAlign="Right"/>
                             </Columns>
                         </asp:GridView>
                             <div class="row gx-3 gy-2 align-items-center">
                                 <div class="col-md-3">
                                     <label for="City">Teslimat İl</label>
-                                    <input class="form-control" type="text" id="customerCity" required="" />
+                                    <input class="form-control" type="text" id="customerCity" required=""  readonly="readonly"/>
                                 </div>
                                 <div class="col-md-3">
                                     <label for="County">Teslimat İlçe</label>
-                                    <input class="form-control" type="text" id="customerCounty" required="" />
+                                    <input class="form-control" type="text" id="customerCounty" required=""  readonly="readonly"/>
                                 </div>
                                 <div class="col-md-6">
                                     <label for="Adres">Teslimat Adres</label>
-                                    <textarea class="form-control" style="vertical-align:unset" id="customerAdres" rows="4" required=""></textarea>
+                                    <textarea class="form-control" style="vertical-align:unset" id="customerAdres" rows="4" required="" readonly="readonly"></textarea>
                                 </div>
                             </div>
                     <div class="form-group">
                         <label for="customerDATE">Plananlanan Kurulum Tarihi</label><br />
-                        <input class="form-control" type="date" id="customerDATE" runat="server" />
-                    </div>                    
+                        <input class="col-md-4" type="date" id="customerDATE" runat="server" />
+                        <label for="smsvar">Mağazaya Bilgi Maili Gidecek</label>
+                        <asp:CheckBox runat="server" ID="smsvar" Checked="true"  CssClass="col-md-3" />
+                        <label for="Montajci">Gidecek Montajcı</label>
+                        <asp:DropDownList runat="server" ID="Montajci" CssClass="ddl col-md-4"></asp:DropDownList>
+                    </div>               
                 </div>
                 <div class="row gx-3 gy-2 align-items-center form-group text-center">
                     <asp:Button runat="server" ID="Onayla" CssClass="btn btn-outline-success" Width="50%" Text="Onayla" OnClick="Onayla_Click" />

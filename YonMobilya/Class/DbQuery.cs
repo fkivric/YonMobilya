@@ -1,10 +1,16 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
+using System.Net.Http;
 using System.Net.Mail;
+using System.Text;
+using System.Threading.Tasks;
 using System.Web;
+using static System.Collections.Specialized.BitVector32;
+using static YonMobilya.Class.Siniflar;
 
 namespace YonMobilya.Class
 {
@@ -156,6 +162,115 @@ namespace YonMobilya.Class
             {
                 // Hata durumunda loglama veya hata mesajı gösterebilirsiniz
                 return false;
+            }
+        }
+
+        public static string SmsUrl = "https://restapi.ttmesaj.com/";
+        public static string SmsToken = "";
+        public string SMSToken()
+        {
+            var login = new Dictionary<string, string>
+               {
+                   {"grant_type", "password"},
+                   {"username", "ttapiuser1"},//TT Mesaj Tarfından Size Verilen Api Kullanıcı Adı
+                   {"password", "ttapiuser1123"},//TT Mesaj Tarfından Size Verilen Api Şifre
+               };
+
+
+            using (HttpClient httpClient = new HttpClient())
+            {
+
+                var response = httpClient.PostAsync(SmsUrl + "ttmesajToken", new FormUrlEncodedContent(login)).Result;
+
+                if (response.IsSuccessStatusCode)
+                {
+                    Dictionary<string, string> tokenDetails = JsonConvert.DeserializeObject<Dictionary<string, string>>(response.Content.ReadAsStringAsync().Result);
+
+                    return tokenDetails.FirstOrDefault().Value;
+                }
+                else
+                {
+                    return "";
+                }
+            }
+        }
+        //private string SmmsToken = "";
+        public async Task SMS(string gsm, string Message,List<LoginObj> loginRes, List<SmstokenObj> SMSRes)
+        {
+            var SmmsToken = SMSRes[0].TokenSMS;
+            try
+            {
+                string description = string.Empty;
+
+                //isNotification parametresinin doldurulması
+                bool? isNotificationValue = null;
+
+
+                //recipentType parametresinin doldurulması
+                string recipentTypeValue = string.Empty;
+                var data = new
+                {
+                    username = SMSRes[0].SmsUser,
+                    password = SMSRes[0].SmsPassword,
+                    numbers = "0" + gsm,
+                    message = Message,
+                    origin = "YON AVM",
+                    sd = "0",
+                    ed = "0",
+                    isNotification = isNotificationValue,
+                    recipentType = recipentTypeValue,
+                    brandCode = ""
+                };
+
+                var content = new StringContent(JsonConvert.SerializeObject(data), Encoding.UTF8, "application/json");
+
+                using (HttpClient httpClient = new HttpClient())
+                {
+                    if (string.IsNullOrEmpty(SmmsToken))
+                    {
+                        WebMsgBox.Show("Token Hatalı");
+                    }
+                    else
+                    {
+                        httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", SmmsToken);
+                        var httppost = await httpClient.PostAsync(SMSRes[0].SmsUrl + "api/SendSms/SendSingle", content);
+                        string responseContent = await httppost.Content.ReadAsStringAsync();
+
+                        if (httppost.IsSuccessStatusCode)
+                        {
+                            try
+                            {
+                                var response = JsonConvert.DeserializeObject<SmsSonuc>(responseContent);
+
+                                if (response.Sonuc.Contains("*OK*")) // success
+                                {
+                                    description = response.Sonuc.Replace("*OK*", "");
+                                    List<SmsGiden> smsSonucs = new List<SmsGiden>();
+                                    SmsGiden sonuc = new SmsGiden();
+                                    sonuc.SOCODE = loginRes[0].SOCODE;
+                                    sonuc.Sonuc = description;
+                                    smsSonucs.Add(sonuc); 
+                                }
+                                else
+                                {
+                                    WebMsgBox.Show("SMS gönderimi başarısız: " + response.Sonuc);
+                                }
+                            }
+                            catch (JsonException ex)
+                            {
+                                WebMsgBox.Show("JSON parse hatası: " + ex.Message);
+                            }
+                        }
+                        else
+                        {
+                            WebMsgBox.Show("HTTP Hatası: " + httppost.StatusCode + " - " + responseContent);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+
             }
         }
     }

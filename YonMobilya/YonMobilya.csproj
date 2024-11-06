@@ -59,6 +59,7 @@
     <Reference Include="System.Core" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Web" />
@@ -657,6 +658,7 @@
     <Content Include="src\index.php" />
     <Content Include="Takvim.aspx" />
     <Content Include="Tamamlanan.aspx" />
+    <Content Include="Tamamlananlar.aspx" />
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
@@ -776,6 +778,13 @@
     </Compile>
     <Compile Include="Tamamlanan.aspx.designer.cs">
       <DependentUpon>Tamamlanan.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Tamamlananlar.aspx.cs">
+      <DependentUpon>Tamamlananlar.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Tamamlananlar.aspx.designer.cs">
+      <DependentUpon>Tamamlananlar.aspx</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>

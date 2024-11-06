@@ -1,42 +1,80 @@
 ﻿//------------------------------------------------------------------------------
-// <otomatik üretildi>
+// <otomatik olarak oluşturulmuş>
 //     Bu kod bir araç tarafından oluşturuldu.
 //
-//     Bu dosyada yapılacak değişiklikler yanlış davranışa neden olabilir ve
+//     Bu dosyada yapılacak değişiklikler hatalı davranışa neden olabilir ve
 //     kod tekrar üretildi. 
-// </otomatik üretildi>
+// </otomatik olarak oluşturulmuş>
 //------------------------------------------------------------------------------
 
-namespace YonMobilya {
-    
-    
-    public partial class frmAnaSayfa {
-        
+namespace YonMobilya
+{
+
+
+    public partial class frmAnaSayfa
+    {
+
         /// <summary>
-        /// toplamadet denetimi.
+        /// AyIsmi denetimi.
         /// </summary>
         /// <remarks>
-        /// Otomatik üretilmiş alan.
+        /// Otomatik olarak oluşturulan alan.
         /// Değiştirmek için, alan bildirimini tasarımcı dosyasından arka plan kod dosyasına taşıyın.
         /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl toplamadet;
-        
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl AyIsmi;
+
         /// <summary>
-        /// toplamciro denetimi.
+        /// bekleyenadet denetimi.
         /// </summary>
         /// <remarks>
-        /// Otomatik üretilmiş alan.
+        /// Otomatik olarak oluşturulan alan.
         /// Değiştirmek için, alan bildirimini tasarımcı dosyasından arka plan kod dosyasına taşıyın.
         /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl toplamciro;
-        
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl bekleyenadet;
+
         /// <summary>
-        /// hakedis denetimi.
+        /// bekleyenciro denetimi.
         /// </summary>
         /// <remarks>
-        /// Otomatik üretilmiş alan.
+        /// Otomatik olarak oluşturulan alan.
         /// Değiştirmek için, alan bildirimini tasarımcı dosyasından arka plan kod dosyasına taşıyın.
         /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl hakedis;
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl bekleyenciro;
+
+        /// <summary>
+        /// bekleyenhakedis denetimi.
+        /// </summary>
+        /// <remarks>
+        /// Otomatik olarak oluşturulan alan.
+        /// Değiştirmek için, alan bildirimini tasarımcı dosyasından arka plan kod dosyasına taşıyın.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl bekleyenhakedis;
+
+        /// <summary>
+        /// tamamlananadet denetimi.
+        /// </summary>
+        /// <remarks>
+        /// Otomatik olarak oluşturulan alan.
+        /// Değiştirmek için, alan bildirimini tasarımcı dosyasından arka plan kod dosyasına taşıyın.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl tamamlananadet;
+
+        /// <summary>
+        /// tamamalananciro denetimi.
+        /// </summary>
+        /// <remarks>
+        /// Otomatik olarak oluşturulan alan.
+        /// Değiştirmek için, alan bildirimini tasarımcı dosyasından arka plan kod dosyasına taşıyın.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl tamamalananciro;
+
+        /// <summary>
+        /// tamamlananhakedis denetimi.
+        /// </summary>
+        /// <remarks>
+        /// Otomatik olarak oluşturulan alan.
+        /// Değiştirmek için, alan bildirimini tasarımcı dosyasından arka plan kod dosyasına taşıyın.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl tamamlananhakedis;
     }
 }

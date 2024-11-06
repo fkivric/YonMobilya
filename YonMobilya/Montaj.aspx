@@ -35,7 +35,7 @@
             left: 50%;
             transform: translate(-50%, -50%);
             /* initial icon state */
-            opacity: 0;
+            opacity: 1;
             transition: opacity 0.3s ease;
             color: #ccc;
             -webkit-text-stroke-width: 2px;
@@ -43,7 +43,7 @@
         }
         /* toggle icon state */
         .profile-picture:hover .upload-icon {
-            opacity: 1;
+            opacity: 0;
         }
 
         .profile-picture2 {
@@ -79,7 +79,7 @@
             left: 50%;
             transform: translate(-50%, -50%);
             /* initial icon state */
-            opacity: 0;
+            opacity: 1;
             transition: opacity 0.3s ease;
             color: #ccc;
             -webkit-text-stroke-width: 2px;
@@ -123,7 +123,7 @@
             left: 50%;
             transform: translate(-50%, -50%);
             /* initial icon state */
-            opacity: 0;
+            opacity: 1;
             transition: opacity 0.3s ease;
             color: #ccc;
             -webkit-text-stroke-width: 2px;
@@ -131,7 +131,7 @@
         }
         /* toggle icon state */
         .profile-picture3:hover .upload-icon3 {
-            opacity: 1;
+            opacity: 0;
         }
 
 
@@ -178,6 +178,18 @@
         .profile-picture4:hover .upload-icon4 {
             opacity: 1;
         }
+
+        .image {
+            height: 100%;
+            width: 100%;
+            position: relative;
+            /* default image */
+            /*background-image: url("img/Ekbelge.png");*/
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+            box-shadow: 0 8px 6px -6px black;
+        }
     </style>
     <style type="text/css">
         .modal {
@@ -204,17 +216,17 @@
             background-color: White;
             z-index: 999;
         }
-        .ddl
-        {
-            border:2px solid #7d6754;
-            border-radius:5px;
-            padding:3px;
-            -webkit-appearance: none; 
-            background-image:url('Images/Arrowhead-Down-01.png');
-            background-position:88px;
-            background-repeat:no-repeat;
-            text-indent: 0.01px;/*In Firefox*/
-            text-overflow: '';/*In Firefox*/
+
+        .ddl {
+            border: 2px solid #7d6754;
+            border-radius: 5px;
+            padding: 3px;
+            -webkit-appearance: none;
+            background-image: url('Images/Arrowhead-Down-01.png');
+            background-position: 88px;
+            background-repeat: no-repeat;
+            text-indent: 0.01px; /*In Firefox*/
+            text-overflow: ''; /*In Firefox*/
         }
     </style>
 </asp:Content>
@@ -232,7 +244,6 @@
                         <div class="card-body">
                             <h4 class="card-title">Kurulum Tamamlama</h4>
                             <div class="row">
-
                                 <div class="table-responsive">
                                     <asp:GridView ID="grid" runat="server" CssClass="table table-striped table-bordered no-wrap"
                                         AutoGenerateColumns="False"
@@ -277,7 +288,7 @@
                             </div>
                             <div class="card mb-12">
                                 <div class="card-body">
-                                    <h2 class="card-title text-md-center">İşlem Tamamlamak için En az 4 Resim ekleyiniz</h2>
+                                    <h2 runat="server" id="resimadet" title="4" class="card-title text-md-center">İşlem Tamamlamak için En az 4 Resim ekleyiniz</h2>
                                     <div class="row gx-1 gy-1 align-items-center">
                                         <div runat="server" id="uploadarea" class="row col-12" visible="false">
                                             <div runat="server" id="resim1" class="col-md-6">
@@ -396,38 +407,38 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="details">
-                                    <div class="recentOrders" style="overflow: auto">
-                                        <div class="cardHeader">
-                                            <%--<h2>Yüklenen Dosyalar</h2>--%>
-                                        </div>
-                                        <asp:Label ID="FileLoad" runat="server" Visible="false"></asp:Label>
-                                        <div class="scroll">
-                                            <asp:GridView runat="server" ID="table" AutoGenerateColumns="false" CssClass="customers" BorderStyle="Solid" Width="100%" OnSelectedIndexChanged="table_SelectedIndexChanged" OnRowCreated="table_RowCreated">
-                                                <Columns>
-                                                    <asp:CommandField ShowSelectButton="True" SelectText="Dosya Gör" HeaderText="İşlem" ItemStyle-HorizontalAlign="Center" ButtonType="Button" />
-                                                    <asp:BoundField ItemStyle-CssClass="td" DataField="CURID" ReadOnly="True" />
-                                                    <asp:BoundField ItemStyle-CssClass="td" DataField="CURNAME" HeaderText="Müşteri" />
-                                                    <asp:BoundField ItemStyle-CssClass="td" DataField="FileTypeName" HeaderText="Dosya Tipi" />
-                                                    <asp:BoundField ItemStyle-CssClass="td" DataField="FileName" HeaderText="Dosya Adı" />
-                                                </Columns>
-                                            </asp:GridView>
-                                        </div>
-                                        <asp:Panel ID="panelViewer" runat="server" CssClass="viewer-panel">
-                                            <asp:Image ID="imgViewer" runat="server" Visible="False" />
-                                            <iframe runat="server" id="iframe" src="#" frameborder="0" visible="false"></iframe>
-                                            <asp:PlaceHolder ID="pdfViewerPlaceHolder" runat="server"></asp:PlaceHolder>
-                                        </asp:Panel>
-                                    </div>
+                                <div class="row">
+                                    <asp:Button runat="server" ID="Kaydet" CssClass="btn btn-success form-control" Text="Kaydet" OnClick="Kaydet_Click" Visible="false" />
                                 </div>
                             </div>
-                            <div class="loading" align="center">
-                                <img src="img/islem_gerceklestiriliyor.gif" alt="" />
+                        </div>
+                    </div>
+                    <div class="details">
+                        <div class="recentOrders" style="overflow: auto">
+                            <div class="cardHeader">
+                                <%--<h2>Yüklenen Dosyalar</h2>--%>
                             </div>
-                            <div class="row">                                
-                                <asp:Button runat="server" ID="Kaydet" CssClass="btn btn-success form-control" Text="Kaydet" OnClick="Kaydet_Click" Visible="false" />
+                            <asp:Label ID="FileLoad" runat="server" Visible="false"></asp:Label>
+                            <div class="scroll">
+                                <asp:GridView runat="server" ID="table" AutoGenerateColumns="false" CssClass="customers" BorderStyle="Solid" Width="100%" OnSelectedIndexChanged="table_SelectedIndexChanged" OnRowCreated="table_RowCreated">
+                                    <Columns>
+                                        <asp:CommandField ShowSelectButton="True" SelectText="Dosya Gör" HeaderText="İşlem" ItemStyle-HorizontalAlign="Center" ButtonType="Button" />
+                                        <asp:BoundField ItemStyle-CssClass="td" DataField="CURID" ReadOnly="True" />
+                                        <asp:BoundField ItemStyle-CssClass="td" DataField="CURNAME" HeaderText="Müşteri" />
+                                        <asp:BoundField ItemStyle-CssClass="td" DataField="FileTypeName" HeaderText="Dosya Tipi" />
+                                        <asp:BoundField ItemStyle-CssClass="td" DataField="FileName" HeaderText="Dosya Adı" />
+                                    </Columns>
+                                </asp:GridView>
                             </div>
                         </div>
+                    </div>
+                    <asp:Panel ID="panelViewer" runat="server" CssClass="viewer-panel">
+                        <asp:Image ID="imgViewer" runat="server" Visible="False" CssClass="image" />
+                        <iframe runat="server" id="iframe" src="#" frameborder="0" visible="false"></iframe>
+                        <asp:PlaceHolder ID="pdfViewerPlaceHolder" runat="server"></asp:PlaceHolder>
+                    </asp:Panel>
+                    <div class="loading" align="center">
+                        <img src="img/islem_gerceklestiriliyor.gif" alt="" />
                     </div>
                 </div>
             </div>
@@ -476,8 +487,7 @@
             }
 
             /// Display the image on the screen ///
-            if (image.type ==='application/pdf')
-            {
+            if (image.type === 'application/pdf') {
                 const profilePicture = document.querySelector('.profile-picture');
                 profilePicture.style.backgroundImage = `url('img/pdf.jpg')`; // Adjust the path as needed
                 filetext.textContent = `Seçilen PDF dosyası: ${file.name}`;
@@ -492,7 +502,7 @@
                     nodes.text = fileUploadInput.value;
                 }
                 filetext.text = fileUploadInput.files[0];
-            // upload image to the server or the cloud
+                // upload image to the server or the cloud
             }
         }
         function upload2() {
@@ -521,8 +531,7 @@
 
             /// Display the image on the screen ///
 
-            if (image.type ==='application/pdf')
-            {
+            if (image.type === 'application/pdf') {
                 const profilePicture = document.querySelector('.profile-picture2');
                 profilePicture.style.backgroundImage = `url('img/pdf.jpg')`; // Adjust the path as needed
                 filetext.textContent = `Seçilen PDF dosyası: ${file.name}`;
@@ -535,10 +544,10 @@
                     const profilePicture = document.querySelector('.profile-picture2');
                     profilePicture.style.backgroundImage = `url(${fileReaderEvent.target.result})`;
                     nodes.text = fileUploadInput.value;
-            }
-            filetext.text = fileUploadInput.files[0];
+                }
+                filetext.text = fileUploadInput.files[0];
 
-            // upload image to the server or the cloud
+                // upload image to the server or the cloud
             }
         }
         function upload3() {
@@ -566,14 +575,13 @@
             }
 
             /// Display the image on the screen ///
-            if (image.type ==='application/pdf')
-            {
+            if (image.type === 'application/pdf') {
                 const profilePicture = document.querySelector('.profile-picture3');
                 profilePicture.style.backgroundImage = `url('img/pdf.jpg')`; // Adjust the path as needed
                 filetext.textContent = `Seçilen PDF dosyası: ${file.name}`;
             }
             else if (image.type.includes('image')) {
-            const fileReader = new FileReader();
+                const fileReader = new FileReader();
                 fileReader.readAsDataURL(image);
 
                 fileReader.onload = (fileReaderEvent) => {
@@ -584,15 +592,14 @@
                 filetext.text = fileUploadInput.files[0];
             }
         }
-            function upload4() {
+        function upload4() {
 
             const fileUploadInput = document.querySelector('.file-uploader4');
             const filetext = document.getElementById('uploaderName4');
 
             /// Validations ///
 
-            if (!fileUploadInput.value)
-            {
+            if (!fileUploadInput.value) {
                 return;
             }
 
@@ -610,14 +617,13 @@
             }
 
             /// Display the image on the screen ///
-            if (image.type ==='application/pdf')
-            {
+            if (image.type === 'application/pdf') {
                 const profilePicture = document.querySelector('.profile-picture4');
                 profilePicture.style.backgroundImage = `url('img/pdf.jpg')`; // Adjust the path as needed
                 filetext.textContent = `Seçilen PDF dosyası: ${file.name}`;
             }
             else if (image.type.includes('image')) {
-            const fileReader = new FileReader();
+                const fileReader = new FileReader();
                 fileReader.readAsDataURL(image);
 
                 fileReader.onload = (fileReaderEvent) => {
@@ -626,8 +632,8 @@
                     nodes.text = fileUploadInput.value;
                 }
                 filetext.text = fileUploadInput.files[0];
-            }        
-                // upload image to the server or the cloud
-    }        
+            }
+            // upload image to the server or the cloud
+        }
     </script>
 </asp:Content>

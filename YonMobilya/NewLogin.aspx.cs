@@ -61,7 +61,14 @@ namespace YonMobilya
                 string Sorgu = "select MTFTPIP as VolFtpHost,MTFTPUSER as VolFtpUser,MTFTPPASSWORD as VolFtpPass from MANAGEMENT";
                 var ftp = DbQuery.Query(Sorgu, ConnectionString).DataTableToList<Ftp>();
                 Session.Add("FTP", ftp);
-                Response.Redirect("frmAnaSayfa.aspx");
+                if (sonuc[0].SOADMIN == "1")
+                {
+                    Response.Redirect("frmAnaSayfa.aspx");
+                }
+                else
+                {
+                    Response.Redirect("Takvim.aspx");
+                }
             }
             else
             {

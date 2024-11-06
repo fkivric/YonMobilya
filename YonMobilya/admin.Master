@@ -103,7 +103,7 @@
                         <a href="frmAnaSayfa.aspx">
                             <b class="logo-icon">
                                 <!-- Dark Logo icon -->
-                                <img src="assets/images/Yon%20Logo.png" alt="homepage" class="dark-logo" />
+                                <img src="assets/images/Yon%20Logo.png" alt="homepage" class="light-logo" />
                                 <!-- Light Logo icon -->
                                 <img src="assets/images/Yon%20Logo.png" style="resize: initial" alt="homepage" class="light-logo" />
                             </b>
@@ -209,9 +209,9 @@
                                 <a class="dropdown-item" href="KullaniciProfili.aspx"><i data-feather="user" class="svg-icon mr-2 ml-1"></i>Bilgilerim</a>
                                 <a class="dropdown-item" href="javascript:void(0)"><i data-feather="mail" class="svg-icon mr-2 ml-1"></i>Bildimler</a>
                                 <div class="dropdown-divider"></div>
-                                <a class="dropdown-item" href="KullaniciEkleme.aspx"><i data-feather="credit-card" class="svg-icon mr-2 ml-1"></i>Yeni Kullanıcı Ekleme</a>
+                                <a runat="server" id="NewUser" class="dropdown-item" href="KullaniciEkleme.aspx"><i data-feather="credit-card" class="svg-icon mr-2 ml-1"></i>Yeni Kullanıcı Ekleme</a>
                                 <div class="dropdown-divider"></div>
-                                <a class="dropdown-item" href="Ayarlar.aspx"><i data-feather="settings" class="svg-icon mr-2 ml-1"></i>Mevcut Kullanıcı Ayarı</a>
+                                <a runat="server" id="EditUser" class="dropdown-item" href="Ayarlar.aspx"><i data-feather="settings" class="svg-icon mr-2 ml-1"></i>Mevcut Kullanıcı Ayarı</a>
                                 <div class="dropdown-divider"></div>
                                 <a class="dropdown-item" href="Cikis.aspx"><i data-feather="power" class="svg-icon mr-2 ml-1"></i>Çıkış</a>
                                 
@@ -237,7 +237,7 @@
                 <nav class="sidebar-nav">
                     <ul id="sidebarnav">
                         <li class="sidebar-item">
-                            <a class="sidebar-link sidebar-link" href="frmAnaSayfa.aspx" aria-expanded="false">
+                            <a runat="server" id="MainPage" class="sidebar-link sidebar-link" href="frmAnaSayfa.aspx" aria-expanded="false">
                                 <i data-feather="home" class="feather-icon"></i>
                                 <span class="hide-menu" style="font-size: large">Ana Panel</span>
                             </a>
@@ -266,7 +266,7 @@
                                 </li>
                                 <li class="sidebar-item"><a class="sidebar-link sidebar-link" href="MagazaKurulum.aspx"
                                     aria-expanded="false"><i data-feather="refresh-cw" class="feather-icon"></i><span class="hide-menu">Mağaza Kurulumu <br />Randevu Atama</span></a></li>
-                                <li class="sidebar-item"><a class="sidebar-link sidebar-link" href="javascript:void(0)"
+                                <li class="sidebar-item"><a class="sidebar-link sidebar-link" href="Tamamlananlar.aspx"
                                     aria-expanded="false"><i data-feather="check-circle" class="feather-icon"></i><span class="hide-menu">Tamamlanan İşler</span> </a></li>
                                 <li class="sidebar-item"><a class="sidebar-link sidebar-link" href="javascript:void(0)"
                                     aria-expanded="false"><i data-feather="flag" class="feather-icon"></i><span class="hide-menu">Hakediş Raporları</span> </a></li>
