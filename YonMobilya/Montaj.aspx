@@ -15,7 +15,6 @@
             background-size: cover;
             box-shadow: 0 8px 6px -6px black;
         }
-
         .file-uploader {
             /* make it invisible */
             opacity: 0;
@@ -28,7 +27,6 @@
             top: 0%;
             left: 0%;
         }
-
         .upload-icon {
             position: absolute;
             top: 45%;
@@ -59,7 +57,6 @@
             background-size: cover;
             box-shadow: 0 8px 6px -6px black;
         }
-
         .file-uploader2 {
             /* make it invisible */
             opacity: 0;
@@ -72,7 +69,6 @@
             top: 0%;
             left: 0%;
         }
-
         .upload-icon2 {
             position: absolute;
             top: 45%;
@@ -103,7 +99,6 @@
             background-size: cover;
             box-shadow: 0 8px 6px -6px black;
         }
-
         .file-uploader3 {
             /* make it invisible */
             opacity: 0;
@@ -116,7 +111,6 @@
             top: 0%;
             left: 0%;
         }
-
         .upload-icon3 {
             position: absolute;
             top: 45%;
@@ -148,7 +142,6 @@
             background-size: cover;
             box-shadow: 0 8px 6px -6px black;
         }
-
         .file-uploader4 {
             /* make it invisible */
             opacity: 0;
@@ -161,7 +154,6 @@
             top: 0%;
             left: 0%;
         }
-
         .upload-icon4 {
             position: absolute;
             top: 45%;
@@ -262,6 +254,7 @@
                                                         <asp:ListItem Value="0" Text="Yapılmadı"></asp:ListItem>
                                                         <asp:ListItem Value="1" Text="Tamamlandı"></asp:ListItem>
                                                         <asp:ListItem Value="2" Text="SSH gerekli"></asp:ListItem>
+                                                        <asp:ListItem Value="3" Text="Değişim Gerekli"></asp:ListItem>
                                                     </asp:DropDownList>
                                                 </ItemTemplate>
                                             </asp:TemplateField>
@@ -295,7 +288,7 @@
                                                 <div class="card">
                                                     <div>
                                                         <div runat="server" id="Div1" class="number"></div>
-                                                        <div class="cardName">Montaj Resmi 1</div>
+                                                        <div class="cardName">Montaj Resmi</div>
                                                     </div>
                                                     <div runat="server" id="profilepicture" class="profile-picture">
                                                         <h1 class="upload-icon">
@@ -320,39 +313,11 @@
                                                 </div>
 
                                             </div>
-                                            <%--                                        <div runat="server" id="resim2" class="col-md-3">
-                                                    <div class="card">
-                                                        <div>
-                                                            <div runat="server" id="Div2" class="number"></div>
-                                                            <div class="cardName">Montaj Resmi 2</div>
-                                                        </div>
-                                                        <div class="profile-picture2">
-                                                            <h1 class="upload-icon2">
-                                                                <i class="fa fa-plus fa-2x" aria-hidden="true"></i>
-                                                            </h1>
-                                                            <input
-                                                                id="oFile2"
-                                                                type="file"
-                                                                runat="server"
-                                                                class="file-uploader2"
-                                                                onchange="upload2()"
-                                                                accept="image/*,application/pdf" />
-                                                        </div>
-                                                        <div class="iconBox">
-                                                            <i class="fa fa-eye" aria-hidden="true"></i>
-                                                            <label id="uploaderName2"></label>
-                                                        </div>
-                                                        <asp:Button ID="btnUpload2" type="submit" Text="Upload" runat="server" OnClick="btnUpload2_Click"></asp:Button>
-                                                        <asp:Panel ID="frmConfirmation2" Visible="False" runat="server">
-                                                            <asp:Label ID="lblUploadResult2" runat="server"></asp:Label>
-                                                        </asp:Panel>
-                                                    </div>
-                                                </div>--%>
                                             <div runat="server" id="resim3" class="col-md-6">
                                                 <div class="card">
                                                     <div>
                                                         <div runat="server" id="Div3" class="number"></div>
-                                                        <div class="cardName">SSH RESİM 1</div>
+                                                        <div class="cardName">SSH RESİM</div>
                                                     </div>
                                                     <div class="profile-picture3">
                                                         <h1 class="upload-icon3">

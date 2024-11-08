@@ -33,8 +33,7 @@ namespace YonMobilya
                 var loginRes = (List<LoginObj>)Session["Login"];
                 if (loginRes != null)
                 {
-                    string script = "$(document).ready(function () { $('[id*=btnSubmit]').click(); });";
-                    ClientScript.RegisterStartupScript(this.GetType(), "load", script, true);
+                    ScriptManager.RegisterStartupScript(this, GetType(), "showLoading", "showLoading();", true);
                     SALID = Request.QueryString["salid"];
                     CURID = Request.QueryString["curid"]; //DbQuery.GetValue($"select SALCURID from SALES where SALID = {SALID}");
                     Dosyalar();
@@ -64,8 +63,7 @@ namespace YonMobilya
             }
             else
             {
-                string script = "$(document).ready(function () { $('[id*=btnSubmit]').click(); });";
-                ClientScript.RegisterStartupScript(this.GetType(), "load", script, true);
+                ScriptManager.RegisterStartupScript(this, GetType(), "hideLoading", "hideLoading();", true);
             }
         }
         private void BindGridView()
@@ -76,7 +74,7 @@ namespace YonMobilya
                 query = String.Format(@"select distinct CDRSALID,ORDCHID,PROID, PROVAL,PRONAME,Convert(int,ORDCHQUAN) as ORDCHBALANCEQUAN,Convert(numeric(18,2),ORDCHQUAN*PRLPRICE) as PRLPRICE
 			     ,TESLIM.DIVNAME
                 FROM MDE_GENEL.dbo.MB_Islemler 
-                left outer join CUSDELIVER on MB_SALID = CDRSALID and CDRORDCHID = MB_ORDCHID
+                left outer join CUSDELIVER t on MB_SALID = CDRSALID and CDRORDCHID = MB_ORDCHID
                 left outer join CURRENTS on CURID = CDRCURID
                 left outer join ORDERSCHILD on ORDCHID = CDRORDCHID
                 left outer join PRODUCTS on PROID = ORDCHPROID
@@ -84,8 +82,9 @@ namespace YonMobilya
                 left outer join DEFSTORAGE WITH (NOLOCK) ON CDRSTORID = DSTORID
                 left outer join DIVISON TESLIM WITH (NOLOCK) ON TESLIM.DIVVAL = DSTORVAL AND ORDCHCOMPANY = TESLIM.DIVCOMPANY
                 outer apply (select PRLPRICE from PRICELIST prl where prl.PRLPROID = PROID and PRLDPRID = 740) as pesinfiyat
-                where CDRSALID =  '{0}' AND CDRSHIPVAL = 'ANTMOB' --and ORDCHBALANCEQUAN >= ORDCHQUAN
+                where CDRSALID =  '{0}' AND CDRSHIPVAL = 'ANTMOB' and CDRBASECANID is NULL
 			    and MB_Tamamlandi = 0  and CDRBASECANID is NULL
+				and not exists (select top 1 * from CUSDELIVER i WITH (NOLOCK) where i.CDRBASECANID = t.CDRID and MB_SALID = i.CDRSALID and i.CDRORDCHID = MB_ORDCHID)
                 order by 1 desc", SALID);
             }
             else

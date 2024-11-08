@@ -26,6 +26,49 @@
             text-indent: 0.01px;/*In Firefox*/
             text-overflow: '';/*In Firefox*/
         }
+        .gridView .pager a,
+        .gridView .pager span {
+            display: inline-block;
+            padding: 5px 10px;
+            margin: 2px;
+            color: white; /* Beyaz yazı rengi */
+            background-color: #007bff; /* Kutucuk rengi */
+            border-radius: 4px; /* Kenarları yuvarlama */
+            text-decoration: none;
+        }
+        .gridView .pager a:hover {
+            background-color: #0056b3; /* Hover efekti */
+        }
+        .gridView .pager span {
+            font-weight: bold;
+            background-color: #00b388; /* Aktif sayfa rengi */
+        }
+    </style>
+    <style type="text/css">
+
+        .loading {
+            font-family: Arial;
+            font-size: 10pt;
+            /*border: 5px solid #67CFF5;
+            width: 200px;
+            height: 100px;*/
+            display: none;
+            position: fixed;
+            background-color: White;
+            z-index: 999;
+        }
+
+        .ddl {
+            border: 2px solid #7d6754;
+            border-radius: 5px;
+            padding: 3px;
+            -webkit-appearance: none;
+            background-image: url('Images/Arrowhead-Down-01.png');
+            background-position: 88px;
+            background-repeat: no-repeat;
+            text-indent: 0.01px; /*In Firefox*/
+            text-overflow: ''; /*In Firefox*/
+        }
     </style>
     <script type="text/javascript">
         function openDatePicker() {
@@ -118,33 +161,30 @@
                                         </div>
                                     </div>
                                     <div class="scroll">
-                                        <asp:GridView runat="server" ID="GridView1" CssClass="table table-striped table-bordered no-wrap" BorderStyle="Solid" Width="100%" 
+                                        <asp:GridView runat="server" ID="GridView1" CssClass="gridView" BorderStyle="Solid" Width="100%" 
                                             AutoGenerateColumns="false" 
-                                            AllowPaging="True" PageSize="20"
-                                            ShowFooter="True" ShowHeaderWhenEmpty="True"
+                                            AllowPaging="True" 
+                                            PageSize="5"
                                             OnPageIndexChanging="GridView1_PageIndexChanging"
                                             OnRowCommand="GridView1_RowCommand" 
                                             OnRowCreated="GridView1_RowCreated"
                                             OnRowDataBound="GridView1_RowDataBound">
                                             <Columns>
-                                                <asp:CommandField ShowSelectButton="True" SelectText="Siparişi İncele" HeaderText="Sipariş Bilgisi" ItemStyle-HorizontalAlign="Center" ButtonType="Button"/>
+                                                <asp:CommandField ItemStyle-CssClass="td2" ShowSelectButton="True" SelectText="Siparişi İncele" HeaderText="Sipariş Bilgisi" ItemStyle-HorizontalAlign="Center" ButtonType="Button"/>
                                                 <asp:BoundField ItemStyle-CssClass="td" DataField="SALID" ReadOnly="True" />
                                                 <asp:BoundField ItemStyle-CssClass="td" DataField="SALCURID" ReadOnly="True" />
                                                 <asp:BoundField ItemStyle-CssClass="td" DataField="CURVAL" HeaderText="Müşteri Kodu" />
-                                                <asp:BoundField ItemStyle-CssClass="td" DataField="CURCHCOUNTY" HeaderText="İlçe" />
                                                 <asp:BoundField ItemStyle-CssClass="td" DataField="CURNAME" HeaderText="Müşteri Adı" />
-                                                <asp:BoundField ItemStyle-CssClass="td" DataField="SALDATE" DataFormatString="{0:d}" HeaderText="Tarih" />
+                                                <asp:BoundField ItemStyle-CssClass="td" DataField="CURCHCOUNTY" HeaderText="İlçe" />
+                                                <asp:BoundField ItemStyle-CssClass="td" DataField="SALDATE" DataFormatString="{0:d}" HeaderText="Satış Tarihi" />
                                                 <asp:BoundField ItemStyle-CssClass="td" DataField="SATISDIVNAME" HeaderText="SATIŞ Mağaza" />
                                                 <asp:BoundField ItemStyle-CssClass="td" DataField="TESLIMDIVNAME" HeaderText="Alım Noktası" />
                                             </Columns>
-                                            <FooterStyle BackColor="#CCCCCC" />
-                                            <PagerSettings Mode="Numeric" Position="Bottom" PageButtonCount="10" />   
+                                            <PagerSettings Mode="Numeric" Position="Bottom"  />
+                                            <PagerStyle CssClass="pager" ForeColor="White" HorizontalAlign="Center" />  
                                         </asp:GridView>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="loading" align="center">
-                                <img src="img/islem_gerceklestiriliyor.gif" alt="" />
                             </div>
                         </div>
                     </div>
@@ -160,12 +200,15 @@
                                         </div>
                                     </div>
                                     <div class="scroll">
-                                        <asp:GridView runat="server" ID="GridView2" CssClass="table table-striped table-bordered no-wrap" BorderStyle="Solid" Width="100%" 
+                                        <asp:GridView runat="server" ID="GridView2" CssClass="gridView" BorderStyle="Solid" Width="100%" 
                                             AutoGenerateColumns="false" 
-                                            AllowPaging="True" PageSize="20"
-                                            ShowFooter="True" ShowHeaderWhenEmpty="True" OnPageIndexChanging="GridView2_PageIndexChanging" OnRowCreated="GridView2_RowCreated" OnRowCommand="GridView2_RowCommand">
+                                            AllowPaging="True" 
+                                            PageSize="5"
+                                            OnPageIndexChanging="GridView2_PageIndexChanging" 
+                                            OnRowCreated="GridView2_RowCreated" 
+                                            OnRowCommand="GridView2_RowCommand">
                                             <Columns>
-                                                <asp:CommandField ShowSelectButton="True" SelectText="Siparişi İncele" HeaderText="Sipariş Bilgisi" ItemStyle-HorizontalAlign="Center" ButtonType="Button"/>
+                                                <asp:CommandField ItemStyle-CssClass="td2" ShowSelectButton="True" SelectText="Siparişi İncele" HeaderText="Sipariş Bilgisi" ItemStyle-HorizontalAlign="Center" ButtonType="Button"/>
                                                 <asp:BoundField ItemStyle-CssClass="td" DataField="MB_SALID" ReadOnly="True" />
                                                 <asp:BoundField ItemStyle-CssClass="td" DataField="CURID" ReadOnly="True" />
                                                 <asp:BoundField ItemStyle-CssClass="td" DataField="OFFCURID" ReadOnly="True" />
@@ -173,13 +216,16 @@
                                                 <asp:BoundField ItemStyle-CssClass="td" DataField="CURNAME" HeaderText="Müşteri Adı" />
                                                 <asp:BoundField ItemStyle-CssClass="td" DataField="MB_PlanTarih" DataFormatString="{0:d}" HeaderText="Plan Tarihi" />
                                                 <asp:BoundField ItemStyle-CssClass="td" DataField="OFFCURNAME" HeaderText="Montajcı Adı" />
-                                                <asp:BoundField ItemStyle-CssClass="td" DataField="PRLPRICE" DataFormatString="{0:n2}" HeaderText="Satış Mağaza" />
+                                                <asp:BoundField ItemStyle-CssClass="td" DataField="PRLPRICE" DataFormatString="{0:n2}" HeaderText="Tutar" />
                                             </Columns>
-                                            <FooterStyle BackColor="#CCCCCC" />
-                                            <PagerSettings Mode="Numeric" Position="Bottom" PageButtonCount="10" />   
+                                            <PagerSettings Mode="Numeric" Position="Bottom"  />
+                                            <PagerStyle CssClass="pager" ForeColor="White" HorizontalAlign="Center" />
                                         </asp:GridView>
                                     </div>
                                 </div>
+                            </div>
+                            <div class="loading" align="center">
+                                <img src="img/islem_gerceklestiriliyor.gif" alt="" />
                             </div>
                         </div>
                     </div>
@@ -240,6 +286,10 @@
                         </asp:GridView>
                             <div class="row gx-3 gy-2 align-items-center">
                                 <div class="col-md-3">
+                                    <label for="City">Teslimat Notu</label>
+                                    <input runat="server" class="form-control" type="text" id="CDRPLNNOTES" required=""  readonly="readonly"/>
+                                </div>
+                                <div class="col-md-3">
                                     <label for="City">Teslimat İl</label>
                                     <input class="form-control" type="text" id="customerCity" required=""  readonly="readonly"/>
                                 </div>
@@ -247,7 +297,7 @@
                                     <label for="County">Teslimat İlçe</label>
                                     <input class="form-control" type="text" id="customerCounty" required=""  readonly="readonly"/>
                                 </div>
-                                <div class="col-md-6">
+                                <div class="col-md-3">
                                     <label for="Adres">Teslimat Adres</label>
                                     <textarea class="form-control" style="vertical-align:unset" id="customerAdres" rows="4" required="" readonly="readonly"></textarea>
                                 </div>
@@ -271,7 +321,24 @@
         <!-- /.modal-dialog -->
         </div>
     </div>
-    <script src="assets/libs/jquery/dist/jquery.min.js"></script>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+    <script type="text/javascript">
+        function ShowProgress() {
+            setTimeout(function () {
+                var modal = $('<div />');
+                modal.addClass("modal");
+                $('body').append(modal);
+                var loading = $(".loading");
+                loading.show();
+                var top = Math.max($(window).height() / 2 - loading[0].offsetHeight / 2, 0);
+                var left = Math.max($(window).width() / 2 - loading[0].offsetWidth / 2, 0);
+                loading.css({ top: top, left: left });
+            }, 200);
+        }
+        $('form').live("submit", function () {
+            ShowProgress();
+        });
+    </script>
     <style>
         /* GridView kontrolünüz için genel stil */
         .gridView {
@@ -302,23 +369,6 @@
         }
     </style>
     <script type="text/javascript">
-    function ShowProgress() {
-        setTimeout(function () {
-            var modal = $('<div />');
-            modal.addClass("modal");
-            $('body').append(modal);
-            var loading = $(".loading");
-            loading.show();
-            var top = Math.max($(window).height() / 2 - loading[0].offsetHeight / 2, 0);
-            var left = Math.max($(window).width() / 2 - loading[0].offsetWidth / 2, 0);
-            loading.css({ top: top, left: left });
-        }, 200);
-    }
-    $('form').live("submit", function () {
-        ShowProgress();
-    });
-    </script>
-    <script type="text/javascript">
     function showModal() { 
         // Modal'ı göster
         $('#full-width-modal').modal('show');
@@ -329,14 +379,5 @@
         // Modal'ı göster
         $('#full-width-modal').modal('hide');
     }
-    </script>
-    <script type="text/javascript">
-        function showLoading() {
-            document.getElementById('loadingDiv').style.display = 'block'; // Loading alanını göster
-        }
-
-        function hideLoading() {
-            document.getElementById('loadingDiv').style.display = 'none'; // Loading alanını gizle
-        }
     </script>
 </asp:Content>

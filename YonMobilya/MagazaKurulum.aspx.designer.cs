@@ -105,6 +105,15 @@ namespace YonMobilya
         protected global::System.Web.UI.WebControls.GridView Musteri;
 
         /// <summary>
+        /// CDRPLNNOTES denetimi.
+        /// </summary>
+        /// <remarks>
+        /// Otomatik olarak oluşturulan alan.
+        /// Değiştirmek için, alan bildirimini tasarımcı dosyasından arka plan kod dosyasına taşıyın.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlInputText CDRPLNNOTES;
+
+        /// <summary>
         /// customerDATE denetimi.
         /// </summary>
         /// <remarks>

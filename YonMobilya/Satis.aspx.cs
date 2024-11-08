@@ -361,7 +361,7 @@ select distinct Convert(varchar(50),MB_SALID) as MB_SALID,MB_ORDCHID,MB_PlanTari
                 musterirow = dt.Rows.Count;
                 Musteri.DataSource = dt;
                 Musteri.DataBind();
-
+                CDRPLNNOTES.Value = DbQuery.GetValue($"select CDRPLNNOTES from CUSDELIVER where CDRSALID = {SALID}");
                 Montajci.DataSource = null;
                 Montajci.Items.Clear(); // Eklenen bu satır, mevcut öğeleri temizler
                 string q = string.Format(@"select 0 as OFFCURID, 'Genel Kurulumcu...' as OFFCURNAME
@@ -384,7 +384,6 @@ select distinct Convert(varchar(50),MB_SALID) as MB_SALID,MB_ORDCHID,MB_PlanTari
                     Montajci.DataSource = null;
                     Montajci.DataBind();
                 }
-
 
                 ScriptManager.RegisterStartupScript(this, GetType(), "hideLoading", "hideLoading();", true);
             }
@@ -688,10 +687,11 @@ select distinct Convert(varchar(50),MB_SALID) as MB_SALID,MB_ORDCHID,MB_PlanTari
         protected void GridView2_PageIndexChanging(object sender, GridViewPageEventArgs e)
         {
             //Yeni sayfa numarasını ayarla
-            GridView1.PageIndex = e.NewPageIndex;
+            GridView2.PageIndex = e.NewPageIndex;
 
             // GridView'i yeniden bağla
             BekleyenListesi();
+            ScriptManager.RegisterStartupScript(this, GetType(), "hideLoading", "hideLoading();", true);
         }
 
         protected void GridView2_RowCreated(object sender, GridViewRowEventArgs e)

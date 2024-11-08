@@ -230,6 +230,10 @@
                         </asp:GridView>
                             <div class="row gx-3 gy-2 align-items-center">
                                 <div class="col-md-3">
+                                    <label for="City">Teslimat Notu</label>
+                                    <input runat="server" class="form-control" type="text" id="CDRPLNNOTES" required=""  readonly="readonly"/>
+                                </div>
+                                <div class="col-md-3">
                                     <label for="City">Teslimat İl</label>
                                     <input class="form-control" type="text" id="customerCity" required=""  readonly="readonly"/>
                                 </div>
@@ -237,7 +241,7 @@
                                     <label for="County">Teslimat İlçe</label>
                                     <input class="form-control" type="text" id="customerCounty" required=""  readonly="readonly"/>
                                 </div>
-                                <div class="col-md-6">
+                                <div class="col-md-3">
                                     <label for="Adres">Teslimat Adres</label>
                                     <textarea class="form-control" style="vertical-align:unset" id="customerAdres" rows="4" required="" readonly="readonly"></textarea>
                                 </div>

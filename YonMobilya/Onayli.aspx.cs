@@ -65,7 +65,7 @@ namespace YonMobilya
                     magaza = loginRes[0].DIVVAL.ToString();
                 }
                 string q = String.Format(@"select CDRSALID,CDRCURID,CURVAL,CURNAME,MB_PlanTarih as ORDDATE,sum(ORDCHQUAN) as ORDCHBALANCEQUAN,Convert(numeric(18,2),sum(ORDCHQUAN*PRLPRICE)) as PRLPRICE,CURCHCOUNTY,CURCHADR1 + CURCHADR2 as ADRESS
-                ,TESLIM.DIVNAME
+                ,TESLIM.DIVNAME,CURCHGSM1 as TELEFON
                 FROM MDE_GENEL.dbo.MB_Islemler WITH (NOLOCK)
                 inner join CUSDELIVER t WITH (NOLOCK) on MB_SALID = t.CDRSALID and t.CDRORDCHID = MB_ORDCHID
                 left outer join CURRENTS WITH (NOLOCK) on CURID = t.CDRCURID
@@ -77,17 +77,18 @@ namespace YonMobilya
                 outer apply (select PRLPRICE from PRICELIST prl WITH (NOLOCK) where prl.PRLPROID = ORDCHPROID and PRLDPRID = 740) as pesinfiyat
                 where MB_Tamamlandi = 0 and MB_SUPCURVAL = '{0}' AND CDRSHIPVAL = 'ANTMOB' and CDRBASECANID is NULL
 				and not exists (select top 1 * from CUSDELIVER i WITH (NOLOCK) where i.CDRBASECANID = t.CDRID and MB_SALID = i.CDRSALID and i.CDRORDCHID = MB_ORDCHID)
-                group by CDRSALID,CDRCURID,CURVAL,CURNAME,MB_PlanTarih,CURCHCOUNTY,CURCHADR1 + CURCHADR2,TESLIM.DIVNAME
+                group by CDRSALID,CDRCURID,CURVAL,CURNAME,MB_PlanTarih,CURCHCOUNTY,CURCHADR1 + CURCHADR2,TESLIM.DIVNAME,CURCHGSM1
                 union
                 select PRDEID as CDRSALID,'' as CDRCURID,ISTEYEN.DIVVAL as CURVAL,ISTEYEN.DIVNAME as CURNAME,MB_PlanTarih as ORDDATE,sum(PRDEQUAN) as ORDCHBALANCEQUAN,sum(PRLPRICE) as PRLPRICE,ISTEYEN.DIVADR2 as CURCHCOUNTY,ISTEYEN.DIVADR1 as ADRESS,TESLIM.DIVNAME
-				FROM MDE_GENEL.dbo.MB_Islemler
+				,ISTEYEN.DIVPHN1 as TELEFON
+                FROM MDE_GENEL.dbo.MB_Islemler
 				left outer join PRODEMAND on PRDEID = MB_ORDCHID
 				left outer join DIVISON ISTEYEN on ISTEYEN .DIVVAL = PRDEDIVISON
 				left outer join DEFSTORAGE on DSTORID = PRDEDSTORIDOUT
                 left outer join DIVISON TESLIM WITH (NOLOCK) ON TESLIM.DIVVAL = DSTORDIVISON
                 outer apply (select PRLPRICE from PRICELIST prl where prl.PRLPROID = PRDEPROID and PRLDPRID = 740) as pesinfiyat
 				where MB_Tamamlandi = 0 and MB_SUPCURVAL = '{0}' and PRDEKIND= 1 and PRDESTS = 0
-				group by PRDEID,ISTEYEN.DIVVAL,ISTEYEN.DIVNAME,MB_PlanTarih,ISTEYEN.DIVADR2,ISTEYEN.DIVADR1,TESLIM.DIVNAME
+				group by PRDEID,ISTEYEN.DIVVAL,ISTEYEN.DIVNAME,MB_PlanTarih,ISTEYEN.DIVADR2,ISTEYEN.DIVADR1,TESLIM.DIVNAME,ISTEYEN.DIVPHN1
                 order by ORDDATE,CURCHCOUNTY,CURNAME", loginRes[0].CURVAL);
                 var dt = DbQuery.Query(q, ConnectionString);
                 GridView1.DataSource = dt;
@@ -95,19 +96,19 @@ namespace YonMobilya
                 if (dt != null)
                 {
                     toplamadet.InnerText = dt.Rows.Count.ToString();
-                    double ciro = 0;
-                    for (int i = 0; i < dt.Rows.Count; i++)
-                    {
-                        ciro = ciro + double.Parse(dt.Rows[0]["PRLPRICE"].ToString());
-                    }
-                    toplamciro.InnerText = ciro.ToString("C", new CultureInfo("tr-TR"));
-                    hakedis.InnerText = (ciro * 0.08).ToString("C", new CultureInfo("tr-TR"));
+                    //double ciro = 0;
+                    //for (int i = 0; i < dt.Rows.Count; i++)
+                    //{
+                    //    ciro = ciro + double.Parse(dt.Rows[0]["PRLPRICE"].ToString());
+                    //}
+                    //toplamciro.InnerText = ciro.ToString("C", new CultureInfo("tr-TR"));
+                    //hakedis.InnerText = (ciro * 0.08).ToString("C", new CultureInfo("tr-TR"));
                 }
                 else
                 {
                     toplamadet.InnerText = "0";
-                    toplamciro.InnerText = "0";
-                    hakedis.InnerText = "0";
+                    //toplamciro.InnerText = "0";
+                    //hakedis.InnerText = "0";
                 }
             }
         }

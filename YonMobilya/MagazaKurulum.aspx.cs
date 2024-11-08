@@ -433,7 +433,12 @@ namespace YonMobilya
                 musterirow = dt.Rows.Count;
                 Musteri.DataSource = dt;
                 Musteri.DataBind();
-
+                string note = "";
+                for (int i = 0; i < dt.Rows.Count; i++)
+                {
+                    note = note + DbQuery.GetValue($"select PRDENOTES from PRODEMAND where PRDEID = {dt.Rows[i][0].ToString()}");
+                }
+                CDRPLNNOTES.Value = note;
                 Montajci.DataSource = null;
                 Montajci.Items.Clear(); // Eklenen bu satır, mevcut öğeleri temizler
                 string q = string.Format(@"
