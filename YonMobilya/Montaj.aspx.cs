@@ -104,6 +104,8 @@ namespace YonMobilya
             {
                 grid.DataSource = dt;
                 grid.DataBind();
+                resimadet.Attributes["title"] = dt.Rows.Count.ToString();
+                resimadet.InnerText = "İşlem Tamamlamak için Her Ürüne 1 Resim ekleyiniz Toplam :" + dt.Rows.Count.ToString() + " Resim Yükleyiniz";
             }
             else
             {
@@ -131,7 +133,7 @@ namespace YonMobilya
                 {
                     FileLoad.Visible = true;
                     table.DataSource = dt;
-                    table.DataBind();
+                    table.DataBind(); 
                 }
             }
             else
@@ -1056,7 +1058,18 @@ namespace YonMobilya
                 }
                 else
                 {
-                    WebMsgBox.Show("Lütfen en az 4 adet resim yükleyiniz");
+                    if (CURID == "0")
+                    {
+                        WebMsgBox.Show("Lütfen en az 1 adet resim yükleyiniz");
+                    }
+                    else if (int.Parse(resimadet.Attributes["title"].ToString()) > 4)
+                    {
+                        WebMsgBox.Show("Lütfen her ürün için 1 resim yükleyiniz");
+                    }
+                    else
+                    {
+                        WebMsgBox.Show("Lütfen en az 4 adet resim yükleyiniz");
+                    }
                 }
             }
         }

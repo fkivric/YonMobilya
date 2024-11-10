@@ -277,7 +277,7 @@
                                         <PagerSettings Mode="Numeric" Position="Bottom" PageButtonCount="10" />
                                     </asp:GridView>
                                 </div>
-                                <asp:Button runat="server" ID="tamlandı" OnClick="tamlandı_Click" Text="Montaj işlemlerini tamamla" CssClass="btn btn-info form-control" />
+                                <asp:Button runat="server" ID="tamlandı" OnClick="tamlandı_Click" Text="Montaj işlemlerini tamamla. Resim Yükle" CssClass="btn btn-info form-control" />
                             </div>
                             <div class="card mb-12">
                                 <div class="card-body">

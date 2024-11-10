@@ -340,6 +340,5 @@
                 __doPostBack('UpdatePanel1', ''); // UpdatePanel'i tetikleyerek takvimi yeniler
             }
         }
-
     </script>
 </asp:Content>
