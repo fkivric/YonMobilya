@@ -157,7 +157,7 @@ namespace YonMobilya
              AND T.CDRSALID > 0 
              AND ORDERSCHILD.ORDCHBALANCEQUAN > 0 
              AND ORDERSCHILD.ORDCHBEYOND = 0
-             AND PROUVAL = '111'
+             AND PROUVAL in ('111','118')
 			 AND CDRSHIPVAL = 'ANTMOB'
              AND SALDIVISON in ({0})
              AND not exists (select * from MDE_GENEL.dbo.MB_Islemler where MB_SALID = SALID AND MB_ORDCHID = CDRORDCHID)
@@ -295,18 +295,17 @@ select distinct Convert(varchar(50),MB_SALID) as MB_SALID,MB_ORDCHID,MB_PlanTari
         protected void GridView1_RowCommand(object sender, GridViewCommandEventArgs e)
         {
             var loginRes = (List<LoginObj>)Session["Login"];
-            ScriptManager.RegisterStartupScript(this, GetType(), "showLoading", "showLoading();", true);
             if (e.CommandName != "Page")
             {
                 // Butonun hangi satırda olduğunu belirleyin
+
                 int index = Convert.ToInt32(e.CommandArgument);
                 GridViewRow row = GridView1.Rows[index];
-
-                var CURID = GridView1.Rows[index].Cells[2].Text;
-                CURVAL = GridView1.Rows[index].Cells[3].Text;
-                var CURNAME = System.Web.HttpUtility.HtmlDecode(GridView1.Rows[index].Cells[5].Text);
+                var CURID = row.Cells[2].Text;
+                CURVAL = row.Cells[3].Text;
+                var CURNAME = System.Web.HttpUtility.HtmlDecode(row.Cells[4].Text);
                 // SQL Sorgusu ile veriyi al
-                var SALID = GridView1.Rows[index].Cells[1].Text;
+                var SALID = row.Cells[1].Text;
 
                 string w = String.Format(@"select CURCHCITY,CURCHCOUNTY,CURCHADR1 + ' ' + CURCHADR2 as CURCHADR from CURRENTSCHILD where CURCHID = {0}", CURID);
                 var adr = DbQuery.Query(w, ConnectionString);
@@ -338,11 +337,11 @@ select distinct Convert(varchar(50),MB_SALID) as MB_SALID,MB_ORDCHID,MB_PlanTari
                     "showModal",
                     script,
                     false
-                );
+                );                
                 NewOrOld.InnerText = "1";
                 customerDATE.Value = DateTime.Now.ToString("yyyy-MM-dd");
                 string query = String.Format(@"select distinct CDRSALID,ORDCHID,PROID, PROVAL,PRONAME,Convert(int,ORDCHBALANCEQUAN) as ORDCHBALANCEQUAN,Convert(numeric(18,2),ORDCHBALANCEQUAN*PRLPRICE) as PRLPRICE
-			     ,TESLIM.DIVNAME, 0 as isSelected
+			     , 0 as isSelected
                 from CUSDELIVER
                 left outer join CURRENTS on CURID = CDRCURID
                 left outer join ORDERSCHILD on ORDCHID = CDRORDCHID
@@ -351,7 +350,7 @@ select distinct Convert(varchar(50),MB_SALID) as MB_SALID,MB_ORDCHID,MB_PlanTari
                 left outer join DEFSTORAGE WITH (NOLOCK) ON CDRSTORID = DSTORID
                 left outer join DIVISON TESLIM WITH (NOLOCK) ON TESLIM.DIVVAL = DSTORVAL AND ORDCHCOMPANY = TESLIM.DIVCOMPANY
                 outer apply (select PRLPRICE from PRICELIST prl where prl.PRLPROID = PROID and PRLDPRID = 740) as pesinfiyat
-                where CDRSALID =  '{0}' and ORDCHBALANCEQUAN >= ORDCHQUAN and WPROVAL in ('DD','EE','YY')
+                where CDRSALID =  '{0}' and WPROVAL in ('DD','EE','YY')
 				AND CDRSHIPVAL = 'ANTMOB'
                 AND not exists (select * from MDE_GENEL.dbo.MB_Islemler where MB_SALID = CDRSALID AND MB_ORDCHID = CDRORDCHID)
                 order by 1 desc", SALID);
@@ -384,8 +383,6 @@ select distinct Convert(varchar(50),MB_SALID) as MB_SALID,MB_ORDCHID,MB_PlanTari
                     Montajci.DataSource = null;
                     Montajci.DataBind();
                 }
-
-                ScriptManager.RegisterStartupScript(this, GetType(), "hideLoading", "hideLoading();", true);
             }
         }
         protected void btnCustomerInfo_Click(object sender, EventArgs e)
@@ -709,7 +706,6 @@ select distinct Convert(varchar(50),MB_SALID) as MB_SALID,MB_ORDCHID,MB_PlanTari
         protected void GridView2_RowCommand(object sender, GridViewCommandEventArgs e)
         {
             var loginRes = (List<LoginObj>)Session["Login"];
-            ScriptManager.RegisterStartupScript(this, GetType(), "showLoading", "showLoading();", true);
             if (e.CommandName != "Page")
             {
                 // Butonun hangi satırda olduğunu belirleyin
@@ -799,8 +795,6 @@ select distinct Convert(varchar(50),MB_SALID) as MB_SALID,MB_ORDCHID,MB_PlanTari
                     Montajci.DataSource = null;
                     Montajci.DataBind();
                 }
-
-                ScriptManager.RegisterStartupScript(this, GetType(), "hideLoading", "hideLoading();", true);
             }
 
         }

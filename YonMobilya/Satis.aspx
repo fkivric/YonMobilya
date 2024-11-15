@@ -203,7 +203,7 @@
                                         <asp:GridView runat="server" ID="GridView2" CssClass="gridView" BorderStyle="Solid" Width="100%" 
                                             AutoGenerateColumns="false" 
                                             AllowPaging="True" 
-                                            PageSize="5"
+                                            PageSize="10"
                                             OnPageIndexChanging="GridView2_PageIndexChanging" 
                                             OnRowCreated="GridView2_RowCreated" 
                                             OnRowCommand="GridView2_RowCommand">
