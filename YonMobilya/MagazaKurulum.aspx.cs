@@ -5,6 +5,7 @@ using System.Data.SqlClient;
 using System.Globalization;
 using System.Linq;
 using System.Net;
+using System.Text;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
@@ -272,6 +273,7 @@ namespace YonMobilya
         protected void Onayla_Click(object sender, EventArgs e)
         {
             ScriptManager.RegisterStartupScript(this, GetType(), "showLoading", "showLoading();", true);
+            StringBuilder ordChidList = new StringBuilder();
             var loginRes = (List<LoginObj>)Session["Login"];
             if (loginRes != null)
             {
@@ -285,6 +287,14 @@ namespace YonMobilya
                         var CURVAL = DbQuery.GetValue($"select CURVAL from PRODEMAND left outer join MDE_GENEL.dbo.MB_Teslimatci on MB_DIVVAL = PRDEDIVISON left outer join CURRENTS on CURID = MB_CURID where PRDEID = {ORDCHID}");
                         if (CURVAL != "SIFIR")
                         {
+
+                            // ORDCHID'yi StringBuilder'a ekle
+                            if (ordChidList.Length > 0)
+                            {
+                                ordChidList.Append(","); // Eğer daha önce değer eklenmişse, virgül ile ayır
+                            }
+                            ordChidList.Append(ORDCHID); // ORDCHID'yi ekle
+
                             var SALID = "0";
                             var PROID = Musteri.Rows[row.RowIndex].Cells[3].Text;
                             string cellValue = Musteri.Rows[row.RowIndex].Cells[7].Text;
@@ -329,6 +339,8 @@ namespace YonMobilya
                         WebMsgBox.Show(row.RowIndex.ToString() + " Seçilmediğinden eklenmedi");
                     }
                 }
+
+                Response.Redirect("MonajFormu.aspx?curid=0&salid=" + ordChidList);
             }
             else
             {

@@ -15,15 +15,6 @@ namespace YonMobilya
     {
 
         /// <summary>
-        /// toplamadet denetimi.
-        /// </summary>
-        /// <remarks>
-        /// Otomatik olarak oluşturulan alan.
-        /// Değiştirmek için, alan bildirimini tasarımcı dosyasından arka plan kod dosyasına taşıyın.
-        /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl toplamadet;
-
-        /// <summary>
         /// GridView1 denetimi.
         /// </summary>
         /// <remarks>

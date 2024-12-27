@@ -164,7 +164,7 @@
                                         <asp:GridView runat="server" ID="GridView1" CssClass="gridView" BorderStyle="Solid" Width="100%" 
                                             AutoGenerateColumns="false" 
                                             AllowPaging="True" 
-                                            PageSize="5"
+                                            PageSize="10"
                                             OnPageIndexChanging="GridView1_PageIndexChanging"
                                             OnRowCommand="GridView1_RowCommand" 
                                             OnRowCreated="GridView1_RowCreated"
@@ -196,6 +196,14 @@
                                         <div class="col-md-12">
                                             <div class="form-group">
                                                 <h2 align="center">Atanan Müşteriler</h2>
+                                            </div>
+                                        </div>
+                                        <div class="card-title-elements">
+                                            <div class="form-group">
+                                                <h4 align="center">Tarih Filitresi</h4>
+                                                <input class="col-md-4" type="date" id="StartDate" runat="server" />
+                                                <input class="col-md-4" type="date" id="EndDate" runat="server" />
+                                                <asp:Button runat="server" ID="Listele" CssClass="col-md-3" Text="Listele" OnClick="Listele_Click" />
                                             </div>
                                         </div>
                                     </div>

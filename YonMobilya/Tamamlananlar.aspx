@@ -318,6 +318,11 @@
                                             </div>
                                         </div>
                                     </div>
+                                    <div class="form-group col-12">
+                                        <input class="col-md-4" type="date" id="StartDate" runat="server"/>
+                                        <input class="col-md-4" type="date" id="EndDate" runat="server" />
+                                        <asp:Button runat="server" ID="Onayla" CssClass="btn btn-outline-success col-md-3" Width="100%" Text="Listele" OnClick="Onayla_Click" />
+                                    </div>
                                     <div class="scroll">
                                         <div class="table-responsive">
                                             <div class="table-responsive">
@@ -325,7 +330,7 @@
                                                     CssClass="gridView"
                                                     AutoGenerateColumns="False"
                                                     AllowPaging="True" 
-                                                    PageSize="10" 
+                                                    PageSize="15" 
                                                     OnPageIndexChanging="GridView1_PageIndexChanging" 
                                                     OnRowCreated="GridView1_RowCreated" 
                                                     OnSelectedIndexChanged="GridView1_SelectedIndexChanged">
@@ -334,13 +339,11 @@
                                                         <asp:BoundField ItemStyle-CssClass="td" DataField="SALID" HeaderText="CDRSALID" />
                                                         <asp:BoundField ItemStyle-CssClass="td" DataField="CURID" HeaderText="CDRCURID" />
                                                         <asp:BoundField ItemStyle-CssClass="td1" DataField="CURNAME" HeaderText="MÜŞTERİ" />
-                                                        <asp:BoundField ItemStyle-CssClass="td1" DataField="PRONAME" HeaderText="ÜRÜN" />
                                                         <asp:BoundField ItemStyle-CssClass="td" DataField="MB_PlanTarih" HeaderText="PLAN TARİHİ" DataFormatString="{0:yyyy/MM/dd}" />
                                                         <asp:BoundField ItemStyle-CssClass="td1" DataField="OFFCURNAME" HeaderText="MONTAJCI" />
                                                         <asp:BoundField ItemStyle-CssClass="td1" DataField="MB_TamamlanmaTarihi" HeaderText="MONTAJ TARİHİ" DataFormatString="{0:yyyy/MM/dd}" />
                                                         <asp:BoundField ItemStyle-CssClass="td1" DataField="PRLPRICE" DataFormatString="{0:C2}" HeaderText="CİRO" />
                                                         <asp:BoundField ItemStyle-CssClass="td1" DataField="Hakedis" DataFormatString="{0:C2}" HeaderText="HAKEDİŞ" />
-                                                        <asp:BoundField ItemStyle-CssClass="td" DataField="PROID" HeaderText="PROID" />
                                                     </Columns>
                                                     <PagerSettings Mode="Numeric" Position="Bottom"  />
                                                     <PagerStyle CssClass="pager" ForeColor="White" HorizontalAlign="Center" />
@@ -369,6 +372,15 @@
                                         <asp:BoundField ItemStyle-CssClass="td" DataField="FileName" HeaderText="Dosya Adı" />
                                     </Columns>
                                 </asp:GridView>
+                            </div>
+                        </div>
+                        <div runat="server" id="Div2" class="row col-12">
+                            <div runat="server" id="Div4" class="col-md-10">
+                                <asp:Panel ID="panelViewer" runat="server" CssClass="viewer-panel">
+                                    <asp:Image ID="imgViewer" runat="server" Visible="False" CssClass="image" />
+                                    <iframe runat="server" id="iframe" src="#" frameborder="0" visible="false"></iframe>
+                                    <asp:PlaceHolder ID="pdfViewerPlaceHolder" runat="server"></asp:PlaceHolder>
+                                </asp:Panel>
                             </div>
                         </div>
                         <div runat="server" id="uploadarea" class="row col-12" visible="false">
@@ -427,15 +439,6 @@
                                         <asp:Label ID="lblUploadResult3" runat="server"></asp:Label>
                                     </asp:Panel>
                                 </div>
-                            </div>
-                        </div>
-                        <div runat="server" id="Div2" class="row col-12">
-                            <div runat="server" id="Div4" class="col-md-10">
-                                <asp:Panel ID="panelViewer" runat="server" CssClass="viewer-panel">
-                                    <asp:Image ID="imgViewer" runat="server" Visible="False" CssClass="image" />
-                                    <iframe runat="server" id="iframe" src="#" frameborder="0" visible="false"></iframe>
-                                    <asp:PlaceHolder ID="pdfViewerPlaceHolder" runat="server"></asp:PlaceHolder>
-                                </asp:Panel>
                             </div>
                         </div>
                         <div class="card">

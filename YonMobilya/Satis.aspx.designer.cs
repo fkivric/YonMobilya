@@ -78,6 +78,33 @@ namespace YonMobilya
         protected global::System.Web.UI.WebControls.GridView GridView1;
 
         /// <summary>
+        /// StartDate denetimi.
+        /// </summary>
+        /// <remarks>
+        /// Otomatik olarak oluşturulan alan.
+        /// Değiştirmek için, alan bildirimini tasarımcı dosyasından arka plan kod dosyasına taşıyın.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlInputGenericControl StartDate;
+
+        /// <summary>
+        /// EndDate denetimi.
+        /// </summary>
+        /// <remarks>
+        /// Otomatik olarak oluşturulan alan.
+        /// Değiştirmek için, alan bildirimini tasarımcı dosyasından arka plan kod dosyasına taşıyın.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlInputGenericControl EndDate;
+
+        /// <summary>
+        /// Listele denetimi.
+        /// </summary>
+        /// <remarks>
+        /// Otomatik olarak oluşturulan alan.
+        /// Değiştirmek için, alan bildirimini tasarımcı dosyasından arka plan kod dosyasına taşıyın.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button Listele;
+
+        /// <summary>
         /// GridView2 denetimi.
         /// </summary>
         /// <remarks>

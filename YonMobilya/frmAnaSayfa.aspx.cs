@@ -43,6 +43,8 @@ namespace YonMobilya
         }
         private void BindGrid()
         {
+            var startdate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1).ToString("yyyy-MM-dd");
+            var enddate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1).AddMonths(1).AddDays(-1).ToString("yyyy-MM-dd");
             var loginRes = (List<LoginObj>)Session["Login"];
             if (loginRes != null)
             {
@@ -72,6 +74,7 @@ namespace YonMobilya
                 outer apply (select PRLPRICE from PRICELIST prl where prl.PRLPROID = MB_PROID and PRLDPRID = 740) as pesinfiyat
                 where MB_Tamamlandi = 0 and MB_SALID != 0 and MB_SUPCURVAL = 'T003387' and CDRSHIPVAL = 'ANTMOB' 
 				and not exists (select top 1 * from CUSDELIVER i WITH (NOLOCK) where i.CDRBASECANID = t.CDRID and T.CDRSALID = i.CDRSALID and i.CDRORDCHID = T.CDRORDCHID)
+                and MB_PlanTarih between '{1}' and '{2}'
                 group by MB_SALID
                 union
                 select outd.DIVNAME as ISTEYEN,sum(PRLPRICE) as TUTAR
@@ -85,11 +88,13 @@ namespace YonMobilya
                             outer apply (select PRLPRICE from PRICELIST prl where prl.PRLPROID = PROID and PRLDPRID = 740) as pesinfiyat
                             where PRDESTS = 0 and PRDEKIND= 1 and MB_Tamamlandi = 0 
                             and MB_SUPCURVAL = '{0}'
-                            group by outd.DIVVAL,outd.DIVNAME,MB_PlanTarih,ind.DIVNAME) sonuc", loginRes[0].CURVAL);
+                            and MB_PlanTarih between '{1}' and '{2}'
+                            group by outd.DIVVAL,outd.DIVNAME,MB_PlanTarih,ind.DIVNAME) sonuc", loginRes[0].CURVAL,startdate,enddate);
                 string qq = String.Format(@"select count(adet) as Toplamadet, sum(tutar) as Toplamtutar from (
                 select distinct Convert(varchar(50),MB_SALID) as adet, sum(PRLPRICE) as tutar from MDE_GENEL..MB_Islemler
                 outer apply (select PRLPRICE from PRICELIST prl where prl.PRLPROID = MB_PROID and PRLDPRID = 740) as pesinfiyat
                 where MB_Tamamlandi = 1 and MB_SALID != 0 and MB_SUPCURVAL = '{0}'
+                and MB_PlanTarih between '{1}' and '{2}'
                 group by MB_SALID
                 union
                 select outd.DIVNAME as ISTEYEN,sum(PRLPRICE) as TUTAR
@@ -103,7 +108,8 @@ namespace YonMobilya
                             outer apply (select PRLPRICE from PRICELIST prl where prl.PRLPROID = PROID and PRLDPRID = 740) as pesinfiyat
                             where PRDESTS = 0 and PRDEKIND= 1 and MB_Tamamlandi = 1 
                             and MB_SUPCURVAL = '{0}'
-                            group by outd.DIVVAL,outd.DIVNAME,MB_PlanTarih,ind.DIVNAME) sonuc", loginRes[0].CURVAL);
+                            and MB_PlanTarih between '{1}' and '{2}'
+                            group by outd.DIVVAL,outd.DIVNAME,MB_PlanTarih,ind.DIVNAME) sonuc", loginRes[0].CURVAL,startdate,enddate);
                 //string q = String.Format(@"select CDRSALID,CDRCURID,CURVAL,CURNAME,ORDDATE,sum(ORDCHBALANCEQUAN) as ORDCHBALANCEQUAN,Convert(numeric(18,2),sum(ORDCHBALANCEQUAN*PRLPRICE)) as PRLPRICE,CURCHCOUNTY
                 //FROM  CUSDELIVER
                 //inner join MDE_GENEL.dbo.MB_Islemler on MB_SALID = CDRSALID and CDRORDCHID = MB_ORDCHID
@@ -183,7 +189,9 @@ namespace YonMobilya
         }
         private void LoadEventCounts()
         {
-            string query = @"
+            var startdate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1).ToString("yyyy-MM-dd");
+            var enddate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1).AddMonths(1).AddDays(-1).ToString("yyyy-MM-dd");
+            string query = String.Format(@"
             SELECT DISTINCT 
                 MB_PlanTarih AS PlanTarih, 
                 MB_SALID AS ID, 
@@ -193,7 +201,9 @@ namespace YonMobilya
             FROM MDE_GENEL.dbo.MB_Islemler
             LEFT OUTER JOIN SALES ON SALID = MB_SALID
             LEFT OUTER JOIN CURRENTS ON CURID = SALCURID
-            where MB_SALID != 0 --and MB_Tamamlandi = 0";
+            where MB_SALID != 0 --and MB_Tamamlandi = 0
+            --and MB_PlanTarih between '{0}' and '{1}'
+            ",startdate,enddate);
 
             // Sonuçları tutacak bir sözlük
             Dictionary<string, List<Islemler>> eventCounts = new Dictionary<string, List<Islemler>>();

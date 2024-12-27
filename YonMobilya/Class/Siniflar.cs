@@ -20,6 +20,8 @@ namespace YonMobilya.Class
             public string Message { get; set; }
             public string Time { get; set; }
             public string Icon { get; set; }
+            public string SALID { get; set; }
+            public string CURID { get; set; }
         }
         public class NotificationService
         {
@@ -32,7 +34,7 @@ namespace YonMobilya.Class
                 using (var connection = new SqlConnection(_connectionString))
                 {
                     connection.Open();
-                    var query = $"SELECT MB_Baslik, MB_Bildiri, MB_Zaman FROM MDE_GENEL.dbo.MB_Notification where MB_Userid = '{_id}'";
+                    var query = $"SELECT MB_Baslik, MB_Bildiri, MB_Zaman, MB_SALID, MB_CURID FROM MDE_GENEL.dbo.MB_Notification where MB_Userid = '{_id}'";
                     using (var command = new SqlCommand(query, connection))
                     {
                         using (var reader = command.ExecuteReader())
@@ -44,6 +46,8 @@ namespace YonMobilya.Class
                                     Title = reader["MB_Baslik"].ToString(),
                                     Message = reader["MB_Bildiri"].ToString(),
                                     Time = reader["MB_Zaman"].ToString(),
+                                    SALID = reader["MB_SALID"].ToString(),
+                                    CURID = reader["MB_CURID"].ToString(),
                                     Icon = "settings"
                                 });
                             }

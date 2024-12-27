@@ -37,8 +37,9 @@ namespace YonMobilya
                 var loginRes = (List<LoginObj>)Session["Login"];
                 if (loginRes != null)
                 {
+                    StartDate.Value = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1).ToString("yyyy-MM-dd");
+                    EndDate.Value = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1).AddMonths(1).AddDays(-1).ToString("yyyy-MM-dd");
                     ScriptManager.RegisterStartupScript(this, GetType(), "showLoading", "showLoading();", true);
-                    BindGrid();
                     var ftp = (List<Ftp>)Session["FTP"];
                     if (ftp != null)
                     {
@@ -62,7 +63,12 @@ namespace YonMobilya
 
         }
 
-        private void BindGrid()
+        protected void Onayla_Click(object sender, EventArgs e)
+        {
+
+            BindGrid(StartDate.Value.ToString(),EndDate.Value.ToString());
+        }
+        private void BindGrid(string Startdate, string Enddate)
         {
             var loginRes = (List<LoginObj>)Session["Login"];
             if (loginRes != null)
@@ -87,22 +93,27 @@ namespace YonMobilya
                 {
                     magaza = loginRes[0].DIVVAL.ToString();
                 }
-                string q = String.Format(@"select SALID,CURID,CURNAME,PRONAME,MB_PlanTarih,MB_TamamlanmaTarihi,OFFCURNAME,PRLPRICE,PRLPRICE*0.08 as Hakedis,PROID from MDE_GENEL..MB_Islemler islem
+                string q = String.Format(@"select Convert(varchar(max),SALID) as SALID,CURID,CURNAME,MB_PlanTarih,Convert(Char(10),MB_TamamlanmaTarihi,121) as MB_TamamlanmaTarihi,OFFCURNAME,sum(PRLPRICE) as PRLPRICE,sum(PRLPRICE*0.08) as Hakedis from MDE_GENEL..MB_Islemler islem
                 left outer join SALES on SALID = islem.MB_SALID
                 left outer join CURRENTS on CURID = SALCURID
-                left outer join PRODUCTS on PROID = islem.MB_PROID
-                left outer join OFFICALCUR on OFFCURID = MB_Montajcı
-                outer apply (select PRLPRICE from PRICELIST prl WITH (NOLOCK) where prl.PRLPROID = PROID and PRLDPRID = 740) as pesinfiyat
-                where MB_Tamamlandi = 1 and islem.MB_SALID != 0 and SALDIVISON in ({0})
+                left outer join OFFICALCUR on OFFCURID = MB_Ekleyen
+                outer apply (select PRLPRICE from PRICELIST prl WITH (NOLOCK) where prl.PRLPROID = islem.MB_PROID and PRLDPRID = 740) as pesinfiyat
+                where MB_Tamamlandi = 1 and islem.MB_SALID != 0 and SALDIVISON in ({0}) 
+				and MB_PlanTarih between '{1}' and '{2}'
+				group by SALID,CURID,CURNAME,MB_PlanTarih,MB_TamamlanmaTarihi,OFFCURNAME
                 union
-                select MB_ORDCHID,MB_SALID,DIVNAME as CURNAME,PRONAME,MB_PlanTarih,MB_TamamlanmaTarihi,OFFCURNAME,PRLPRICE,PRLPRICE*0.08 as Hakedis,PROID from MDE_GENEL..MB_Islemler
+				select STRING_AGG(SALID, ','),CURID,CURNAME,MB_PlanTarih,MB_TamamlanmaTarihi,OFFCURNAME,sum(PRLPRICE) as PRLPRICE,sum(Hakedis) as Hakedis from (
+                select MB_ORDCHID as SALID,MB_SALID as CURID,DIVNAME as CURNAME,MB_PlanTarih,Convert(Char(10),MB_TamamlanmaTarihi,121) as MB_TamamlanmaTarihi,OFFCURNAME,sum(PRLPRICE) as PRLPRICE,sum(PRLPRICE*0.08) as Hakedis from MDE_GENEL..MB_Islemler
                 inner join PRODEMAND on PRDEID = MB_ORDCHID
-                left outer join PRODUCTS on PROID = MB_PROID
                 left outer join DIVISON on PRDEDIVISON = DIVVAL
-                left outer join OFFICALCUR on OFFCURID = MB_Montajcı
-                outer apply (select PRLPRICE from PRICELIST prl WITH (NOLOCK) where prl.PRLPROID = PROID and PRLDPRID = 740) as pesinfiyat
-                where MB_Tamamlandi = 1 and DIVVAL in ({0})
-                order by MB_TamamlanmaTarihi", magaza);
+                left outer join OFFICALCUR on OFFCURID = MB_Ekleyen
+                outer apply (select PRLPRICE from PRICELIST prl WITH (NOLOCK) where prl.PRLPROID = MB_PROID and PRLDPRID = 740) as pesinfiyat
+                where MB_Tamamlandi = 1 and DIVVAL in ({0}) 
+				and MB_PlanTarih between '{1}' and '{2}'
+				group by MB_ORDCHID,MB_SALID,DIVNAME,MB_PlanTarih,MB_TamamlanmaTarihi,OFFCURNAME
+				) son
+				group by CURID,CURNAME,MB_PlanTarih,MB_TamamlanmaTarihi,OFFCURNAME
+                order by MB_TamamlanmaTarihi", magaza,Startdate,Enddate);
                 var dt = DbQuery.Query(q, ConnectionString);
                 GridView1.DataSource = dt;
                 GridView1.DataBind();
@@ -111,7 +122,7 @@ namespace YonMobilya
         protected void GridView1_PageIndexChanging(object sender, GridViewPageEventArgs e)
         {
             GridView1.PageIndex = e.NewPageIndex;
-            BindGrid(); // Sayfa değiştiğinde verileri yeniden bağlayın
+            BindGrid(StartDate.Value.ToString(),EndDate.Value.ToString()); // Sayfa değiştiğinde verileri yeniden bağlayın
         }
 
         protected void GridView1_RowCreated(object sender, GridViewRowEventArgs e)
@@ -121,7 +132,6 @@ namespace YonMobilya
             {
                 e.Row.Cells[1].Visible = false;
                 e.Row.Cells[2].Visible = false;
-                e.Row.Cells[10].Visible = false;
             }
         }
         protected void GridView1_SelectedIndexChanged(object sender, EventArgs e)
@@ -130,7 +140,6 @@ namespace YonMobilya
             table.DataBind();
             CURID = GridView1.SelectedRow.Cells[2].Text;
             SALID = GridView1.SelectedRow.Cells[1].Text;
-            PROID = GridView1.SelectedRow.Cells[10].Text;
             if (CURID != "0")
             {
                 string q = String.Format(@"select 
@@ -155,13 +164,13 @@ namespace YonMobilya
             {
                 string q = String.Format(@"select 
 	             d.MB_CURID as CURID
-	            ,CURNAME
+	            ,d.MB_SALID as CURNAME
 	            ,FileTypeName
 	            ,MB_FileName as FileName
                 from MDE_GENEL.dbo.MB_BayiDosyaları d
                 left outer join MDE_GENEL.dbo.MB_DosyaTipi t on t.id = MB_FileType
                 left outer join VDB_YON01.dbo.CURRENTS c on c.CURID = d.MB_CURID
-                where d.MB_CURID = {0} and MB_SALID = {1}
+                where d.MB_CURID = {0} and MB_SALID in ({1})
                 order by MB_FileType", CURID, SALID);
                 var dt = DbQuery.Query(q, ConnectionString);
                 if (dt != null)
@@ -173,12 +182,13 @@ namespace YonMobilya
             }
             imgViewer.Visible = false;
             pdfViewerPlaceHolder.Visible = false;
-            uploadarea.Visible = true;
+            uploadarea.Visible = false;
         }
         protected void table_SelectedIndexChanged(object sender, EventArgs e)
         {
             ScriptManager.RegisterStartupScript(this, GetType(), "showLoading", "showLoading();", true);
             // Retrieve the URL from ViewState
+            var CURNAME = table.SelectedRow.Cells[2].Text;
             var Filename = table.SelectedRow.Cells[4].Text;
             var FileType = table.SelectedRow.Cells[3].Text.ToUpper();
             string uploadedFileUrl = "";
@@ -188,7 +198,7 @@ namespace YonMobilya
             }
             else
             {
-                uploadedFileUrl = ftpUrl + "/" + CURID + "/Mobilya Montaj/" + FileType + "/" + SALID + "/" + Filename;
+                uploadedFileUrl = ftpUrl + "/" + CURID + "/Mobilya Montaj/" + FileType + "/" + CURNAME + "/" + Filename;
             }
             try
             {
@@ -223,7 +233,7 @@ namespace YonMobilya
                     pdfViewerPlaceHolder.Visible = false;
 
                 }
-                else if (Filename.EndsWith("jpg") || Filename.EndsWith("jpeg") || Filename.EndsWith("png"))
+                else if (Filename.EndsWith("jpg") || Filename.EndsWith("JPG") || Filename.EndsWith("jpeg") || Filename.EndsWith("JPEG") || Filename.EndsWith("png") || Filename.EndsWith("PNG") || Filename.EndsWith("jfif"))
                 {
                     //System.Threading.Thread.Sleep(5000);
                     WebClient ftpClient = new WebClient();
@@ -715,5 +725,6 @@ namespace YonMobilya
             // Display the result of the upload.
             frmConfirmation3.Visible = true;
         }
+
     }
 }

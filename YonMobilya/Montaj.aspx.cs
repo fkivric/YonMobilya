@@ -1,10 +1,16 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using OfficeOpenXml.FormulaParsing.Excel.Functions.RefAndLookup;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
+using System.Runtime.Remoting.Metadata.W3cXsd2001;
+using System.Text;
+using System.Threading.Tasks;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
@@ -26,6 +32,18 @@ namespace YonMobilya
         public static string SALID = "";
         public static string ORDCHID = "";
         DataTable dosyalar = new DataTable();
+        DataTable UrunSorgu = new DataTable();
+        List<UrunReismleri> IDList = new List<UrunReismleri>();
+        public static List<UrunReismleri> OnaylıListe = new List<UrunReismleri>();
+        public class UrunReismleri
+        {
+            public string PRONAME { get; set; }
+            public long PROID { get; set; }
+        }
+        HttpClient httpClient = new HttpClient();
+
+        public static string SmsUrl = "https://restapi.ttmesaj.com/";
+        public static string SmsToken = "";
         protected void Page_Load(object sender, EventArgs e)
         {
             if (!IsPostBack)
@@ -34,6 +52,9 @@ namespace YonMobilya
                 if (loginRes != null)
                 {
                     ScriptManager.RegisterStartupScript(this, GetType(), "showLoading", "showLoading();", true);
+
+                    string[] salidArray = Request.QueryString["salid"].Split(',');
+
                     SALID = Request.QueryString["salid"];
                     CURID = Request.QueryString["curid"]; //DbQuery.GetValue($"select SALCURID from SALES where SALID = {SALID}");
                     Dosyalar();
@@ -44,14 +65,89 @@ namespace YonMobilya
                         ftpUsername = ftp[0].VolFtpUser;
                         ftpPassword = ftp[0].VolFtpPass;
                     }
+                    string Token = Session["Smstoken"] as string;
+                    if (Token == "" || Token == null)
+                    {
+                        List<SmstokenObj> smstokenObjs = new List<SmstokenObj>();
+                        SMSToken();
+                        Session.Add("Smstoken", SmsToken);
+                        SmstokenObj obj = new SmstokenObj();
+                        obj.SmsUrl = SmsUrl;
+                        obj.SmsUser = "yon.kara";
+                        obj.SmsPassword = "N6K9L3A55";
+                        obj.TokenSMS = SmsToken;
+                        smstokenObjs.Add(obj);
+                        Session.Add("SMS", smstokenObjs);
+                        Session.Add("Smstoken", SmsToken);
+                    }
                     //string imageUrl = "img/profile.jpg";
                     //profilepicture.Style["background-image"] = $"url('{ResolveUrl(imageUrl)}')";
                     BindGridView();
-                    if (CURID == "0")
+                    int adet = 0;
+                    //if (CURID == "0" || CURID == "")
+                    //{
+                    if (UrunSorgu != null)
                     {
-                        //var adet = resimadet.Attributes["title"].ToString();
-                        resimadet.Attributes["title"] = "1";
-                        resimadet.InnerText = "Mağaza Montajı için 1 Resim Yeterli";
+                        // 2. LINQ kullanarak gruplama işlemi yapın.
+                        var groupedData = UrunSorgu.AsEnumerable()
+                                        .GroupBy(row => row.Field<string>("PRONAME").Split(' ').Take(3).Aggregate((a, b) => a + " " + b))
+                                        .Select((grp, index) => new
+                                        {
+                                            ProductName = grp.Key,
+                                            TotalCount = grp.Count(),
+                                            NewID = grp.First().Field<long>("ORDCHID"), // Gruptaki ilk öğenin ORDCHID değeri //UrunSorgu.Rows[index+1+ grp.Count()]["ORDCHID"].ToString() // Sıra numarası olarak grubun indeksi
+                                        }).ToList();
+
+                        // 3. Sonuçları yazdırma
+                        foreach (var item in groupedData)
+                        {
+                            UrunReismleri urun = new UrunReismleri();
+                            Console.WriteLine($"Ürün Adı: {item.ProductName}, Toplam Adet: {item.TotalCount}, Yeni ID: {item.NewID}");
+                            adet++;
+                            urun.PRONAME = item.ProductName;
+                            urun.PROID = item.NewID;
+                            IDList.Add(urun);
+                        }
+                    }
+                    //}
+                    //else
+                    //{
+                    //    for (int i = 0; i < UrunSorgu.Rows.Count; i++)
+                    //    {
+                    //        UrunReismleri urun = new UrunReismleri(); 
+                    //        adet++;
+                    //        urun.PRONAME = UrunSorgu.Rows[i]["PRONAME"].ToString();
+                    //        urun.PROID = long.Parse(UrunSorgu.Rows[i]["PROID"].ToString());
+                    //        IDList.Add(urun);
+                    //    }
+                    //}
+                    Urunler.DataValueField = "PROID";
+                    Urunler.DataTextField = "PRONAME";
+                    Urunler.DataSource=IDList;
+                    Urunler.DataBind();
+                    if (CURID == "0" || CURID == "")
+                    {
+                        if (salidArray.Length > 1)
+                        {
+                            if (adet == 0)
+                            {
+                                adet = grid.Rows.Count;
+                            }
+                            resimadet.Attributes["title"] = adet.ToString();
+                            resimadet.InnerHtml = @"Mağaza Montajı için Ürün Başına 1 Resim Yeterli,<br>Yüklenecek Ürünü Seçerek İlerleyin.....<br>Toplam : " + adet.ToString() + " Resim Yükleyiniz";
+                            //resimadet.InnerText = @"Mağaza Montajı için Ürün Başına 1 Resim Yeterli,\n\rResim YÜKELEME SIRASI LÜTFEN YUKARDAKİ ÜRÜN SIRASINA GÖRE OLSUN.....\n\rToplam : " + adet.ToString() + " Resim Yükleyiniz";
+                        }
+                        else
+                        {
+                            adet = grid.Rows.Count;
+                            resimadet.Attributes["title"] = adet.ToString();
+                            resimadet.InnerText = "Mağaza Montajı için Ürün Başına 1 Resim Yeterli,<br>Yüklenecek Ürünü Seçerek İlerleyin.....<br> Toplam : " + adet.ToString() + " Resim Yükleyiniz";
+                        }
+                    }
+                    else
+                    {
+                        resimadet.Attributes["title"] = adet.ToString();
+                        resimadet.InnerText = "İşlem Tamamlamak için Her Ürüne 1 Resim ekleyiniz,<br>Yüklenecek Ürünü Seçerek İlerleyin.....<br>Topla, Toplam : " + adet.ToString() + " Resim Yükleyiniz";
                     }
                 }
                 else
@@ -66,11 +162,142 @@ namespace YonMobilya
                 ScriptManager.RegisterStartupScript(this, GetType(), "hideLoading", "hideLoading();", true);
             }
         }
+        private void SMSToken()
+        {
+            var login = new Dictionary<string, string>
+               {
+                   {"grant_type", "password"},
+                   {"username", "ttapiuser1"},//TT Mesaj Tarfından Size Verilen Api Kullanıcı Adı
+                   {"password", "ttapiuser1123"},//TT Mesaj Tarfından Size Verilen Api Şifre
+               };
+
+
+            using (HttpClient httpClient = new HttpClient())
+            {
+
+                var response = httpClient.PostAsync(SmsUrl + "ttmesajToken", new FormUrlEncodedContent(login)).Result;
+
+                if (response.IsSuccessStatusCode)
+                {
+                    Dictionary<string, string> tokenDetails = JsonConvert.DeserializeObject<Dictionary<string, string>>(response.Content.ReadAsStringAsync().Result);
+
+                    SmsToken = tokenDetails.FirstOrDefault().Value;
+                }
+                else
+                {
+                    WebMsgBox.Show("Sms Token Bilgisi Okunamadı Çıkış Yapıp Tekrar Girin");
+                }
+            }
+        }
+        private string SmmsToken = "";
+        private async Task SMS(string gsm, string Message)
+        {
+            var SMSRes = (List<SmstokenObj>)Session["SMS"];
+            var loginRes = (List<LoginObj>)Session["Login"];
+            SmmsToken = SMSRes[0].TokenSMS;
+            try
+            {
+                string description = string.Empty;
+
+                //isNotification parametresinin doldurulması
+                bool? isNotificationValue = null;
+
+
+                //recipentType parametresinin doldurulması
+                string recipentTypeValue = string.Empty;
+                var data = new
+                {
+                    username = SMSRes[0].SmsUser,
+                    password = SMSRes[0].SmsPassword,
+                    numbers = "0" + gsm,
+                    message = Message,
+                    origin = "YON AVM",
+                    sd = "0",
+                    ed = "0",
+                    isNotification = isNotificationValue,
+                    recipentType = recipentTypeValue,
+                    brandCode = ""
+                };
+
+                var content = new StringContent(JsonConvert.SerializeObject(data), Encoding.UTF8, "application/json");
+
+                using (HttpClient httpClient = new HttpClient())
+                {
+                    if (string.IsNullOrEmpty(SmmsToken))
+                    {
+                        WebMsgBox.Show("Token Hatalı");
+                    }
+                    else
+                    {
+                        httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", SmmsToken);
+                        var httppost = await httpClient.PostAsync(SMSRes[0].SmsUrl + "api/SendSms/SendSingle", content);
+                        string responseContent = await httppost.Content.ReadAsStringAsync();
+
+                        if (httppost.IsSuccessStatusCode)
+                        {
+                            try
+                            {
+                                var response = JsonConvert.DeserializeObject<SmsSonuc>(responseContent);
+
+                                if (response.Sonuc.Contains("*OK*")) // success
+                                {
+                                    description = response.Sonuc.Replace("*OK*", "");
+                                    List<SmsGiden> smsSonucs = new List<SmsGiden>();
+                                    SmsGiden sonuc = new SmsGiden();
+                                    sonuc.SOCODE = loginRes[0].SOCODE;
+                                    sonuc.Sonuc = description;
+                                    smsSonucs.Add(sonuc);
+                                    Session.Add("SMSGONDERIM", smsSonucs);
+                                }
+                                else
+                                {
+                                    WebMsgBox.Show("SMS gönderimi başarısız: " + response.Sonuc);
+                                }
+                            }
+                            catch (JsonException ex)
+                            {
+                                WebMsgBox.Show("JSON parse hatası: " + ex.Message);
+                            }
+                        }
+                        else
+                        {
+                            WebMsgBox.Show("HTTP Hatası: " + httppost.StatusCode + " - " + responseContent);
+                        }
+                    }
+                    //else
+                    //{
+                    //    httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", SmmsToken);
+                    //    var httppost = httpClient.PostAsync(ApiUrl + "api/SendSms/SendSingle", content).Result;
+                    //    var response = JsonConvert.DeserializeObject<SmsSonuc>(httppost.Content.ReadAsStringAsync().Result);
+
+                    //    if (response.Sonuc.Contains("*OK*")) // success
+                    //    {
+                    //        description = response.Sonuc.Replace("*OK*", "");                            
+                    //    }
+                    //    else
+                    //    {
+
+                    //    }
+                    //}
+                }
+            }
+            catch (Exception ex)
+            {
+
+            }
+        }
+
         private void BindGridView()
         {
-            string query = "";
-            if (CURID != "0")
+            string DIVNAME = "";
+            if (Session["DIVNAME"].ToString()== null)
             {
+                DIVNAME = Session["DIVNAME"].ToString();
+            }
+            string query = "";
+            if (CURID != "0" && CURID != "")
+            {
+                var ss = Session["DIVNAME"].ToString();
                 query = String.Format(@"select distinct CDRSALID,ORDCHID,PROID, PROVAL,PRONAME,Convert(int,ORDCHQUAN) as ORDCHBALANCEQUAN,Convert(numeric(18,2),ORDCHQUAN*PRLPRICE) as PRLPRICE
 			     ,TESLIM.DIVNAME
                 FROM MDE_GENEL.dbo.MB_Islemler 
@@ -84,8 +311,13 @@ namespace YonMobilya
                 outer apply (select PRLPRICE from PRICELIST prl where prl.PRLPROID = PROID and PRLDPRID = 740) as pesinfiyat
                 where CDRSALID =  '{0}' AND CDRSHIPVAL = 'ANTMOB' and CDRBASECANID is NULL
 			    and MB_Tamamlandi = 0  and CDRBASECANID is NULL
-				and not exists (select top 1 * from CUSDELIVER i WITH (NOLOCK) where i.CDRBASECANID = t.CDRID and MB_SALID = i.CDRSALID and i.CDRORDCHID = MB_ORDCHID)
-                order by 1 desc", SALID);
+                ", SALID);
+                if (DIVNAME != "")
+                {
+                    query += String.Format("and TESLIM.DIVNAME = '{0}'", DIVNAME);
+                }
+                query += @"and not exists (select top 1 * from CUSDELIVER i WITH (NOLOCK) where i.CDRBASECANID = t.CDRID and MB_SALID = i.CDRSALID and i.CDRORDCHID = MB_ORDCHID)
+                order by 1 desc";
             }
             else
             {
@@ -95,28 +327,29 @@ namespace YonMobilya
 				left outer join PRODUCTS on PROID = MB_PROID
                 outer apply (select PRLPRICE from PRICELIST prl where prl.PRLPROID = PRDEPROID and PRLDPRID = 740) as pesinfiyat
 				where MB_Tamamlandi = 0 and MB_SUPCURVAL = 'T003387' and PRDEKIND= 1 and PRDESTS = 0
-				and PRDEID = '{0}'
+				and PRDEID in ({0})
 			    and MB_Tamamlandi = 0        
                 order by 1 desc", SALID);
             }
-            var dt = DbQuery.Query(query, ConnectionString);
-            if (dt != null)
+            UrunSorgu = DbQuery.Query(query, ConnectionString);
+            if (UrunSorgu != null)
             {
-                grid.DataSource = dt;
+                grid.DataSource = UrunSorgu;
                 grid.DataBind();
-                resimadet.Attributes["title"] = dt.Rows.Count.ToString();
-                resimadet.InnerText = "İşlem Tamamlamak için Her Ürüne 1 Resim ekleyiniz Toplam :" + dt.Rows.Count.ToString() + " Resim Yükleyiniz";
+                //resimadet.Attributes["title"] = UrunSorgu.Rows.Count.ToString();
+                //resimadet.InnerText = "İşlem Tamamlamak için Her Ürüne 1 Resim ekleyiniz Toplam :" + UrunSorgu.Rows.Count.ToString() + " Resim Yükleyiniz";
             }
             else
             {
+                Tamamlama.Visible = true;
                 tamlandı.Visible = false;
-                uploadarea.Visible = true;
+                uploadarea.Visible = false;
                 Kaydet.Visible = true;
             }
         }
         internal void Dosyalar()
         {
-            if (CURID != "0")
+            if (CURID != "0" && CURID != "")
             {
                 string q = String.Format(@"select 
 	             d.MB_CURID as CURID
@@ -140,13 +373,13 @@ namespace YonMobilya
             {
                 string q = String.Format(@"select 
 	             d.MB_CURID as CURID
-	            ,CURNAME
+	            ,d.MB_SALID as CURNAME
 	            ,FileTypeName
 	            ,MB_FileName as FileName
                 from MDE_GENEL.dbo.MB_BayiDosyaları d
                 left outer join MDE_GENEL.dbo.MB_DosyaTipi t on t.id = MB_FileType
                 left outer join VDB_YON01.dbo.CURRENTS c on c.CURID = d.MB_CURID
-                where d.MB_CURID = {0} and MB_SALID = {1}
+                where d.MB_CURID = 0 and MB_SALID in ({1})
                 order by MB_FileType", CURID,SALID);
                 var dt = DbQuery.Query(q, ConnectionString);
                 if (dt != null)
@@ -219,6 +452,30 @@ namespace YonMobilya
         protected void btnUpload_Click(object sender, EventArgs e)
         {
             var loginRes = (List<LoginObj>)Session["Login"];
+            string[] salidArray = Request.QueryString["salid"].Split(',');
+            string sira = "";
+            string qq = String.Format(@"select COUNT(*) as adet
+                            from MDE_GENEL.dbo.MB_BayiDosyaları d
+                            left outer join MDE_GENEL.dbo.MB_DosyaTipi t on t.id = MB_FileType
+                            left outer join VDB_YON01.dbo.CURRENTS c on c.CURID = d.MB_CURID
+                            where d.MB_CURID = {0} and MB_SALID in ({1}) and t.id = 1", CURID, SALID);
+            dosyalar = DbQuery.Query(qq, ConnectionString2);
+            if (dosyalar == null)
+            {
+                sira = "0";
+            }
+            else
+            {
+                if (dosyalar.Rows[0][0].ToString() == "1")
+                {
+                    sira = "1";
+                }
+                else
+                {
+                    sira = (int.Parse(dosyalar.Rows[0]["adet"].ToString())).ToString();
+                }
+            }
+            var NewSALID = Urunler.SelectedValue;
             string strFileName;
             string strFilePath;
             string strFolder;
@@ -243,14 +500,14 @@ namespace YonMobilya
                 strFilePath = strFolder + strFileName;
                 if (File.Exists(strFilePath))
                 {
-                    lblUploadResult.Text = strFileName + " Bu Dosya Daha Önce Yüklenmiş.....!";
+                    lblUploadResult.Text = strFileName + " Bu Resim Daha Önce Yüklenmiş.....!";
                 }
                 else
                 {
                     oFile.PostedFile.SaveAs(strFilePath);
                     try
                     {
-                        ftpFolder = Server.MapPath("./UploadedFiles/Mobilya Kurulum/" + CURID + "/" + SALID + "/FTPGiden/");
+                        ftpFolder = Server.MapPath("./UploadedFiles/Mobilya Kurulum/" + CURID + "/" + NewSALID + "/FTPGiden/");
                         ftpFilePath = ftpFolder + strFileName;
                         if (!Directory.Exists(ftpFolder))
                         {
@@ -284,33 +541,11 @@ namespace YonMobilya
                         }
                         if (CURID == "0")
                         {
-                            if (!FTPCechkFolder(CURID + "/Mobilya Montaj/TAMAMLANAN/" + SALID))
+                            if (!FTPCechkFolder(CURID + "/Mobilya Montaj/TAMAMLANAN/" + NewSALID))
                             {
-                                CreateFolderFTP(CURID + "/Mobilya Montaj/TAMAMLANAN/" + SALID);
+                                CreateFolderFTP(CURID + "/Mobilya Montaj/TAMAMLANAN/" + NewSALID);
                             }
-                            string sira = "";
-                            string qq = String.Format(@"select COUNT(*) as adet
-                            from MDE_GENEL.dbo.MB_BayiDosyaları d
-                            left outer join MDE_GENEL.dbo.MB_DosyaTipi t on t.id = MB_FileType
-                            left outer join VDB_YON01.dbo.CURRENTS c on c.CURID = d.MB_CURID
-                            where d.MB_CURID = {0} and MB_SALID = {1} and t.id = 1", CURID,SALID);
-                            dosyalar = DbQuery.Query(qq, ConnectionString2);
-                            if (dosyalar == null)
-                            {
-                                sira = "0";
-                            }
-                            else
-                            {
-                                if (dosyalar.Rows[0][0].ToString() == "1")
-                                {
-                                    sira = "1";
-                                }
-                                else
-                                {
-                                    sira = (int.Parse(dosyalar.Rows[0]["adet"].ToString())).ToString();
-                                }
-                            }
-                            var PROID  = grid.Rows[0].Cells[2].Text.ToString();
+                            var PROID  = Urunler.SelectedValue;
                             string newFileName = PROID + "_" + sira + Path.GetExtension(strFileName); // Örneğin "newFileName.ext"
 
                             string newFilePath = Path.Combine(ftpFolder, newFileName);
@@ -318,7 +553,7 @@ namespace YonMobilya
                             // Rename the file
                             File.Move(ftpFilePath, newFilePath);
                             // Upload the file to FTP server
-                            string ftpFullUrl = ftpUrl + "/" + CURID + "/Mobilya Montaj/TAMAMLANAN/" + SALID +"/"+ newFileName;
+                            string ftpFullUrl = ftpUrl + "/" + CURID + "/Mobilya Montaj/TAMAMLANAN/" + NewSALID + "/"+ newFileName;
                             FtpWebRequest ftpRequest = (FtpWebRequest)WebRequest.Create(ftpFullUrl);
                             ftpRequest.Method = WebRequestMethods.Ftp.UploadFile;
                             ftpRequest.Credentials = new NetworkCredential(ftpUsername, ftpPassword);
@@ -333,7 +568,7 @@ namespace YonMobilya
 
                             using (FtpWebResponse response = (FtpWebResponse)ftpRequest.GetResponse())
                             {
-                                string q = String.Format(@"insert into MDE_GENEL.dbo.MB_BayiDosyaları values ({0},{1},1,'{2}','{3}')", CURID, SALID, newFileName, loginRes[0].SOCODE);
+                                string q = String.Format(@"insert into MDE_GENEL.dbo.MB_BayiDosyaları values ({0},{1},1,'{2}','{3}')", CURID, NewSALID, newFileName, loginRes[0].SOCODE);
                                 DbQuery.insertquery(q, ConnectionString2);
                                 lblUploadResult.Text = strFileName + " Dosya Kaydedildi";
                             }
@@ -343,28 +578,28 @@ namespace YonMobilya
                         else
                         {
 
-                            string sira = "";
-                            string qq = String.Format(@"select COUNT(*) as adet
-                            from MDE_GENEL.dbo.MB_BayiDosyaları d
-                            left outer join MDE_GENEL.dbo.MB_DosyaTipi t on t.id = MB_FileType
-                            left outer join VDB_YON01.dbo.CURRENTS c on c.CURID = d.MB_CURID
-                            where d.MB_CURID = {0} and t.id = 1", CURID);
-                            dosyalar = DbQuery.Query(qq, ConnectionString2);
-                            if (dosyalar == null)
-                            {
-                                sira = "0";
-                            }
-                            else
-                            {
-                                if (dosyalar.Rows[0][0].ToString() == "1")
-                                {
-                                    sira = "1";
-                                }
-                                else
-                                {
-                                    sira = (int.Parse(dosyalar.Rows[0]["adet"].ToString())).ToString();
-                                }
-                            }
+                            //string sira = "";
+                            //string qq = String.Format(@"select COUNT(*) as adet
+                            //from MDE_GENEL.dbo.MB_BayiDosyaları d
+                            //left outer join MDE_GENEL.dbo.MB_DosyaTipi t on t.id = MB_FileType
+                            //left outer join VDB_YON01.dbo.CURRENTS c on c.CURID = d.MB_CURID
+                            //where d.MB_CURID = {0} and t.id = 1", CURID);
+                            //dosyalar = DbQuery.Query(qq, ConnectionString2);
+                            //if (dosyalar == null)
+                            //{
+                            //    sira = "0";
+                            //}
+                            //else
+                            //{
+                            //    if (dosyalar.Rows[0][0].ToString() == "1")
+                            //    {
+                            //        sira = "1";
+                            //    }
+                            //    else
+                            //    {
+                            //        sira = (int.Parse(dosyalar.Rows[0]["adet"].ToString())).ToString();
+                            //    }
+                            //}
                             string newFileName = SALID + "_" + sira + Path.GetExtension(strFileName); // Örneğin "newFileName.ext"
                             string newFilePath = Path.Combine(ftpFolder, newFileName);
 
@@ -393,6 +628,11 @@ namespace YonMobilya
                             // Delete the local file after upload
                             File.Delete(newFilePath);
                         }
+                        var eklenen = new UrunReismleri();
+                        eklenen.PROID = long.Parse(Urunler.SelectedValue);
+                        eklenen.PRONAME = Urunler.SelectedItem.Text;
+                        OnaylıListe.Add(eklenen);
+                        Urunler.Items.Remove(Urunler.SelectedItem);
                     }
                     catch (Exception ex)
                     {
@@ -402,7 +642,7 @@ namespace YonMobilya
             }
             else
             {
-                lblUploadResult.Text = "Yüklenecek dosyayı seçmek için 'Gözat'a tıklayın.";
+                lblUploadResult.Text = "Yüklenecek resimi seçmek için 'Gözat'a tıklayın.";
             }
             // Display the result of the upload.
             //File.Delete(ftpFilePath);
@@ -932,6 +1172,8 @@ namespace YonMobilya
                 grid.Enabled = false;
                 tamlandı.Visible = false;
                 Kaydet.Visible = true;
+                Secim.Visible = true;
+                UrunMontaj.Visible = false;
             }
             else
             {
@@ -943,6 +1185,7 @@ namespace YonMobilya
         {
             ScriptManager.RegisterStartupScript(this, GetType(), "showLoading", "showLoading();", true);
             // Retrieve the URL from ViewState
+            var CURNAME = table.SelectedRow.Cells[2].Text;
             var Filename = table.SelectedRow.Cells[4].Text;
             var FileType = table.SelectedRow.Cells[3].Text.ToUpper();
             string uploadedFileUrl = "";
@@ -952,7 +1195,7 @@ namespace YonMobilya
             }
             else
             {
-                uploadedFileUrl = ftpUrl + "/" + CURID + "/Mobilya Montaj/" + FileType + "/" + SALID + "/" + Filename;
+                uploadedFileUrl = ftpUrl + "/" + CURID + "/Mobilya Montaj/" + FileType + "/" + CURNAME + "/" + Filename;
             }
             try
             {
@@ -987,7 +1230,7 @@ namespace YonMobilya
                     pdfViewerPlaceHolder.Visible = false;
 
                 }
-                else if (Filename.EndsWith("jpg") || Filename.EndsWith("jpeg") || Filename.EndsWith("png"))
+                else if (Filename.EndsWith("jpg") || Filename.EndsWith("jpeg") || Filename.EndsWith("png") || Filename.EndsWith("jfif"))
                 {
                     //System.Threading.Thread.Sleep(5000);
                     WebClient ftpClient = new WebClient();
@@ -1040,18 +1283,42 @@ namespace YonMobilya
             var loginRes = (List<LoginObj>)Session["Login"];
             if (loginRes != null)
             {
-                if (table.Rows.Count >= int.Parse(resimadet.Attributes["title"].ToString()))
+                if (Urunler.Items.Count == 0)
+                //if (table.Rows.Count >= int.Parse(resimadet.Attributes["title"].ToString()))
                 {
                     foreach (GridViewRow row in grid.Rows)
                     {
                         DropDownList chkSelect = (DropDownList)row.FindControl("chkSelect");
                         var ss = chkSelect.SelectedValue;
                         var _ordchid = row.Cells[1].Text;
-                        DbQuery.insertquery($"update MDE_GENEL.dbo.MB_Islemler set MB_Tamamlandi = 1,MB_TamamlanmaTarihi = getdate(),MB_Montajcı = '{loginRes[0].SOCODE.Replace("TT-","")}' where MB_ORDCHID = {_ordchid}", ConnectionString);
+
+                        DbQuery.insertquery($"update MB_Islemler set MB_Tamamlandi = {int.Parse(ss)},MB_TamamlanmaTarihi = getdate(),MB_Montajcı = '{loginRes[0].SOCODE.Replace("TT-", "")}' where MB_ORDCHID = {_ordchid}", ConnectionString2);
                         if (CURID == "0")
                         {
-                            DbQuery.insertquery($"update PRODEMAND set PRDESTS = 2 where PRDEID = {_ordchid}", ConnectionString2);
+                            DbQuery.insertquery($"update PRODEMAND set PRDESTS = 2 where PRDEID = {_ordchid}", ConnectionString);
                         }
+                        else
+                        {
+                            var Data = DbQuery.Query($@"select TESLIM.DIVVAL as TESLIMDEPO,SATIS.DIVVAL as SATISDEPO,PRONAME,CURVAL,CURNAME from CUSDELIVER
+                            left outer join MDE_GENEL.dbo.MB_Islemler on CDRORDCHID = MB_ORDCHID
+                            left outer join PRODUCTS on PROID = MB_PROID
+                            left outer join CURRENTS on CURID = CDRCURID
+                            LEFT OUTER JOIN DEFSTORAGE WITH (NOLOCK) ON CDRSTORID = DSTORID
+                            LEFT OUTER JOIN DIVISON TESLIM WITH (NOLOCK) ON TESLIM.DIVVAL = DSTORVAL
+                            LEFT OUTER JOIN DIVISON SATIS WITH (NOLOCK) ON SATIS.DIVVAL = CDRSALEDIV
+                            where MB_ORDCHID = {_ordchid}", ConnectionString);
+                            var TESLIMDEPO = Data.Rows[0]["TESLIMDEPO"].ToString();
+                            var SATISDEPO = Data.Rows[0]["SATISDEPO"].ToString();
+
+                            var TESLIMGSM = DbQuery.GetValue($"select DIVPHN1 from DIVISON where DIVVAL = '{TESLIMDEPO}'");
+                            var TESLIMSMS = SMS(TESLIMGSM, "ÜRÜN TESLİM EDİLDİ...!" + Environment.NewLine + Data.Rows[0]["CURNAME"].ToString() + " Müşterinin " + Data.Rows[0]["PRONAME"].ToString() + " ürünü ");
+                            if (TESLIMDEPO != SATISDEPO)
+                            {
+                                var SATISGSM = DbQuery.GetValue($"select DIVPHN1 from DIVISON where DIVVAL = '{SATISDEPO}'");
+                                var SATISSMS = SMS(SATISGSM, "ÜRÜN TESLİM EDİLDİ....!" + Environment.NewLine + Data.Rows[0]["CURNAME"].ToString() + " Müşterinin " + Data.Rows[0]["PRONAME"].ToString() + " ürünü ");
+                            }
+                        }
+
                     }
                     WebMsgBox.Show("Kayıt Tamamlandı");
                     Response.Redirect("Takvim.aspx");

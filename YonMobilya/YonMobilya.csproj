@@ -44,12 +44,17 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="EPPlus, Version=4.5.2.0, Culture=neutral, PublicKeyToken=ea159fdaa78159a1, processorArchitecture=MSIL">
+      <HintPath>..\packages\EPPlus.4.5.2\lib\net40\EPPlus.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.13.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
+    <Reference Include="PresentationCore" />
     <Reference Include="System.Net" />
     <Reference Include="System.Net.Http" />
+    <Reference Include="System.Security" />
     <Reference Include="System.Web.DynamicData" />
     <Reference Include="System.Web.Entity" />
     <Reference Include="System.Web.ApplicationServices" />
@@ -640,13 +645,16 @@
     <Content Include="docs\docs.html" />
     <Content Include="docs\highlights\highlight.min.css" />
     <Content Include="docs\highlights\highlight.min.js" />
+    <Content Include="Dokum.html" />
     <Content Include="frmAnaSayfa.aspx" />
+    <Content Include="HakedisRaporu.aspx" />
     <Content Include="img\islem_gerceklestiriliyor.gif" />
     <Content Include="img\yonavmlogo.png" />
     <Content Include="KullaniciEkleme.aspx" />
     <Content Include="KullaniciProfili.aspx" />
     <Content Include="Kurulum.aspx" />
     <Content Include="MagazaKurulum.aspx" />
+    <Content Include="MonajFormu.aspx" />
     <Content Include="Montaj.aspx" />
     <Content Include="NewLogin.aspx" />
     <Content Include="Onayli.aspx" />
@@ -693,6 +701,13 @@
     <Compile Include="frmAnaSayfa.aspx.designer.cs">
       <DependentUpon>frmAnaSayfa.aspx</DependentUpon>
     </Compile>
+    <Compile Include="HakedisRaporu.aspx.cs">
+      <DependentUpon>HakedisRaporu.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="HakedisRaporu.aspx.designer.cs">
+      <DependentUpon>HakedisRaporu.aspx</DependentUpon>
+    </Compile>
     <Compile Include="Helper.cs" />
     <Compile Include="KullaniciEkleme.aspx.cs">
       <DependentUpon>KullaniciEkleme.aspx</DependentUpon>
@@ -721,6 +736,13 @@
     </Compile>
     <Compile Include="MagazaKurulum.aspx.designer.cs">
       <DependentUpon>MagazaKurulum.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="MonajFormu.aspx.cs">
+      <DependentUpon>MonajFormu.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="MonajFormu.aspx.designer.cs">
+      <DependentUpon>MonajFormu.aspx</DependentUpon>
     </Compile>
     <Compile Include="Montaj.aspx.cs">
       <DependentUpon>Montaj.aspx</DependentUpon>

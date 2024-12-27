@@ -233,9 +233,9 @@
             <div class="row">
                 <div class="col-md-12">
                     <div class="card">
-                        <div class="card-body">
+                        <div runat="server" id="Tamamlama"  class="card-body">
                             <h4 class="card-title">Kurulum Tamamlama</h4>
-                            <div class="row">
+                            <div runat="server" id="UrunMontaj" class="row">
                                 <div class="table-responsive">
                                     <asp:GridView ID="grid" runat="server" CssClass="table table-striped table-bordered no-wrap"
                                         AutoGenerateColumns="False"
@@ -260,7 +260,7 @@
                                             </asp:TemplateField>
                                             <asp:BoundField DataField="ORDCHID" ReadOnly="true" />
                                             <asp:BoundField DataField="PROVAL" HeaderText="Ürün Kodu" />
-                                            <asp:BoundField DataField="PRONAME" HeaderText="Ürün Adı" />
+                                            <asp:BoundField DataField="PRONAME"  ItemStyle-CssClass="td1" HeaderText="Ürün Adı" />
                                             <asp:BoundField DataField="ORDCHBALANCEQUAN" HeaderText="Kurulum Adet" />
                                             <asp:TemplateField HeaderText="Kurulum Adet" ItemStyle-Width="100px">
                                                 <ItemTemplate>
@@ -281,8 +281,12 @@
                             </div>
                             <div class="card mb-12">
                                 <div class="card-body">
-                                    <h2 runat="server" id="resimadet" title="4" class="card-title text-md-center">İşlem Tamamlamak için En az 4 Resim ekleyiniz</h2>
                                     <div class="row gx-1 gy-1 align-items-center">
+                                        <div runat="server" id="Secim" class="col-md-12" visible="false">
+                                            <h2 runat="server" id="resimadet" title="4" class="card-title text-md-center">İşlem Tamamlamak için En az 4 Resim ekleyiniz</h2>
+                                            <h2 class="card-title align-items-center">Resim Yüklenecek ürün seçin</h2>
+                                            <asp:DropDownList runat="server" ID="Urunler" CssClass="ddl form-control"></asp:DropDownList>
+                                        </div>
                                         <div runat="server" id="uploadarea" class="row col-12" visible="false">
                                             <div runat="server" id="resim1" class="col-md-6">
                                                 <div class="card">
@@ -409,8 +413,37 @@
             </div>
         </div>
     </div>
+    
+    <style>
+        /* GridView kontrolünüz için genel stil */
+        .gridView {
+            width: 100%; /* GridView'in tam genişlikte olmasını sağlar */
+            table-layout:auto; /* Sütun genişliklerini korur */
+            border-collapse:collapse;            
+        }
 
-    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+            .gridView .td1 .td2 {
+                word-wrap: break-word;
+                white-space: normal;
+                overflow-wrap: break-word;
+            }
+
+        .td1 {
+            width:70%;
+            table-layout:fixed;
+            word-wrap: break-word; /* Uzun kelimeleri satır sonuna sarmak için */
+            white-space: normal; /* Satır sonu karakterlerini ve boşlukları işleyin */
+            overflow-wrap: break-word; /* Uzun kelimeleri alt satıra geçirin */            
+            /*border: solid;*/
+            /* max-width: 150px; İsteğe bağlı: sütun genişliğini sınırlandırın */
+        }
+        .td2 {
+            width:10%;
+            table-layout:auto;
+            /*border: none;*/
+        }
+    </style>
+    <%--<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>--%>
     <script type="text/javascript">
         function ShowProgress() {
             setTimeout(function () {

@@ -1,0 +1,185 @@
+﻿<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="assets/extra-libs/c3/c3.min.css" rel="stylesheet">
+    <link href="dist/css/style.min.css" rel="stylesheet">
+    <title>ÜRÜN TESLİM FORMU</title>
+    <style>
+        @media print {
+            @page {
+                size: A4;
+                margin: 10mm;
+            }
+
+            body {
+                margin: 0;
+            }
+        }
+
+        .container {
+            width: 210mm;
+            height: 297mm;
+            margin: 0 auto;
+            padding: 10mm;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            page-break-after: always;
+        }
+
+        .header, .footer {
+            text-align: center;
+            padding: 2mm 0;
+        }
+
+        .content {
+            text-align: justify;
+        }
+
+        .right-align {
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        table, th, td {
+            border: 1px solid black;
+        }
+
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+
+        .table-container {
+            max-height: 180mm;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <img src="assets/images/Yon%20Logo.png" style="resize: initial" alt="homepage" class="light-logo" />
+        <img src="assets/images/Yon%20Text.png" style="resize: initial" class="light-logo" alt="homepage" />
+        <div class="header">
+            <h1>ÜRÜN TESLİM FORMU</h1>
+        </div>
+        <div class="content">
+            <div class="right-align">
+                <table style="width:300px">
+                    <tr>
+                        <td><strong>SATIŞ MAĞAZA:</strong></td>
+                        <td><p><span id="satis-temsilcisi">SQL Verisi 2</span></p></td>
+                    </tr>
+                    <tr>
+                        <td><strong>MONTAJ TARİHİ:</strong></td>
+                        <td><p><span id="tarih">SQL Verisi 3</span></p></td>
+                    </tr>
+                </table>
+            </div>
+            <p><strong>MÜŞTERİ ADI:</strong> <span id="musteri-adi">SQL Verisi 1</span></p>
+            <p><strong>ADRES:</strong> <span id="adres"></span>SQL Verisi 4</p>
+            <p><strong>TEL:</strong> <span id="tel">SQL Verisi 5</span></p>
+            <br />
+        </div>
+        <br />
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ÜRÜN ADI</th>
+                        <th>KODU</th>
+                        <th>ADET</th>
+                        <th>AÇIKLAMA</th>
+                        <th>SONUÇ</th>
+                    </tr>
+                </thead>
+                <tbody id="urun-tablo">
+                    <!-- Ürün satırları buraya eklenecek -->
+                </tbody>
+            </table>
+        </div>
+        <br />
+        <div class="tab-content">
+            <table>
+                <tr>
+                    <th colspan="2" align="center">
+                        <p align="center">Yön AVM® Aldığım Ürünlerin Sorunsuz ve Eksiksiz Tarafımdan Teslim Alınmıştır.</p>
+                    </th>
+                </tr>
+                <tr>
+                    <td>
+                        <p><strong>MÜŞTERİ ADI SOYADI:</strong> <span id="musteri-adi-soyadi">SQL Verisi 6</span></p>
+                    </td>
+                    <td>
+                        <p><strong>EKİP ADI SOYADI:</strong> <span id="ekip-adi-soyadi">SQL Verisi 8</span></p>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <p><strong>MÜŞTERİ İMZASI:</strong> <span id="musteri-imza"></span></p>
+                    </td>
+                    <td>
+                        <p><strong>EKİP İMZASI:</strong> <span id="ekip-imza"></span></p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="footer text-center">
+            <p>© 2024 Yön Alışveriş Merkezleri (YÖN AVM®)</p>
+        </div>
+    </div>
+    <script>
+        //function fillForm(data) {
+        //    document.getElementById('musteri-adi').innerText = data.musteriAdi;
+        //    document.getElementById('satis-temsilcisi').innerText = data.satisTemsilcisi;
+        //    document.getElementById('tarih').innerText = data.tarih;
+        //    document.getElementById('adres').innerText = data.adres;
+        //    document.getElementById('tel').innerText = data.tel;
+        //    document.getElementById('musteri-adi-soyadi').innerText = data.musteriAdiSoyadi;
+        //    document.getElementById('musteri-imza').innerText = data.musteriImza;
+        //    document.getElementById('ekip-adi-soyadi').innerText = data.ekipAdiSoyadi;
+        //    document.getElementById('ekip-imza').innerText = data.ekipImza;
+
+        //    const urunTablo = document.getElementById('urun-tablo');
+        //    data.urunler.forEach((urun) => {
+        //        const row = document.createElement('tr');
+        //        row.innerHTML = `<td>${urun.urunAdi}</td><td>${urun.kodu}</td><td>${urun.adet}</td><td>${urun.aciklama}</td><td></td>`;
+        //        urunTablo.appendChild(row);
+        //    });
+        //}
+
+        // Örnek veri doldurma
+        //fillForm({
+        //    musteriAdi: "Ahmet Öztürk",
+        //    satisTemsilcisi: "ANTALYA 4",
+        //    tarih: "02.07.2024",
+        //    adres: "Göksu Mahallesi Suphi Türel Caddesi No:33 Livagarde Konutları F Blok Daire 15 Kat 4 Kepez/Antalya",
+        //    tel: "5308269871",
+        //    musteriAdiSoyadi: "Ahmet Öztürk",
+        //    musteriImza: "",
+        //    ekipAdiSoyadi: "Ekip Adı",
+        //    ekipImza: "",
+        //    urunler: [
+        //        { urunAdi: "Moonlight Başlık 160 Lik", kodu: "07-788", adet: 1, aciklama: "" },
+        //        { urunAdi: "Moonlight Baza (B) 160*200 Ç.P", kodu: "07-788", adet: 1, aciklama: "" },
+        //        { urunAdi: "Moonlight Yatak 160*200", kodu: "", adet: 1, aciklama: "" },
+        //        { urunAdi: "Moonlight Başlık 160 Lik", kodu: "07-788", adet: 1, aciklama: "" },
+        //        { urunAdi: "Moonlight Baza (B) 160*200 Ç.P", kodu: "07-788", adet: 1, aciklama: "" },
+        //        { urunAdi: "Moonlight Yatak 160*200", kodu: "", adet: 1, aciklama: "" },
+        //        { urunAdi: "Moonlight Başlık 160 Lik", kodu: "07-788", adet: 1, aciklama: "" },
+        //        { urunAdi: "Moonlight Baza (B) 160*200 Ç.P", kodu: "07-788", adet: 1, aciklama: "" },
+        //        { urunAdi: "Moonlight Baza (B) 160*200 Ç.P", kodu: "07-788", adet: 1, aciklama: "" },
+        //        { urunAdi: "Moonlight Yatak 160*200", kodu: "", adet: 1, aciklama: "" },
+        //        { urunAdi: "Moonlight Başlık 160 Lik", kodu: "07-788", adet: 1, aciklama: "" },
+        //        { urunAdi: "Moonlight Baza (B) 160*200 Ç.P", kodu: "07-788", adet: 1, aciklama: "" },
+        //        { urunAdi: "Moonlight Yatak 160*200", kodu: "", adet: 1, aciklama: "" }
+        //    ]
+        //});
+    </script>
+</body>
+</html>

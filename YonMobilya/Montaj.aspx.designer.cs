@@ -15,6 +15,24 @@ namespace YonMobilya
     {
 
         /// <summary>
+        /// Tamamlama denetimi.
+        /// </summary>
+        /// <remarks>
+        /// Otomatik olarak oluşturulan alan.
+        /// Değiştirmek için, alan bildirimini tasarımcı dosyasından arka plan kod dosyasına taşıyın.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl Tamamlama;
+
+        /// <summary>
+        /// UrunMontaj denetimi.
+        /// </summary>
+        /// <remarks>
+        /// Otomatik olarak oluşturulan alan.
+        /// Değiştirmek için, alan bildirimini tasarımcı dosyasından arka plan kod dosyasına taşıyın.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl UrunMontaj;
+
+        /// <summary>
         /// grid denetimi.
         /// </summary>
         /// <remarks>
@@ -33,6 +51,15 @@ namespace YonMobilya
         protected global::System.Web.UI.WebControls.Button tamlandı;
 
         /// <summary>
+        /// Secim denetimi.
+        /// </summary>
+        /// <remarks>
+        /// Otomatik olarak oluşturulan alan.
+        /// Değiştirmek için, alan bildirimini tasarımcı dosyasından arka plan kod dosyasına taşıyın.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl Secim;
+
+        /// <summary>
         /// resimadet denetimi.
         /// </summary>
         /// <remarks>
@@ -40,6 +67,15 @@ namespace YonMobilya
         /// Değiştirmek için, alan bildirimini tasarımcı dosyasından arka plan kod dosyasına taşıyın.
         /// </remarks>
         protected global::System.Web.UI.HtmlControls.HtmlGenericControl resimadet;
+
+        /// <summary>
+        /// Urunler denetimi.
+        /// </summary>
+        /// <remarks>
+        /// Otomatik olarak oluşturulan alan.
+        /// Değiştirmek için, alan bildirimini tasarımcı dosyasından arka plan kod dosyasına taşıyın.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.DropDownList Urunler;
 
         /// <summary>
         /// uploadarea denetimi.

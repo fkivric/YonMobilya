@@ -193,7 +193,8 @@ namespace YonMobilya
         }
         private void LoadEventCounts()
         {
-            string query = @"
+            var loginRes = (List<LoginObj>)Session["Login"];
+            string query = String.Format(@"
             SELECT DISTINCT 
                 MB_PlanTarih AS PlanTarih, 
                 MB_SALID AS ID, 
@@ -203,7 +204,8 @@ namespace YonMobilya
             LEFT OUTER JOIN SALES ON SALID = MB_SALID
             LEFT OUTER JOIN CURRENTS ON CURID = SALCURID
 			LEFT OUTER JOIN ORDERSCHILD on ORDCHORDID = (select ORDID from ORDERS where ORDSALID = SALID)
-			where MB_SALID != 0 and MB_Tamamlandi = 0";
+            left outer join SOCIAL on SOCODE = 'TT-' + MB_Ekleyen
+			where MB_SALID != 0 and MB_Tamamlandi = 0 and SOCODE = '{0}'", loginRes[0].SOCODE); 
 
             // Sonuçları tutacak bir sözlük
             Dictionary<string, List<Islemler>> eventCounts = new Dictionary<string, List<Islemler>>();

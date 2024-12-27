@@ -34,7 +34,8 @@
 
             notifications.forEach(notification => {
                 const notificationItem = document.createElement('a');
-                notificationItem.href = 'javascript:void(0)';
+                notificationItem.href = 'Montaj.aspx?curid=' + encodeURIComponent(notification.CURID) + '&salid=' + encodeURIComponent(notification.SALID);
+                //notificationItem.href = 'Montaj.aspx?curid=' + CURID + '&salid=' + encodeURIComponent(id) + '';
                 notificationItem.className = 'message-item d-flex align-items-center border-bottom px-3 py-2';
 
                 const iconDiv = document.createElement('div');
@@ -268,7 +269,7 @@
                                     aria-expanded="false"><i data-feather="refresh-cw" class="feather-icon"></i><span class="hide-menu">Mağaza Kurulumu <br />Randevu Atama</span></a></li>
                                 <li class="sidebar-item"><a class="sidebar-link sidebar-link" href="Tamamlananlar.aspx"
                                     aria-expanded="false"><i data-feather="check-circle" class="feather-icon"></i><span class="hide-menu">Tamamlanan İşler</span> </a></li>
-                                <li class="sidebar-item"><a class="sidebar-link sidebar-link" href="javascript:void(0)"
+                                <li class="sidebar-item"><a class="sidebar-link sidebar-link" href="HakedisRaporu.aspx"
                                     aria-expanded="false"><i data-feather="flag" class="feather-icon"></i><span class="hide-menu">Hakediş Raporları</span> </a></li>
                         </li>
                         <li runat="server" id="firma" class="sidebar-item">

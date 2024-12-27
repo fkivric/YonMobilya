@@ -49,7 +49,7 @@ namespace YonMobilya
             LEFT OUTER JOIN CURRENTS WITH (NOLOCK)   ON CURID = OFFCURCURID
             LEFT OUTER JOIN SOCIAL WITH (NOLOCK) ON SOCURID = CURID AND 'TT-' + CAST(OFFCURID AS VARCHAR(4)) =  SOCODE
             left outer join POTENCY on POTDEPART = SOCODE and POTSTS = 1 and POTNOTES1 != '00'
-            where CURSTS = 1 and SODEPART  ='027'
+            where CURSTS = 1 and SODEPART  in ('027','003')
             group by CURVAL,SOCODE,SOENTERKEY,SONAME,SOSURNAME,OFFCURPOSITION            
             ) net
             where SOCODE = '{0}' and SOPAS = '{1}'", uname.Value, pwd.Value);
@@ -61,6 +61,7 @@ namespace YonMobilya
                 string Sorgu = "select MTFTPIP as VolFtpHost,MTFTPUSER as VolFtpUser,MTFTPPASSWORD as VolFtpPass from MANAGEMENT";
                 var ftp = DbQuery.Query(Sorgu, ConnectionString).DataTableToList<Ftp>();
                 Session.Add("FTP", ftp);
+                Session.Add("DIVNAME", "");
                 if (sonuc[0].SOADMIN == "1")
                 {
                     Response.Redirect("frmAnaSayfa.aspx");
@@ -79,18 +80,25 @@ namespace YonMobilya
                 LEFT OUTER JOIN CURRENTS ON CURID = SOCURID
                 LEFT OUTER JOIN DEPARTMENT ON DEPVAL=SODEPART
                 LEFT OUTER JOIN EMAILACCOUNT ON EMASOCODE= SOCODE  
-                where SOSTS = 1 and SODEPART != '027'
+                where SOSTS = 1 and SODEPART = '027'
                 and SOCODE = '{0}' and SOENTERKEY = '{1}' and POTNOTES1 != ''
                 group by CURVAL,SOCODE,SOENTERKEY,SONAME,SOSURNAME,SOADMIN", uname.Value, pwd.Value);
                 var sonuc2 = DbQuery.Query(w, ConnectionString).DataTableToList<LoginObj>();
                 if (sonuc2 != null)
                 {
-                    Session.Add("Login", sonuc2);
+                    Session.Add("Login", sonuc);
 
                     string Sorgu = "select MTFTPIP as VolFtpHost,MTFTPUSER as VolFtpUser,MTFTPPASSWORD as VolFtpPass from MANAGEMENT";
                     var ftp = DbQuery.Query(Sorgu, ConnectionString).DataTableToList<Ftp>();
                     Session.Add("FTP", ftp);
-                    Response.Redirect("SSHGiris2.aspx");
+                    if (sonuc[0].SOADMIN == "1")
+                    {
+                        Response.Redirect("frmAnaSayfa.aspx");
+                    }
+                    else
+                    {
+                        Response.Redirect("Takvim.aspx");
+                    }
                 }
                 else
                 {

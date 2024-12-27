@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using OfficeOpenXml.FormulaParsing.Excel.Functions.RefAndLookup;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -38,6 +39,8 @@ namespace YonMobilya
                 if (loginRes != null)
                 {
                     ScriptManager.RegisterStartupScript(this, GetType(), "showLoading", "showLoading();", true);
+                    StartDate.Value = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1).ToString("yyyy-MM-dd");
+                    EndDate.Value = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1).AddMonths(1).AddDays(-1).ToString("yyyy-MM-dd");
                     TeslimatListesi(); 
                     BekleyenListesi();
                     ScriptManager.RegisterStartupScript(this, GetType(), "hideLoading", "hideLoading();", true);
@@ -188,7 +191,7 @@ namespace YonMobilya
         }
         void BekleyenListesi()
         {
-            string q = @"
+            string q = $@"
             select MB_SALID, CURID,OFFCURID, CURVAL, CURNAME,OFFCURNAME, MB_PlanTarih, sum(ORDCHQUAN) as ORDCHBALANCEQUAN,Convert(numeric(18,2), sum(tutar)) as PRLPRICE from (
 select distinct Convert(varchar(50),MB_SALID) as MB_SALID,MB_ORDCHID,MB_PlanTarih,MB_Ekleyen, sum(PRLPRICE) as tutar from MDE_GENEL..MB_Islemler
                 outer apply (select PRLPRICE from PRICELIST prl where prl.PRLPROID = MB_PROID and PRLDPRID = 740) as pesinfiyat
@@ -200,7 +203,8 @@ select distinct Convert(varchar(50),MB_SALID) as MB_SALID,MB_ORDCHID,MB_PlanTari
             inner join ORDERSCHILD on ORDCHID = CDRORDCHID
             inner join OFFICALCUR on Convert(varchar(3),OFFCURID) = MB_Ekleyen
             outer apply(select PRLPRICE from PRICELIST prl where prl.PRLPROID = CDRLPROID and PRLDPRID = 740) as pesinfiyat
-            where CDRSHIPVAL = 'ANTMOB' 
+            where CDRSHIPVAL = 'ANTMOB'
+            and MB_PlanTarih between '{StartDate.Value}' and '{EndDate.Value}'
 			and not exists (select top 1 * from CUSDELIVER i WITH (NOLOCK) where i.CDRBASECANID = t.CDRID and T.CDRSALID = i.CDRSALID and i.CDRORDCHID = T.CDRORDCHID)
             group by MB_SALID,CURID,OFFCURID,CURVAL,CURNAME,OFFCURNAME,MB_PlanTarih
             order by MB_PlanTarih";
@@ -306,7 +310,7 @@ select distinct Convert(varchar(50),MB_SALID) as MB_SALID,MB_ORDCHID,MB_PlanTari
                 var CURNAME = System.Web.HttpUtility.HtmlDecode(row.Cells[4].Text);
                 // SQL Sorgusu ile veriyi al
                 var SALID = row.Cells[1].Text;
-
+                var DIVNAME = row.Cells[8].Text;
                 string w = String.Format(@"select CURCHCITY,CURCHCOUNTY,CURCHADR1 + ' ' + CURCHADR2 as CURCHADR from CURRENTSCHILD where CURCHID = {0}", CURID);
                 var adr = DbQuery.Query(w, ConnectionString);
                 string City = "";
@@ -352,8 +356,9 @@ select distinct Convert(varchar(50),MB_SALID) as MB_SALID,MB_ORDCHID,MB_PlanTari
                 outer apply (select PRLPRICE from PRICELIST prl where prl.PRLPROID = PROID and PRLDPRID = 740) as pesinfiyat
                 where CDRSALID =  '{0}' and WPROVAL in ('DD','EE','YY')
 				AND CDRSHIPVAL = 'ANTMOB'
+                AND TESLIM.DIVNAME = '{1}'
                 AND not exists (select * from MDE_GENEL.dbo.MB_Islemler where MB_SALID = CDRSALID AND MB_ORDCHID = CDRORDCHID)
-                order by 1 desc", SALID);
+                order by 1 desc", SALID, DIVNAME);
                 SqlDataAdapter da = new SqlDataAdapter(query, sql);
                 DataTable dt = new DataTable();
                 da.Fill(dt);
@@ -392,90 +397,19 @@ select distinct Convert(varchar(50),MB_SALID) as MB_SALID,MB_ORDCHID,MB_PlanTari
 
         protected void Onayla_Click(object sender, EventArgs e)
         {
+            StringBuilder ordChidList = new StringBuilder();
             var loginRes = (List<LoginObj>)Session["Login"];
             if (loginRes != null)
             {
                 try
                 {
+                    var CURID = DbQuery.GetValue($"select SALCURID from SALES where SALID = {Musteri.Rows[0].Cells[1].Text.ToString()}");
                     foreach (GridViewRow row in Musteri.Rows)
                     {
+                        var kayitli = DbQuery.GetValue($"select MB_ID from MDE_GENEL.dbo.MB_Islemler where MB_ORDCHID = {Musteri.Rows[row.RowIndex].Cells[2].Text}");
                         CheckBox chkSelect = (CheckBox)row.FindControl("chkSelect");
                         if (chkSelect != null && chkSelect.Checked)
                         {
-                            // Seçili olan satırı işleme kodu buraya yazılır.
-                            string SALID = Musteri.Rows[row.RowIndex].Cells[1].Text.ToString();
-                            var CURID = DbQuery.GetValue($"select CURVAL from SALES left outer join MDE_GENEL.dbo.MB_Teslimatci on MB_DIVVAL = SALDIVISON left outer join CURRENTS on CURID = MB_CURID where SALID = {SALID}");
-                            if (CURID != "SIFIR")
-                            {
-
-
-                                var ORDCHID = Musteri.Rows[row.RowIndex].Cells[2].Text;
-                                var PROID = Musteri.Rows[row.RowIndex].Cells[3].Text;
-                                string cellValue = Musteri.Rows[row.RowIndex].Cells[7].Text;
-
-                                // 'TL' para birimi işaretini çıkar
-                                string cleanedValue = cellValue.Replace(" TL", "").Replace(",", "");
-
-                                // Yerel ayar kullanarak string'i double'a dönüştür
-                                double sellAmount;
-                                bool isParsed = double.TryParse(cleanedValue, NumberStyles.Any, CultureInfo.InvariantCulture, out sellAmount);
-                                if (double.TryParse(cleanedValue, NumberStyles.Any, CultureInfo.InvariantCulture, out sellAmount))
-                                {
-                                    var SellAmount = sellAmount;
-                                }
-                                else
-                                {
-                                    // Dönüştürme başarısız
-                                    Console.WriteLine("Değeri double'a dönüştürme başarısız.");
-                                }
-                                var PlanTarih = customerDATE.Value.ToString();
-                                var SMSRes = (List<SmstokenObj>)Session["SMS"];
-                                var PROVAL = Musteri.Rows[row.RowIndex].Cells[4].Text;
-                                var PRONAME = Musteri.Rows[row.RowIndex].Cells[5].Text;
-                                var CURGSM = DbQuery.GetValue($"select isnull(isnull(CURCHGSM1,CURCHGSM2),CURCHGSM3) from CURRENTSCHILD where CURCHID in (select SALCURID from SALES where SALID = {SALID})");
-                                var CURNAME = DbQuery.GetValue($"select CURNAME from CURRENTS where CURID  in (select SALCURID from SALES where SALID = {SALID})");
-                                string Musmetin = "Sayın " + CURNAME + " Yön Avm® den almış oldugunuz " + Environment.NewLine + PRONAME + " Ürünüz " + PlanTarih + Environment.NewLine + "tarihinde Telimat için planlanmıştır.";
-                                var BGMUDURGSM = DbQuery.GetValue($"select substring(DIVPHN2,3,10) as DIVPHN2 from DIVISON where DIVVAL in (select SALDIVISON from SALES where SALID = {SALID})");
-                                var MGMUDURGSM = DbQuery.GetValue($"select DIVPHN1 from DIVISON where DIVVAL in (select SALDIVISON from SALES where SALID = {SALID})");
-                                if (NewOrOld.InnerText == "1")
-                                {
-                                    Dictionary<string, string> val = new Dictionary<string, string>();
-                                    val.Add("@MB_CURVAL", CURID);
-                                    val.Add("@MB_SALID", SALID);
-                                    val.Add("@MB_ORDCHID", ORDCHID);
-                                    val.Add("@MB_PROID", PROID);
-                                    val.Add("@MB_SellAmount", sellAmount.ToString());
-                                    val.Add("@MB_PlanTarih", PlanTarih);
-                                    val.Add("@MB_Ekleyen", Montajci.SelectedValue);
-                                    val.Add("@ReturnDesc", "");
-                                    var sonuc = DbQuery.Insert2("MB_Islemler_New", val);
-
-                                    if (smsvar != null && smsvar.Checked)
-                                    {
-                                        var MUSTERİSMS = SMS(CURGSM, Musmetin);
-                                    }
-                                    var snc = SMS("5547414216", Musmetin);
-                                    var BGMSMS = SMS(BGMUDURGSM, CURNAME + " Müşterinin " + PRONAME + " ürünü " + PlanTarih + Environment.NewLine + " tarihinde teslimat için Planlanmıştır.");
-                                    var MGMSMS = SMS(MGMUDURGSM, CURNAME + " Müşterinin " + PRONAME + " ürünü " + PlanTarih + Environment.NewLine + " tarihinde teslimat için Planlanmıştır.");
-                                }
-                                else
-                                {
-                                    var kayitli = DbQuery.GetValue($"select MB_ID from MDE_GENEL.dbo.MB_Islemler where MB_ORDCHID = {ORDCHID}");
-                                    DbQuery.insertquery($"update MDE_GENEL.dbo.MB_Islemler set MB_PlanTarih = '{PlanTarih}', MB_Ekleyen = '{Montajci.SelectedValue}' where MB_ID = {kayitli}", ConnectionString);
-                                    var BGMSMS = SMS(BGMUDURGSM, CURNAME + " Müşterinin " + PRONAME + " ürünü " + PlanTarih + Environment.NewLine + " teslimat tarihi değişmiştir.");
-                                    var MGMSMS = SMS(MGMUDURGSM, CURNAME + " Müşterinin " + PRONAME + " ürünü " + PlanTarih + Environment.NewLine + " teslimat tarihi değişmiştir.");
-                                }
-                            }
-                            else
-                            {
-                                WebMsgBox.Show("Mağaza Teslimatcısı Tanımlanmamış");
-                            }
-                        }
-                        else
-                        {
-                            var ORDCHID = Musteri.Rows[row.RowIndex].Cells[2].Text;
-                            string SALID = Musteri.Rows[row.RowIndex].Cells[1].Text.ToString();
-                            var kayitli = DbQuery.GetValue($"select MB_ID from MDE_GENEL.dbo.MB_Islemler where MB_ORDCHID = {ORDCHID}");
                             if (kayitli != null)
                             {
                                 var PlanTarih = customerDATE.Value.ToString();
@@ -483,8 +417,89 @@ select distinct Convert(varchar(50),MB_SALID) as MB_SALID,MB_ORDCHID,MB_PlanTari
                             }
                             else
                             {
-                                DbQuery.insertquery($"delete MDE_GENEL.dbo.MB_Islemler where MB_ID =  {kayitli}", ConnectionString);
+
+                                // Seçili olan satırı işleme kodu buraya yazılır.
+                                string SALID = Musteri.Rows[row.RowIndex].Cells[1].Text.ToString();
+                                var CURVAL = DbQuery.GetValue($"select CURVAL from SALES left outer join MDE_GENEL.dbo.MB_Teslimatci on MB_DIVVAL = SALDIVISON left outer join CURRENTS on CURID = MB_CURID where SALID = {SALID}");
+                                if (CURVAL != "SIFIR")
+                                {
+                                    var ORDCHID = Musteri.Rows[row.RowIndex].Cells[2].Text;
+                                    // ORDCHID'yi StringBuilder'a ekle
+                                    if (ordChidList.Length > 0)
+                                    {
+                                        ordChidList.Append(","); // Eğer daha önce değer eklenmişse, virgül ile ayır
+                                    }
+                                    ordChidList.Append(ORDCHID); // ORDCHID'yi ekle
+
+                                    var PROID = Musteri.Rows[row.RowIndex].Cells[3].Text;
+                                    string cellValue = Musteri.Rows[row.RowIndex].Cells[7].Text;
+
+                                    // 'TL' para birimi işaretini çıkar
+                                    string cleanedValue = cellValue.Replace(" TL", "").Replace(",", "");
+
+                                    // Yerel ayar kullanarak string'i double'a dönüştür
+                                    double sellAmount;
+                                    bool isParsed = double.TryParse(cleanedValue, NumberStyles.Any, CultureInfo.InvariantCulture, out sellAmount);
+                                    if (double.TryParse(cleanedValue, NumberStyles.Any, CultureInfo.InvariantCulture, out sellAmount))
+                                    {
+                                        var SellAmount = sellAmount;
+                                    }
+                                    else
+                                    {
+                                        // Dönüştürme başarısız
+                                        Console.WriteLine("Değeri double'a dönüştürme başarısız.");
+                                    }
+                                    var PlanTarih = customerDATE.Value.ToString();
+                                    var SMSRes = (List<SmstokenObj>)Session["SMS"];
+                                    var PROVAL = Musteri.Rows[row.RowIndex].Cells[4].Text;
+                                    var PRONAME = Musteri.Rows[row.RowIndex].Cells[5].Text;
+                                    var CURGSM = DbQuery.GetValue($"select isnull(isnull(CURCHGSM1,CURCHGSM2),CURCHGSM3) from CURRENTSCHILD where CURCHID in (select SALCURID from SALES where SALID = {SALID})");
+                                    var CURNAME = DbQuery.GetValue($"select CURNAME from CURRENTS where CURID  in (select SALCURID from SALES where SALID = {SALID})");
+                                    string Musmetin = "Sayın " + CURNAME + " Yön Avm® den almış oldugunuz " + Environment.NewLine + PRONAME + " Ürünüz " + PlanTarih + Environment.NewLine + "tarihinde Telimat için planlanmıştır.";
+                                    var BGMUDURGSM = DbQuery.GetValue($"select substring(DIVPHN2,3,10) as DIVPHN2 from DIVISON where DIVVAL in (select SALDIVISON from SALES where SALID = {SALID})");
+                                    var MGMUDURGSM = DbQuery.GetValue($"select DIVPHN1 from DIVISON where DIVVAL in (select SALDIVISON from SALES where SALID = {SALID})");
+                                    if (NewOrOld.InnerText == "1")
+                                    {
+                                        Dictionary<string, string> val = new Dictionary<string, string>();
+                                        val.Add("@MB_CURVAL", CURVAL);
+                                        val.Add("@MB_SALID", SALID);
+                                        val.Add("@MB_ORDCHID", ORDCHID);
+                                        val.Add("@MB_PROID", PROID);
+                                        val.Add("@MB_SellAmount", sellAmount.ToString());
+                                        val.Add("@MB_PlanTarih", PlanTarih);
+                                        val.Add("@MB_Ekleyen", Montajci.SelectedValue);
+                                        val.Add("@ReturnDesc", "");
+                                        var sonuc = DbQuery.Insert2("MB_Islemler_New", val);
+
+                                        if (smsvar != null && smsvar.Checked)
+                                        {
+                                            var MUSTERİSMS = SMS(CURGSM, Musmetin);
+                                        }
+                                        var snc = SMS("5547414216", Musmetin);
+                                        var BGMSMS = SMS(BGMUDURGSM, CURNAME + " Müşterinin " + PRONAME + " ürünü " + PlanTarih + Environment.NewLine + " tarihinde teslimat için Planlanmıştır.");
+                                        var MGMSMS = SMS(MGMUDURGSM, CURNAME + " Müşterinin " + PRONAME + " ürünü " + PlanTarih + Environment.NewLine + " tarihinde teslimat için Planlanmıştır.");
+                                    }
+                                    else
+                                    {
+                                        //var kayitli = DbQuery.GetValue($"select MB_ID from MDE_GENEL.dbo.MB_Islemler where MB_ORDCHID = {ORDCHID}");
+                                        DbQuery.insertquery($"update MDE_GENEL.dbo.MB_Islemler set MB_PlanTarih = '{PlanTarih}', MB_Ekleyen = '{Montajci.SelectedValue}' where MB_ID = {kayitli}", ConnectionString);
+                                        var BGMSMS = SMS(BGMUDURGSM, CURNAME + " Müşterinin " + PRONAME + " ürünü " + PlanTarih + Environment.NewLine + " teslimat tarihi değişmiştir.");
+                                        var MGMSMS = SMS(MGMUDURGSM, CURNAME + " Müşterinin " + PRONAME + " ürünü " + PlanTarih + Environment.NewLine + " teslimat tarihi değişmiştir.");
+                                    }
+                                }
+                                else
+                                {
+                                    WebMsgBox.Show("Mağaza Teslimatcısı Tanımlanmamış");
+                                }
                             }
+                        }
+                        else
+                        {
+
+                            DbQuery.insertquery($"delete MDE_GENEL.dbo.MB_Islemler where MB_ID =  {kayitli}", ConnectionString);
+
+                            var ORDCHID = Musteri.Rows[row.RowIndex].Cells[2].Text;
+                            string SALID = Musteri.Rows[row.RowIndex].Cells[1].Text.ToString();
 
                         }
                     }
@@ -495,6 +510,22 @@ select distinct Convert(varchar(50),MB_SALID) as MB_SALID,MB_ORDCHID,MB_PlanTari
                     TeslimatListesi();
                     BekleyenListesi();
 
+                    Response.Redirect("MonajFormu.aspx?curid=" + CURID + "&salid=" + ordChidList);
+
+
+                    //string url = "MonajFormu.aspx?curid=" + CURID + "&salid=" + ordChidList;
+                    //string script = @"var printWindow = window.open('" + url + "', '_blank');";
+                    //ClientScript.RegisterStartupScript(this.GetType(), "OpenInNewTab", script, true);
+
+                    //string url = "MonajFormu.aspx?curid=" + CURID + "&salid=" + ordChidList;
+                    //string script = @"var printWindow = window.open('" + url + "', '_blank'); " +
+                    //    "printWindow.onload = function() {printWindow.print();};";
+                    //ClientScript.RegisterStartupScript(this.GetType(), "OpenPrintWindow", script, true);
+
+
+                    //string url = "MonajFormu.aspx?curid=" + CURID + "&salid=" + ordChidList;
+                    //string script = "window.open('" + url + "', '_blank'); window.print();";
+                    //ClientScript.RegisterStartupScript(this.GetType(), "OpenPrintWindow", script, true);
                 }
                 catch (Exception)
                 {
@@ -816,6 +847,11 @@ select distinct Convert(varchar(50),MB_SALID) as MB_SALID,MB_ORDCHID,MB_PlanTari
                     chkSelect.Checked = (isSelected == 1);
                 }
             }
+        }
+
+        protected void Listele_Click(object sender, EventArgs e)
+        {
+            BekleyenListesi();
         }
     }
 }
