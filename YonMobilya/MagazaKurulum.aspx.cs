@@ -20,6 +20,7 @@ namespace YonMobilya
         public static string ConnectionString2 = "Server=192.168.4.24;Database=MDE_GENEL;User Id=sa;Password=MagicUser2023!;";
         SqlConnection sql = new SqlConnection(ConnectionString);
         SqlConnection sql2 = new SqlConnection(ConnectionString);
+        public static double Oran = 0;
         protected void Page_Load(object sender, EventArgs e)
         {
             if (!IsPostBack)
@@ -27,6 +28,7 @@ namespace YonMobilya
                 var loginRes = (List<LoginObj>)Session["Login"];
                 if (loginRes != null)
                 {
+                    Oran = double.Parse(loginRes[0].CURCHDISCRATE) / 100;
                     TeslimatListesi();
                     BekleyenListesi();
                 }
@@ -90,7 +92,7 @@ namespace YonMobilya
                 ciro = ciro + double.Parse(dt.Rows[i]["TUTAR"].ToString());
             }
             toplamciro.InnerText = ciro.ToString("C", new CultureInfo("tr-TR"));
-            hakedis.InnerText = (ciro * 0.08).ToString("C", new CultureInfo("tr-TR"));
+            hakedis.InnerText = (ciro * Oran).ToString("C", new CultureInfo("tr-TR"));
 
             //Page.ClientScript.RegisterStartupScript(
             //    this.GetType(),
@@ -123,7 +125,7 @@ namespace YonMobilya
             {
                 magaza = loginRes[0].DIVVAL.ToString();
             }
-            string q = String.Format(@"select MB_PlanTarih,outd.DIVVAL,outd.DIVNAME as ISTEYEN,ind.DIVNAME as VEREN,sum(PRDEQUAN) as ADET,sum(PRLPRICE) as TUTAR,MB_Ekleyen
+            string q = String.Format(@"select MB_PlanTarih,outd.DIVVAL,outd.DIVNAME as ISTEYEN,ind.DIVNAME as VEREN,sum(PRDEQUAN) as ADET,sum(MB_SellAmount) as TUTAR,MB_Ekleyen
             from PRODEMAND 
             left outer join PRODUCTS on PROID = PRDEPROID
             left outer join DEFSTORAGE outs on outs.DSTORID = PRDEDSTORIDOUT
@@ -132,7 +134,7 @@ namespace YonMobilya
             left outer join DIVISON ind on ind.DIVVAL = outs.DSTORDIVISON
 			inner join MDE_GENEL.dbo.MB_Islemler on MB_ORDCHID = PRDEID
             outer apply (select PRLPRICE from PRICELIST prl where prl.PRLPROID = PROID and PRLDPRID = 740) as pesinfiyat
-            where PRDESTS = 0 and PRDEKIND= 1
+            where MB_Tamamlandi = 0
             AND PRDEDIVISON in ({0})
             group by outd.DIVVAL,outd.DIVNAME,MB_PlanTarih,ind.DIVNAME,MB_Ekleyen", magaza);
             SqlDataAdapter da = new SqlDataAdapter(q, ConnectionString);
@@ -147,7 +149,7 @@ namespace YonMobilya
                 ciro = ciro + double.Parse(dt.Rows[i]["TUTAR"].ToString());
             }
             tamamalananciro.InnerText = ciro.ToString("C", new CultureInfo("tr-TR"));
-            tamamlananhakedis.InnerText = (ciro * 0.08).ToString("C", new CultureInfo("tr-TR"));
+            tamamlananhakedis.InnerText = (ciro * Oran).ToString("C", new CultureInfo("tr-TR"));
 
             //Page.ClientScript.RegisterStartupScript(
             //    this.GetType(),
@@ -330,7 +332,7 @@ namespace YonMobilya
                             }
                             else
                             {
-
+                                DbQuery.insertquery($"update MDE_GENEL.dbo.MB_Islemler set MB_PlanTarih = '{PlanTarih}',MB_Ekleyen = '{Montajci.SelectedValue}'' where MB_ORDCHID = '{ORDCHID}' ", ConnectionString2);
                             }
                         }
                     }
@@ -436,7 +438,12 @@ namespace YonMobilya
                 left outer join DIVISON on PRDEDIVISON = DIVVAL
                 outer apply (select PRLPRICE from PRICELIST prl where prl.PRLPROID = PROID and PRLDPRID = 740) as pesinfiyat
                 where PRDEKIND= 1 
-                AND exists (select * from MDE_GENEL.dbo.MB_Islemler where MB_SALID = 0 AND MB_ORDCHID = PRDEID and MB_PlanTarih = '{1}' and MB_Tamamlandi = 0)
+                AND exists (select * from MDE_GENEL.dbo.MB_Islemler 
+                            where MB_SALID = 0 
+                            AND MB_ORDCHID = PRDEID 
+                            and MB_PlanTarih = '{1}' 
+                            and MB_Tamamlandi = 0
+                            )
                 and DIVVAL = '{0}'
                 order by 1 desc", CURVAL, PRDEDATE);
                 SqlDataAdapter da = new SqlDataAdapter(query, sql);
@@ -459,7 +466,7 @@ namespace YonMobilya
 			    left outer join SOCIAL on SOCURID = CURID  and 'TT-'+Cast(OFFCURID as varchar(20)) = SOCODE
 			    where CURVAL = '{0}' and CURSTS = 1 and OFFCURPOSITION = 'MONTAJCI'", loginRes[0].CURVAL);
                 var dt2 = DbQuery.Query(q, ConnectionString);
-                if (dt2 != null && dt.Rows.Count > 0) // Sorgudan dönen veri kontrolü
+                if (dt2 != null && dt2.Rows.Count > 0) // Sorgudan dönen veri kontrolü
                 {
                     Montajci.DataValueField = "OFFCURID";
                     Montajci.DataTextField = "OFFCURNAME";

@@ -31,6 +31,7 @@ namespace YonMobilya
         public static string CURID = "";
         public static string SALID = "";
         public static string ORDCHID = "";
+        public static double Oran = 0;
         DataTable dosyalar = new DataTable();
         DataTable UrunSorgu = new DataTable();
         List<UrunReismleri> IDList = new List<UrunReismleri>();
@@ -51,6 +52,7 @@ namespace YonMobilya
                 var loginRes = (List<LoginObj>)Session["Login"];
                 if (loginRes != null)
                 {
+                    Oran = double.Parse(loginRes[0].CURCHDISCRATE) / 100;
                     ScriptManager.RegisterStartupScript(this, GetType(), "showLoading", "showLoading();", true);
 
                     string[] salidArray = Request.QueryString["salid"].Split(',');
@@ -102,7 +104,7 @@ namespace YonMobilya
                         foreach (var item in groupedData)
                         {
                             UrunReismleri urun = new UrunReismleri();
-                            Console.WriteLine($"Ürün Adı: {item.ProductName}, Toplam Adet: {item.TotalCount}, Yeni ID: {item.NewID}");
+                            //Console.WriteLine($"Ürün Adı: {item.ProductName}, Toplam Adet: {item.TotalCount}, Yeni ID: {item.NewID}");
                             adet++;
                             urun.PRONAME = item.ProductName;
                             urun.PROID = item.NewID;
@@ -286,7 +288,6 @@ namespace YonMobilya
 
             }
         }
-
         private void BindGridView()
         {
             string DIVNAME = "";
@@ -322,13 +323,14 @@ namespace YonMobilya
             else
             {
                 query = String.Format(@"select 0 as CDRSALID,PRDEID as ORDCHID,PRDEPROID,PROVAL,PRONAME,Convert(int,PRDEQUAN) as ORDCHBALANCEQUAN,Convert(numeric(18,2),PRDEQUAN*PRLPRICE) as PRLPRICE
-				FROM MDE_GENEL.dbo.MB_Islemler
+				FROM MDE_GENEL.dbo.MB_Islemler i
 				left outer join PRODEMAND on PRDEID = MB_ORDCHID
 				left outer join PRODUCTS on PROID = MB_PROID
                 outer apply (select PRLPRICE from PRICELIST prl where prl.PRLPROID = PRDEPROID and PRLDPRID = 740) as pesinfiyat
 				where MB_Tamamlandi = 0 and MB_SUPCURVAL = 'T003387' and PRDEKIND= 1 and PRDESTS = 0
 				and PRDEID in ({0})
-			    and MB_Tamamlandi = 0        
+			    and MB_Tamamlandi = 0
+				and not exists (select * from MDE_GENEL..MB_BayiDosyaları d where d.MB_SALID = i.MB_ORDCHID)
                 order by 1 desc", SALID);
             }
             UrunSorgu = DbQuery.Query(query, ConnectionString);
@@ -448,7 +450,6 @@ namespace YonMobilya
             {
             }
         }
-
         protected void btnUpload_Click(object sender, EventArgs e)
         {
             var loginRes = (List<LoginObj>)Session["Login"];
@@ -650,7 +651,6 @@ namespace YonMobilya
             FileLoad.Visible = true;
             Dosyalar();
         }
-
         //protected void btnUpload2_Click(object sender, EventArgs e)
         //{
         //    string strFileName;
@@ -765,7 +765,6 @@ namespace YonMobilya
         //    // Display the result of the upload.
         //    frmConfirmation2.Visible = true;
         //}
-
         protected void btnUpload3_Click(object sender, EventArgs e)
         {
             var loginRes = (List<LoginObj>)Session["Login"];
@@ -897,7 +896,6 @@ namespace YonMobilya
             // Display the result of the upload.
             frmConfirmation3.Visible = true;
         }
-
         //protected void btnUpload4_Click(object sender, EventArgs e)
         //{
         //    string strFileName;
@@ -1011,7 +1009,6 @@ namespace YonMobilya
         //    // Display the result of the upload.
         //    frmConfirmation4.Visible = true;
         //}
-
         protected void grid_SelectedIndexChanged(object sender, EventArgs e)
         {
             ScriptManager.RegisterStartupScript(this, GetType(), "showLoading", "showLoading();", true);
@@ -1093,7 +1090,6 @@ namespace YonMobilya
                 FileLoad.Text = "Error: " + ex.Message;
             }
         }
-
         protected void grid_RowDataBound(object sender, GridViewRowEventArgs e)
         {
             if (e.Row.RowType == DataControlRowType.Footer)
@@ -1119,7 +1115,6 @@ namespace YonMobilya
                 }
             }
         }
-
         protected void grid_RowCreated(object sender, GridViewRowEventArgs e)
         {
             if (e.Row.Cells.Count > 1)
@@ -1129,14 +1124,12 @@ namespace YonMobilya
                 e.Row.Cells[4].Visible = false;
             }
         }
-
         protected void grid_PageIndexChanging(object sender, GridViewPageEventArgs e)
         {
             //Yeni sayfa numarasını ayarla
             grid.PageIndex = e.NewPageIndex;
             BindGridView();
         }
-
         protected void grid_RowCommand(object sender, GridViewCommandEventArgs e)
         {
             if (e.CommandName == "Select")
@@ -1153,7 +1146,6 @@ namespace YonMobilya
                 }
             }
         }
-
         protected void tamlandı_Click(object sender, EventArgs e)
         {
             bool tamam = true;
@@ -1180,7 +1172,6 @@ namespace YonMobilya
                 ScriptManager.RegisterStartupScript(this, GetType(), "showalert", "alert('Tüm Ürünlerde Sonuç Seçimi Yapınız...');", true);
             }
         }
-
         protected void table_SelectedIndexChanged(object sender, EventArgs e)
         {
             ScriptManager.RegisterStartupScript(this, GetType(), "showLoading", "showLoading();", true);
@@ -1272,12 +1263,10 @@ namespace YonMobilya
                 FileLoad.Text = "Error: " + ex.Message;
             }
         }
-
         protected void table_RowCreated(object sender, GridViewRowEventArgs e)
         {
             e.Row.Cells[1].Visible = false;
         }
-
         protected void Kaydet_Click(object sender, EventArgs e)
         {
             var loginRes = (List<LoginObj>)Session["Login"];

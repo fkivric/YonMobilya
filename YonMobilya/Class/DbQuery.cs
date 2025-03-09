@@ -125,7 +125,10 @@ namespace YonMobilya.Class
                 da.Fill(dt);
                 if (dt != null)
                 {
-                    return dt.Rows[0][0].ToString();
+                    if (dt.Rows.Count > 0)
+                        return dt.Rows[0][0].ToString();
+                    else
+                        return null;
                 }
                 else
                 {

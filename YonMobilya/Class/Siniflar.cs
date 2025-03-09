@@ -94,6 +94,7 @@ namespace YonMobilya.Class
             public string SONAME { get; set; }
             public string DIVVAL { get; set; }
             public string SOADMIN { get; set; }
+            public string CURCHDISCRATE { get; set; }
         }
 
         public class SmstokenObj

@@ -21,6 +21,7 @@ namespace YonMobilya
         public static string ConnectionString = "Server=192.168.4.24;Database=VDB_YON01;User Id=sa;Password=MagicUser2023!;";
         SqlConnection sql = new SqlConnection(ConnectionString);
         CultureInfo culture = new CultureInfo("tr-TR");
+        public static double Oran;
         protected void Page_Load(object sender, EventArgs e)
         {
             if (!IsPostBack)
@@ -28,6 +29,7 @@ namespace YonMobilya
                 var loginRes = (List<LoginObj>)Session["Login"];
                 if (loginRes != null)
                 {
+                    Oran = double.Parse(loginRes[0].CURCHDISCRATE) / 100;
                     LoadEventCounts();
                     BindGrid();
                     //Convert.ToDateTime(dataTable.Rows[0]["Tarih"].ToString()).ToString("dd MMMM yyyy", new CultureInfo("tr-TR")) + " Tarihli Güncelleme";
@@ -68,8 +70,8 @@ namespace YonMobilya
                 {
                     magaza = loginRes[0].DIVVAL.ToString();
                 }
-                string q = String.Format(@"select count(adet) as Toplamadet, sum(tutar) as Toplamtutar from (
-                select distinct Convert(varchar(50),MB_SALID) as adet, sum(PRLPRICE) as tutar from MDE_GENEL..MB_Islemler
+                string q = String.Format(@"select count(adet) as Toplamadet, isnull(sum(tutar),0) as Toplamtutar from (
+                select distinct Convert(varchar(50),MB_SALID) as adet, sum(MB_SellAmount) as tutar from MDE_GENEL..MB_Islemler
 				inner join CUSDELIVER T on MB_SALID = CDRSALID and CDRORDCHID = MB_ORDCHID
                 outer apply (select PRLPRICE from PRICELIST prl where prl.PRLPROID = MB_PROID and PRLDPRID = 740) as pesinfiyat
                 where MB_Tamamlandi = 0 and MB_SALID != 0 and MB_SUPCURVAL = 'T003387' and CDRSHIPVAL = 'ANTMOB' 
@@ -77,7 +79,7 @@ namespace YonMobilya
                 and MB_PlanTarih between '{1}' and '{2}'
                 group by MB_SALID
                 union
-                select outd.DIVNAME as ISTEYEN,sum(PRLPRICE) as TUTAR
+                select outd.DIVNAME as ISTEYEN,sum(MB_SellAmount) as TUTAR
                             from PRODEMAND 
                             left outer join PRODUCTS on PROID = PRDEPROID
                             left outer join DEFSTORAGE outs on outs.DSTORID = PRDEDSTORIDOUT
@@ -90,14 +92,14 @@ namespace YonMobilya
                             and MB_SUPCURVAL = '{0}'
                             and MB_PlanTarih between '{1}' and '{2}'
                             group by outd.DIVVAL,outd.DIVNAME,MB_PlanTarih,ind.DIVNAME) sonuc", loginRes[0].CURVAL,startdate,enddate);
-                string qq = String.Format(@"select count(adet) as Toplamadet, sum(tutar) as Toplamtutar from (
-                select distinct Convert(varchar(50),MB_SALID) as adet, sum(PRLPRICE) as tutar from MDE_GENEL..MB_Islemler
+                string qq = String.Format(@"select count(adet) as Toplamadet, isnull(sum(tutar),0) as Toplamtutar from (
+                select distinct Convert(varchar(50),MB_SALID) as adet, sum(MB_SellAmount) as tutar from MDE_GENEL..MB_Islemler
                 outer apply (select PRLPRICE from PRICELIST prl where prl.PRLPROID = MB_PROID and PRLDPRID = 740) as pesinfiyat
                 where MB_Tamamlandi = 1 and MB_SALID != 0 and MB_SUPCURVAL = '{0}'
                 and MB_PlanTarih between '{1}' and '{2}'
                 group by MB_SALID
                 union
-                select outd.DIVNAME as ISTEYEN,sum(PRLPRICE) as TUTAR
+                select outd.DIVNAME as ISTEYEN,sum(MB_SellAmount) as TUTAR
                             from PRODEMAND 
                             left outer join PRODUCTS on PROID = PRDEPROID
                             left outer join DEFSTORAGE outs on outs.DSTORID = PRDEDSTORIDOUT
@@ -106,7 +108,7 @@ namespace YonMobilya
                             left outer join DIVISON ind on ind.DIVVAL = outs.DSTORDIVISON
 			                inner join MDE_GENEL.dbo.MB_Islemler on MB_ORDCHID = PRDEID
                             outer apply (select PRLPRICE from PRICELIST prl where prl.PRLPROID = PROID and PRLDPRID = 740) as pesinfiyat
-                            where PRDESTS = 0 and PRDEKIND= 1 and MB_Tamamlandi = 1 
+                            where MB_Tamamlandi = 1 
                             and MB_SUPCURVAL = '{0}'
                             and MB_PlanTarih between '{1}' and '{2}'
                             group by outd.DIVVAL,outd.DIVNAME,MB_PlanTarih,ind.DIVNAME) sonuc", loginRes[0].CURVAL,startdate,enddate);
@@ -145,7 +147,7 @@ namespace YonMobilya
                     double ciro = 0;
                     ciro = double.Parse(dt.Rows[0]["Toplamtutar"].ToString());
                     bekleyenciro.InnerText = ciro.ToString("C", new CultureInfo("tr-TR"));
-                    bekleyenhakedis.InnerText = (ciro * 0.08).ToString("C", new CultureInfo("tr-TR"));
+                    bekleyenhakedis.InnerText = (ciro * Oran).ToString("C", new CultureInfo("tr-TR"));
                     //bekleyenadet.InnerText = dt.Rows.Count.ToString();
                     //double ciro = 0;
                     //for (int i = 0; i < dt.Rows.Count; i++)
@@ -169,7 +171,7 @@ namespace YonMobilya
                     double ciro2 = 0;
                     ciro2 = double.Parse(dt2.Rows[0]["Toplamtutar"].ToString());
                     tamamalananciro.InnerText = ciro2.ToString("C", new CultureInfo("tr-TR"));
-                    tamamlananhakedis.InnerText = (ciro2 * 0.08).ToString("C", new CultureInfo("tr-TR"));
+                    tamamlananhakedis.InnerText = (ciro2 * Oran).ToString("C", new CultureInfo("tr-TR"));
                     //tamamlananadet.InnerText = dt2.Rows.Count.ToString();
                     //double ciro2 = 0;
                     //for (int i = 0; i < dt2.Rows.Count; i++)

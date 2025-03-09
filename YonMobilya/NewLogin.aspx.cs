@@ -44,13 +44,14 @@ namespace YonMobilya
         {
             string q = string.Format(@"select * from (
             select CURVAL, SOCODE as SOCODE,SOENTERKEY as SOPAS,SONAME + ' ' +SOSURNAME as SONAME, STRING_AGG(POTNOTES1,',') as DIVVAL,
-			CASE WHEN OFFCURPOSITION = 'MONTAJCI' THEN 0 ELSE 1 END AS SOADMIN
+			CASE WHEN OFFCURPOSITION = 'MONTAJCI' THEN 0 ELSE 1 END AS SOADMIN,CURCHDISCRATE
 			from OFFICALCUR WITH (NOLOCK)
-            LEFT OUTER JOIN CURRENTS WITH (NOLOCK)   ON CURID = OFFCURCURID
+            LEFT OUTER JOIN CURRENTS WITH (NOLOCK) ON CURID = OFFCURCURID
+            LEFT OUTER JOIN CURRENTSCHILD WITH (NOLOCK) ON CURID = CURCHID
             LEFT OUTER JOIN SOCIAL WITH (NOLOCK) ON SOCURID = CURID AND 'TT-' + CAST(OFFCURID AS VARCHAR(4)) =  SOCODE
             left outer join POTENCY on POTDEPART = SOCODE and POTSTS = 1 and POTNOTES1 != '00'
             where CURSTS = 1 and SODEPART  in ('027','003')
-            group by CURVAL,SOCODE,SOENTERKEY,SONAME,SOSURNAME,OFFCURPOSITION            
+            group by CURVAL,SOCODE,SOENTERKEY,SONAME,SOSURNAME,OFFCURPOSITION,CURCHDISCRATE
             ) net
             where SOCODE = '{0}' and SOPAS = '{1}'", uname.Value, pwd.Value);
             var sonuc = DbQuery.Query(q, ConnectionString).DataTableToList<LoginObj>();
@@ -61,7 +62,7 @@ namespace YonMobilya
                 string Sorgu = "select MTFTPIP as VolFtpHost,MTFTPUSER as VolFtpUser,MTFTPPASSWORD as VolFtpPass from MANAGEMENT";
                 var ftp = DbQuery.Query(Sorgu, ConnectionString).DataTableToList<Ftp>();
                 Session.Add("FTP", ftp);
-                Session.Add("DIVNAME", "");
+                Session.Add("DIVNAME", "");                
                 if (sonuc[0].SOADMIN == "1")
                 {
                     Response.Redirect("frmAnaSayfa.aspx");

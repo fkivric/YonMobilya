@@ -28,6 +28,7 @@ namespace YonMobilya
         SqlConnection sql = new SqlConnection(ConnectionString);
         SqlConnection sql2 = new SqlConnection(ConnectionString);
         HttpClient httpClient = new HttpClient();
+        public static double Oran;
 
         public static string SmsUrl = "https://restapi.ttmesaj.com/";
         public static string SmsToken = "";
@@ -38,6 +39,7 @@ namespace YonMobilya
                 var loginRes = (List<LoginObj>)Session["Login"];
                 if (loginRes != null)
                 {
+                    Oran = double.Parse(loginRes[0].CURCHDISCRATE)/100;
                     ScriptManager.RegisterStartupScript(this, GetType(), "showLoading", "showLoading();", true);
                     StartDate.Value = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1).ToString("yyyy-MM-dd");
                     EndDate.Value = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1).AddMonths(1).AddDays(-1).ToString("yyyy-MM-dd");
@@ -179,7 +181,7 @@ namespace YonMobilya
                 ciro = ciro + double.Parse(dt.Rows[i]["PRLPRICE"].ToString());
             }
             toplamciro.InnerText = ciro.ToString("C", new CultureInfo("tr-TR"));
-            hakedis.InnerText = (ciro * 0.08).ToString("C", new CultureInfo("tr-TR"));
+            hakedis.InnerText = (ciro * Oran).ToString("C", new CultureInfo("tr-TR"));
 
             //Page.ClientScript.RegisterStartupScript(
             //    this.GetType(),
@@ -221,7 +223,7 @@ select distinct Convert(varchar(50),MB_SALID) as MB_SALID,MB_ORDCHID,MB_PlanTari
                 ciro = ciro + double.Parse(dt.Rows[i]["PRLPRICE"].ToString());
             }
             tamamalananciro.InnerText = ciro.ToString("C", new CultureInfo("tr-TR"));
-            tamamlananhakedis.InnerText = (ciro * 0.08).ToString("C", new CultureInfo("tr-TR"));
+            tamamlananhakedis.InnerText = (ciro * Oran).ToString("C", new CultureInfo("tr-TR"));
         }
         protected void Musteri_SelectedIndexChanged(object sender, EventArgs e)
         {
@@ -413,6 +415,7 @@ select distinct Convert(varchar(50),MB_SALID) as MB_SALID,MB_ORDCHID,MB_PlanTari
                             if (kayitli != null)
                             {
                                 var PlanTarih = customerDATE.Value.ToString();
+                                var tutar = Musteri.Rows[row.RowIndex].Cells[4].Text;
                                 DbQuery.insertquery($"update MDE_GENEL.dbo.MB_Islemler set MB_PlanTarih = '{PlanTarih}', MB_Ekleyen = '{Montajci.SelectedValue}' where MB_ID = {kayitli}", ConnectionString);
                             }
                             else
@@ -529,8 +532,6 @@ select distinct Convert(varchar(50),MB_SALID) as MB_SALID,MB_ORDCHID,MB_PlanTari
                 }
                 catch (Exception)
                 {
-
-                    throw;
                 }
             }
             else

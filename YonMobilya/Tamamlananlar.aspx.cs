@@ -30,6 +30,7 @@ namespace YonMobilya
         public static string ORDCHID = "";
         public static string PRONAME = "";
         public static string PROID = "";
+        public static double Oran = 0;
         protected void Page_Load(object sender, EventArgs e)
         {
             if (!IsPostBack)
@@ -37,6 +38,7 @@ namespace YonMobilya
                 var loginRes = (List<LoginObj>)Session["Login"];
                 if (loginRes != null)
                 {
+                    Oran = double.Parse(loginRes[0].CURCHDISCRATE) / 100;
                     StartDate.Value = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1).ToString("yyyy-MM-dd");
                     EndDate.Value = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1).AddMonths(1).AddDays(-1).ToString("yyyy-MM-dd");
                     ScriptManager.RegisterStartupScript(this, GetType(), "showLoading", "showLoading();", true);

@@ -15,6 +15,7 @@ namespace YonMobilya
     {
         public static string ConnectionString = "Server=192.168.4.24;Database=VDB_YON01;User Id=sa;Password=MagicUser2023!;";
         SqlConnection sql = new SqlConnection(ConnectionString);
+        public static double Oran = 0;
         protected void Page_Load(object sender, EventArgs e)
         {
             if (!IsPostBack)
@@ -22,6 +23,7 @@ namespace YonMobilya
                 var loginRes = (List<LoginObj>)Session["Login"];
                 if (loginRes != null)
                 {
+                    Oran = double.Parse(loginRes[0].CURCHDISCRATE) / 100;
                     sorgu1();
                     secililiste.Visible = false;
                     GorevAta.Visible = false;
